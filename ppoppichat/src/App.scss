@@ -1,0 +1,22 @@
+#root,
+body,
+html,
+#app {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+#home-navbar {
+  position: absolute;
+}
+
+.app-page {
+  width: 100vw;
+  height: 100vh;
+}
+
+.home-navbar.navbar-button {
+  background: red;
+}
