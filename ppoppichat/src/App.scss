@@ -1,3 +1,5 @@
+@import "./variables.scss";
+
 #root,
 body,
 html,
@@ -17,6 +19,46 @@ html,
   height: 100vh;
 }
 
-.home-navbar.navbar-button {
-  background: red;
+.navbar-button {
+  text-decoration: none;
+  * {
+    transition: color 1s;
+  }
+  white-space: nowrap;
+  :link {
+    color: none;
+  }
+  :visited {
+    color: none;
+  }
+  :hover {
+    color: none;
+  }
+  :active {
+    color: none;
+  }
+  position: absolute;
+  top: calcvw(70);
+
+  &#home {
+    left: calcvw(80);
+  }
+  &#download {
+    left: calcvw(490);
+  }
+  &#contact {
+    left: calcvw(720);
+  }
+  &#story {
+    left: calcvw(960);
+  }
+  &#login {
+    left: calcvw(1630);
+  }
+
+  .navbar-button-inner {
+    font-family: $font-fredoka;
+    font-size: calcvw(30);
+    color: black;
+  }
 }

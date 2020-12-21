@@ -1,4 +1,42 @@
-$hunter-green: #3a5a40;
-$oxford-blue: #001b2e;
-$glaucous: #5f7fb3;
-$light-blue: #a5b7d4;
+//set css variables
+:root {
+    --hunter-green: #3a5a40;
+    --oxford-blue: #001b2e;
+    --glaucous: #5f7fb3;
+    --light-blue: #a5b7d4;
+
+    --actor: "Actor", sans-serif;
+    --varela: "Varela Round", sans-serif;
+    --fredoka: "Fredoka One", cursive;
+}
+//then call css variables as css variables
+$hunter-green: var(--hunter-green);
+$oxford-blue: var(--oxford-blue);
+$glaucous: var(--glaucous);
+$light-blue: var(--light-blue);
+
+$font-actor: var(--actor);
+$font-varela: var(--varela);
+$font-fredoka: var(--fredoka);
+
+@function calcvw($pxvalue) {
+    @return (1vw * ($pxvalue / 19.2));
+}
+
+@mixin calcpos($x, $y) {
+    left: calcvw($x);
+    top: calcvw($y);
+}
+@mixin calcWidthHeight($width, $height) {
+    width: calcvw($width);
+    height: calcvw($height);
+}
+@mixin calcall($x, $y, $width, $height) {
+    @include calcpos($x, $y);
+    @include calcWidthHeight($width, $height);
+}
+@mixin center($width, $height) {
+    left: 50vw;
+    top: 50vh;
+    transform: translate(-1px * $width/2, -1px * $height/2);
+}

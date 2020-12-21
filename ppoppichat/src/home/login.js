@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { useHistory } from "react-router-dom";
 import firebase from './fire'
 
 import './login.scss';
@@ -7,7 +7,23 @@ import './login.scss';
 //import { useAuthState } from 'react-firebase-hooks/auth';
 
 
+function EnterButton(props) {
+    //const isLoggedIn = props.isLoggedIn;
+    let history = useHistory();
+    if ('signed in, click to sign out' === props.isLoggedIn) {
+        return (
 
+            <button
+                onClick={function () {
+                    history.push("/ppoppi");
+                }}
+            >
+                heloo click to enter!!
+            </button>
+        )
+    }
+    return null;
+}
 export class Login extends React.Component {
 
     constructor(props) {
@@ -27,7 +43,7 @@ export class Login extends React.Component {
             // The signed-in user info.
             var user = result.user;
             // ...
-            console.log(token)
+            //console.log(token)
         }).catch(function (error) {
             // Handle Errors here.
             var errorCode = error.code;
@@ -43,10 +59,12 @@ export class Login extends React.Component {
         this.setState({
             loginStatus: 'signing out'
         })
+        //reset login message
         firebase.auth().signOut().then(function () {
             this.setState({
-                loginStatus: 'not signed in',
-                onclick: this.opensigninpopup.bind(this)
+                loginStatus: 'not signed in, click to sign in',
+                onclick: this.opensigninpopup.bind(this),
+                message: 'pls log in >:))'
             })
         }).catch(function (error) {
             // An error happened.
@@ -55,22 +73,23 @@ export class Login extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.provider)
+        //console.log(this.provider)
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-                console.log(user.email)
+                //console.log(user)
                 // User is signed in.   
                 this.setState({
                     loginStatus: 'signed in, click to sign out',
-                    onclick: this.signout.bind(this)
+                    onclick: this.signout.bind(this),
+                    message: 'Hello owo ' + user.displayName
                 })
             } else {
-                console.log('not signed in')
                 // No user is signed in.
                 //this.onclick = this.openpopup
                 this.setState({
                     loginStatus: 'not signed in',
-                    onclick: this.opensigninpopup.bind(this)
+                    onclick: this.opensigninpopup.bind(this),
+                    message: 'pls log in >:))'
                 })
             }
         }.bind(this));
@@ -85,11 +104,20 @@ export class Login extends React.Component {
         return (
 
             <div className="login app-page" >
-                <div
-                    onClick={this.state.onclick}
-                    id='placeholderbutton'>
-                    {this.state.loginStatus}
+                <div id='login-platform'>
+                    <span>
+                        {this.state.message}
+                    </span>
+                    <br />
+                    <span>these are placeholders.</span>
+                    <br />
+                    <button
+                        onClick={this.state.onclick}
+                    >{this.state.loginStatus}</button>
+                    <EnterButton isLoggedIn={this.state.loginStatus}></EnterButton>
+
                 </div>
+
             </div>
         )
     }

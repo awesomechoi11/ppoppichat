@@ -1,5 +1,13 @@
-#placeholderbutton {
-    width: 100px;
-    height: 100px;
-    background: red;
+@import "../variables.scss";
+
+#login-platform {
+    $width: 780;
+    $height: 570;
+    width: 1px * $width;
+    height: 1px * $height;
+    position: absolute;
+    @include center($width, $height);
+    background: $glaucous;
+    border-radius: 15px;
+    filter: drop-shadow(15px 15px $oxford-blue);
 }
