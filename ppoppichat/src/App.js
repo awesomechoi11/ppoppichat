@@ -43,9 +43,11 @@ const routes = [
 ];
 
 
-function App() {
 
-  const homenavbar =
+class App extends React.Component {
+
+
+  homenavbar =
     (
       <div id='home-navbar'>
 
@@ -64,32 +66,39 @@ function App() {
       </div>
     )
 
-  return (
-    <Router>
-      <div id='app'>
-        <Switch>
+
+  render() {
 
 
-          {routes.map((route, index) => (
+    return (
+      <Router>
+        <div id='app'>
+          <Switch>
 
-            <Route key={index} exact path={(route.path ? route.path : '/' + route.id)}>
-              <div>
 
-                {homenavbar}
-                {route.main}
-              </div>
+            {routes.map((route, index) => (
+
+              <Route key={index} exact path={(route.path ? route.path : '/' + route.id)}>
+                <div>
+
+                  {this.homenavbar}
+                  {route.main}
+                </div>
+              </Route>
+
+            ))}
+
+            <Route path='/ppoppi'>
+
+              <Ppoppi />
+
             </Route>
 
-          ))}
-
-          <Route path='/ppoppi'>
-            <Ppoppi />
-          </Route>
-
-        </Switch>
-      </div>
-    </Router>
-  );
+          </Switch>
+        </div>
+      </Router>
+    )
+  }
 }
 
 export default App;

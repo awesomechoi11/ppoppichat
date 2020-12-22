@@ -24,11 +24,12 @@ function EnterButton(props) {
     }
     return null;
 }
+
 export class Login extends React.Component {
 
     constructor(props) {
         super(props)
-
+        //console.log(this.context)
         this.provider = new firebase.auth.GoogleAuthProvider();
         this.state = { loginStatus: 'loading' }
     }
@@ -43,7 +44,7 @@ export class Login extends React.Component {
             // The signed-in user info.
             var user = result.user;
             // ...
-            //console.log(token)
+            console.log(firebase)
         }).catch(function (error) {
             // Handle Errors here.
             var errorCode = error.code;
@@ -73,7 +74,6 @@ export class Login extends React.Component {
     }
 
     componentDidMount() {
-        //console.log(this.provider)
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
                 //console.log(user)
@@ -122,5 +122,4 @@ export class Login extends React.Component {
         )
     }
 }
-
 

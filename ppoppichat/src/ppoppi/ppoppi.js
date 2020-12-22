@@ -2,31 +2,53 @@ import React from 'react';
 
 import './ppoppi.scss';
 
-
+import firebase from '../home/fire'
 
 import { Panel } from './sidebar/panel';
 import { Main } from './main/main';
 
-
-import {
-    Switch,
-    Route,
-
-} from "react-router-dom";
-
-
-//check if logged in,
-//redirect to login page if not logged in
-
-function SidebarButton() {
-
-}
+import placeholderPicture from './poppi.png'
 
 
 export class Ppoppi extends React.Component {
 
+    constructor() {
+        super()
+        this.state = {
+            userName: 'loading...',
+            userStatus: 'status-offline',
+            userPicture: placeholderPicture
+        }
 
+    }
 
+    componentDidMount() {
+        //check if logged in,
+        //redirect to login page if not logged in
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+
+                console.log(user)
+                //console.log(user)
+                // User is signed in.   
+                this.setState({
+                    userName: user.displayName,
+                    userStatus: 'status-online',
+                    userPicture: user.photoURL
+                })
+
+            } else {
+                //redirect to login page if not logged in
+                let loc = new URL(window.location);
+                loc = loc.origin
+                window.location = loc + '/login'
+            }
+        }.bind(this));
+    }
+
+    redirecthome() {
+
+    }
 
     render() {
         return (
@@ -34,17 +56,17 @@ export class Ppoppi extends React.Component {
             <div id='ppoppi-wrapper' className="" >
                 <div id='sidebar'>
                     <div id='main-user-wrapper'>
-                        <div id='user-status' className='status-online'></div>
+                        <div id='user-status' className={this.state.userStatus}></div>
 
-                        <image
+                        <img
                             id='user-picture'
-                        //src={this.props.i}
+                            src={this.state.userPicture}
                         >
 
-                        </image>
+                        </img>
 
                         <div id='user-name'>
-                            PPoPPstar132
+                            {this.state.userName}
                         </div>
                     </div>
                     <div id='channels-wrapper'>

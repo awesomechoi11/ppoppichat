@@ -8,23 +8,30 @@ import {
 
 import './main.scss'
 
+import './watch/watch'
+import { Watch } from "./watch/watch";
+
 const mainroutes = [
     {
         id: "watch",
         path: '/watch',
+        page: <Watch></Watch>
 
     },
     {
         id: "notification",
         path: '/notifications',
+        page: <div>123</div>
     },
     {
         id: "friends",
         path: '/friends',
+        page: <div>123</div>
     },
     {
         id: "settings",
         path: '/settings',
+        page: <div>123</div>
     },
 ];
 
@@ -40,7 +47,7 @@ function Main() {
                 {mainroutes.map((item, index) => (
 
                     <Route key={index} path={url + item.path}>
-                        <div id={item.id}>{item.id}</div>
+                        <div id={item.id}>{item.page}</div>
 
                     </Route>
                 ))}
