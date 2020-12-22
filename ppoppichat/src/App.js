@@ -18,12 +18,12 @@ const routes = [
     id: "home",
     text: 'PPoPPi',
     path: '/',
-    main: () => <div>123</div>
+    main: <div>home page</div>
   },
   {
     id: "download",
     text: 'download',
-    main: <div>download</div>
+    main: <div>download</div>,
   },
   {
     id: "contact",
@@ -45,6 +45,25 @@ const routes = [
 
 function App() {
 
+  const homenavbar =
+    (
+      <div id='home-navbar'>
+
+        {routes.map((route, index) => (
+          <Link
+            key={index}
+            id={route.id}
+            className='navbar-button'
+            to={(route.path ? route.path : '/' + route.id)}
+          >
+            <div className='navbar-button-inner'>
+              {route.text}
+            </div>
+          </Link>
+        ))}
+      </div>
+    )
+
   return (
     <Router>
       <div id='app'>
@@ -54,27 +73,16 @@ function App() {
           {routes.map((route, index) => (
 
             <Route key={index} exact path={(route.path ? route.path : '/' + route.id)}>
-              <div id='home-navbar'>
+              <div>
 
-                {routes.map((route, index) => (
-                  <Link
-                    key={index}
-                    id={route.id}
-                    className='navbar-button'
-                    to={(route.path ? route.path : '/' + route.id)}
-                  >
-                    <div className='navbar-button-inner'>
-                      {route.text}
-                    </div>
-                  </Link>
-                ))}
+                {homenavbar}
+                {route.main}
               </div>
-              {route.main}
             </Route>
 
           ))}
 
-          <Route exact path='ppoppi'>
+          <Route path='/ppoppi'>
             <Ppoppi />
           </Route>
 
