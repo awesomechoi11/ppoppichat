@@ -16,10 +16,10 @@ $sidebar-width: 310px;
 }
 #main-wrapper {
     width: calc(100% - #{$sidebar-width});
-    background: blue;
 }
 .divider {
     width: 95%;
+    margin: 0 auto 0 auto;
     border: 0;
     border-bottom: 1px solid $glaucous;
 }
@@ -72,4 +72,10 @@ $sidebar-width: 310px;
     margin: 0 5px 0 5px;
     background: $light-blue;
     border-radius: 10px 10px 0 0;
+}
+
+#topbar {
+    height: 48px;
+    width: 100%;
+    background: $glaucous;
 }

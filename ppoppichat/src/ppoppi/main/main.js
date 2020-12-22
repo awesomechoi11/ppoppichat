@@ -6,6 +6,8 @@ import {
     useParams,
 } from "react-router-dom";
 
+import './main.scss'
+
 const mainroutes = [
     {
         id: "watch",
@@ -17,13 +19,13 @@ const mainroutes = [
         path: '/notifications',
     },
     {
+        id: "friends",
+        path: '/friends',
+    },
+    {
         id: "settings",
         path: '/settings',
     },
-    {
-        id: "friends",
-        path: '/friends',
-    }
 ];
 
 function Main() {
@@ -38,7 +40,7 @@ function Main() {
                 {mainroutes.map((item, index) => (
 
                     <Route key={index} path={url + item.path}>
-                        <div>{item.id}</div>
+                        <div id={item.id}>{item.id}</div>
 
                     </Route>
                 ))}
