@@ -13,23 +13,23 @@ import { Watch } from "./watch/watch";
 
 const mainroutes = [
     {
-        id: "watch",
+        id: "watch-wrapper",
         path: '/watch',
-        page: <Watch></Watch>
+        page: <Watch ></Watch>
 
     },
     {
-        id: "notification",
+        id: "notification-wrapper",
         path: '/notifications',
         page: <div>123</div>
     },
     {
-        id: "friends",
+        id: "friends-wrapper",
         path: '/friends',
         page: <div>123</div>
     },
     {
-        id: "settings",
+        id: "settings-wrapper",
         path: '/settings',
         page: <div>123</div>
     },
@@ -39,7 +39,7 @@ function Main() {
     const defaultPage = '/watch'
     let { path, url } = useRouteMatch();
     //let url = '/ppoppi'
-    console.log(path, url)
+    //console.log(path, url)
     return (
 
         <div id='main-inner'>

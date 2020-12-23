@@ -33,6 +33,7 @@ $sidebar-width: 310px;
     height: 41px;
     padding-top: 17px;
     padding-bottom: 17px;
+
     #user-picture {
         width: 36px;
         height: 36px;
@@ -67,6 +68,21 @@ $sidebar-width: 310px;
         background: rgb(177, 75, 180);
     }
 }
+
+#status-message {
+    height: 28px;
+    border-radius: 22px;
+    background: #5371a1;
+    color: var(--oxford-blue);
+    font-family: var(--fredoka);
+    text-align: left;
+    display: flex;
+    padding: 0 12px;
+    margin: 0 10px 15px 10px;
+    align-content: center;
+    line-height: 150%;
+}
+
 #channels-wrapper {
     height: calc(100% - 75px);
     margin: 0 5px 0 5px;

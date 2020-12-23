@@ -21,6 +21,7 @@ export class Ppoppi extends React.Component {
             userStatus: 'status-offline',
             userPicture: placeholderPicture
         }
+        this.handleSignIn = handleSignIn.bind(this)
 
     }
 
@@ -32,7 +33,7 @@ export class Ppoppi extends React.Component {
                 // User is signed in.   
 
                 this.db = firebase.firestore();
-                handleSignIn()
+                this.handleSignIn(user)
 
             } else {
                 //redirect to login page if not logged in
@@ -64,6 +65,12 @@ export class Ppoppi extends React.Component {
                         <div id='user-name'>
                             {this.state.userName}
                         </div>
+                    </div>
+                    <div id='status-message'>
+
+
+                        {this.state.statusMessage}
+
                     </div>
                     <div id='channels-wrapper'>
                         <div id='channels-panel-wrapper'>
