@@ -6,9 +6,11 @@ import firebase from '../home/fire'
 
 import { Panel } from './sidebar/panel';
 import { Main } from './main/main';
+import { Channels } from './sidebar/channels';
 
 import placeholderPicture from './poppi.png'
-
+import { handleSignIn } from './firebaseFunctions'
+const FireContext = React.createContext(firebase);
 
 export class Ppoppi extends React.Component {
 
@@ -27,15 +29,10 @@ export class Ppoppi extends React.Component {
         //redirect to login page if not logged in
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
-
-                console.log(user)
-                //console.log(user)
                 // User is signed in.   
-                this.setState({
-                    userName: user.displayName,
-                    userStatus: 'status-online',
-                    userPicture: user.photoURL
-                })
+
+                this.db = firebase.firestore();
+                handleSignIn()
 
             } else {
                 //redirect to login page if not logged in
@@ -44,11 +41,9 @@ export class Ppoppi extends React.Component {
                 window.location = loc + '/login'
             }
         }.bind(this));
-    }
-
-    redirecthome() {
 
     }
+
 
     render() {
         return (
@@ -60,6 +55,7 @@ export class Ppoppi extends React.Component {
 
                         <img
                             id='user-picture'
+                            alt='User profile'
                             src={this.state.userPicture}
                         >
 
@@ -74,8 +70,11 @@ export class Ppoppi extends React.Component {
                             <Panel />
                         </div>
                         <hr className='divider'></hr>
-                        <div id='channels'>
-                            dsa
+                        <div id='channels-wrapper'>
+
+                            <Channels channels={this.state.channels} />
+
+
                         </div>
                     </div>
                 </div>

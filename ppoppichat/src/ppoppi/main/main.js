@@ -3,7 +3,7 @@ import {
     Route,
     Switch,
     Redirect,
-    useParams,
+
 } from "react-router-dom";
 
 import './main.scss'
@@ -36,9 +36,10 @@ const mainroutes = [
 ];
 
 function Main() {
-
+    const defaultPage = '/watch'
     let { path, url } = useRouteMatch();
     //let url = '/ppoppi'
+    console.log(path, url)
     return (
 
         <div id='main-inner'>
@@ -51,6 +52,10 @@ function Main() {
 
                     </Route>
                 ))}
+                <Route exact path={url}>
+                    <Redirect to={path + defaultPage} />
+                </Route>
+
             </Switch>
         </div >
     )
