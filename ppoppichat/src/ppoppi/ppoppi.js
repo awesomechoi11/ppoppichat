@@ -14,9 +14,12 @@ const FireContext = React.createContext(firebase);
 
 export class Ppoppi extends React.Component {
 
+    //this.unsubUserInfo function to close subscription to user info updates
+
     constructor() {
         super()
         this.state = {
+            loggedIn: false,
             userName: 'loading...',
             userStatus: 'status-offline',
             userPicture: placeholderPicture
@@ -34,7 +37,7 @@ export class Ppoppi extends React.Component {
 
                 this.db = firebase.firestore();
                 this.handleSignIn(user)
-                    .then(this.listenToUserInfo(user))
+                    .then(this.unsubUserInfo = this.listenToUserInfo(user))
 
             } else {
                 //redirect to login page if not logged in
@@ -90,7 +93,7 @@ export class Ppoppi extends React.Component {
                     <div id='topbar'>
 
                     </div>
-                    <Main></Main>
+                    <Main loggedin={this.state.loggedIn} ></Main>
                 </div>
             </div>
         )

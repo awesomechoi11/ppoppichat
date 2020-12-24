@@ -3,12 +3,12 @@ import firebase from "firebase/app"
 //when connected to this url
 //fetch from firebase 
 import placeholderPicture from './unknown.png'
-import { useCollection } from 'react-firebase-hooks/firestore';
-
+import { useDocument } from 'react-firebase-hooks/firestore';
+import { getUserfromRef } from '../../firebaseFunctions'
 import {
     useParams
 } from "react-router-dom";
-
+import React, { useState, useEffect } from 'react';
 
 
 const membersDivider = (
@@ -40,48 +40,72 @@ const plusSvg = (
 function Watch(props) {
     let { videoRoom } = useParams();
     console.log(videoRoom)
-    const [value, loading, error] = useCollection(
-        firebase.firestore().collection('chats'),
+    //set a listener for watchroom
+
+    const [value, loading, error] = useDocument(
+        //firebase.firestore().doc('videorooms/' + videoRoom),
+        firebase.firestore().doc('videorooms/8Pj3RI1MteLxUzEFiCu3'),
         {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
     );
+    /*
+    
+                    <span>
+                    Collection:{' '}
+                    {value.docs.map(doc => (
+                        <div key={doc.id}>
+                            {console.log(doc.data().channel.path)}
+                        </div>
+                    ))}
+                </span>
+    */
     return (
 
         <div id='watch-inner'>
-            <div className='video-room-sidebar'>
-                <div className='title-wrapper'> bchoisters video room</div>
-                <div className='members-wrapper'>
-                    <div className='members-divider video-room-sidebar-divider'>
-                        {membersDivider}
-                        {plusSvg}
-                    </div>
-                    <div className='members-list'>
-                        {error && <strong>Error: {JSON.stringify(error)}</strong>}
-                        {loading && <span>Loading...</span>}
-                        {value && (
-                            <span>
-                                Collection:{' '}
-                                {value.docs.map(doc => (
-                                    <div key={doc.id}>
-                                        {console.log(doc.data().channel.path)}
-                                    </div>
-                                ))}
-                            </span>
-                        )}
-                        <MemberItem></MemberItem>
-                    </div>
-                </div>
-                <div className='queue-wrapper'>
-                    <div className='queue-divider video-room-sidebar-divider'>
-                        {queueDivider}
-                        {plusSvg}
-                    </div>
-                    <div className='queue-list'>
+            {loading && <span>Loading...</span>}
+            {error && <strong>Error: {JSON.stringify(error)}</strong>}
 
+            {value && (
+                <div className='video-room-sidebar'>
+                    <div className='title-wrapper'> {value.data().roomName}</div>
+                    <div className='members-wrapper'>
+                        <div className='members-divider video-room-sidebar-divider'>
+                            {membersDivider}
+                            {plusSvg}
+                        </div>
+                        <div className='members-list'>
+                            {value.data().members.map((member, index) => (
+                                <div key={index}>
+                                    <MemberItem userRef={member}></MemberItem>
+                                </div>
+
+                            ))}
+
+                        </div>
+                    </div>
+                    <div className='queue-wrapper'>
+                        <div className='queue-divider video-room-sidebar-divider'>
+                            {queueDivider}
+                            {plusSvg}
+                        </div>
+                        <div className='queue-list'>
+                            {
+
+
+                                value.data().queue.map((url, index) => (
+                                    <div key={index}>
+                                        {url}
+                                    </div>
+
+                                ))
+
+
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
             <div className='video-room-media-wrapper'>
 
             </div>
@@ -92,13 +116,36 @@ function Watch(props) {
 export { Watch }
 
 
-function MemberItem() {
+function MemberItem(props) {
+    //firebase.firestore()
+    const [userData, setUserData] = useState(null);
 
+
+    useEffect(() => {    // Update the document title using the browser API    
+        //console.log(userData)
+        getUserfromRef(props.userRef)
+            .then(userDataa => {
+                setUserData(userDataa)
+                //console.log(userData)
+            })
+    });
+    var imgsrc = placeholderPicture
+    var username = 'Loading...'
+    if (userData === null) {
+        return (
+            <div className='member-item-wrapper'>
+                <img className='member-item-picture' src={placeholderPicture}></img>
+                <div className='member-item-name'>
+                    Loading...
+                </div>
+            </div>
+        )
+    }
     return (
         <div className='member-item-wrapper'>
-            <img className='member-item-picture' src={placeholderPicture}></img>
+            <img className='member-item-picture' src={userData.photoURL}></img>
             <div className='member-item-name'>
-                hellowoyo
+                {userData.nickname}
             </div>
         </div>
     )

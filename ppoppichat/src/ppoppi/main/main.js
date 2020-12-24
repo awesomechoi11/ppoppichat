@@ -35,28 +35,31 @@ const mainroutes = [
     },
 ];
 
-function Main() {
+function Main(props) {
     const defaultPage = '/watch'
     let { path, url } = useRouteMatch();
     //let url = '/ppoppi'
     //console.log(path, url)
+    console.log(props)
     return (
 
         <div id='main-inner'>
-            <Switch>
+            {props.loggedin &&
+                <Switch>
 
-                {mainroutes.map((item, index) => (
+                    {mainroutes.map((item, index) => (
 
-                    <Route key={index} path={url + item.path}>
-                        <div id={item.id}>{item.page('hello')}</div>
+                        <Route key={index} path={url + item.path}>
+                            <div id={item.id}>{item.page('hello')}</div>
 
+                        </Route>
+                    ))}
+                    <Route exact path={url}>
+                        <Redirect to={path + defaultPage} />
                     </Route>
-                ))}
-                <Route exact path={url}>
-                    <Redirect to={path + defaultPage} />
-                </Route>
 
-            </Switch>
+                </Switch>
+            }
         </div >
     )
 }

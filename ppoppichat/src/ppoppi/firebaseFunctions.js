@@ -15,7 +15,7 @@ function newUserDefaults(user) {
 }
 
 export function listenToUserInfo(user) {
-    this.db.collection("users").doc(user.uid)
+    return this.db.collection("users").doc(user.uid)
         .onSnapshot(function (doc) {
             var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
             console.log(source, " data: ", doc.data());
@@ -30,6 +30,16 @@ export function listenToUserInfo(user) {
         }.bind(this));
 }
 
+export async function getUserfromRef(userRef) {
+    let user = await userRef.get()
+    if (user.exists) {
+        return user.data()
+        //console.log(user.data())
+    } else {
+        console.error('user does not exist!!!')
+    }
+    //firebase.firestore().doc(userRef.path)
+}
 
 export async function handleSignIn(user) {
     let userdoc = this.db.collection("users").doc(user.uid)
@@ -44,7 +54,8 @@ export async function handleSignIn(user) {
                 userName: user.displayName,
                 userStatus: 'status-online',
                 userPicture: user.photoURL,
-                statusMessage: ''
+                statusMessage: '',
+                loggedIn: true,
             })
         } else {
             //set state with user info
@@ -57,7 +68,8 @@ export async function handleSignIn(user) {
                 userStatus: 'status-online',
                 userPicture: doc.data().photoURL,
                 statusMessage: doc.data().statusMessage,
-                'last-login': firebase.firestore.Timestamp.now()
+                'last-login': firebase.firestore.Timestamp.now(),
+                loggedIn: true,
             })
         }
     })
