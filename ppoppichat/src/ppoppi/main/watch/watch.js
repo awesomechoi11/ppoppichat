@@ -3,6 +3,12 @@ import firebase from "firebase/app"
 //when connected to this url
 //fetch from firebase 
 import placeholderPicture from './unknown.png'
+import { useCollection } from 'react-firebase-hooks/firestore';
+
+import {
+    useParams
+} from "react-router-dom";
+
 
 
 const membersDivider = (
@@ -22,16 +28,24 @@ const plusSvg = (
     <div className='sidebar-add-button'>
 
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path className='add-path' d="M15 9H3" stroke-width="3" stroke-linecap="round" />
-            <path className='add-path' d="M9 3V9V15" stroke-width="3" stroke-linecap="round" />
+            <path className='add-path' d="M15 9H3" strokeWidth="3" strokeLinecap="round" />
+            <path className='add-path' d="M9 3V9V15" strokeWidth="3" strokeLinecap="round" />
         </svg>
     </div>
 )
 
-function Watch() {
 
-    console.log(firebase)
-    //let url = '/ppoppi'
+
+
+function Watch(props) {
+    let { videoRoom } = useParams();
+    console.log(videoRoom)
+    const [value, loading, error] = useCollection(
+        firebase.firestore().collection('chats'),
+        {
+            snapshotListenOptions: { includeMetadataChanges: true },
+        }
+    );
     return (
 
         <div id='watch-inner'>
@@ -43,6 +57,18 @@ function Watch() {
                         {plusSvg}
                     </div>
                     <div className='members-list'>
+                        {error && <strong>Error: {JSON.stringify(error)}</strong>}
+                        {loading && <span>Loading...</span>}
+                        {value && (
+                            <span>
+                                Collection:{' '}
+                                {value.docs.map(doc => (
+                                    <div key={doc.id}>
+                                        {console.log(doc.data().channel.path)}
+                                    </div>
+                                ))}
+                            </span>
+                        )}
                         <MemberItem></MemberItem>
                     </div>
                 </div>

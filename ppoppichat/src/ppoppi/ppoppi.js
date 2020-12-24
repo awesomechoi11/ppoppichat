@@ -9,7 +9,7 @@ import { Main } from './main/main';
 import { Channels } from './sidebar/channels';
 
 import placeholderPicture from './poppi.png'
-import { handleSignIn } from './firebaseFunctions'
+import { handleSignIn, listenToUserInfo } from './firebaseFunctions'
 const FireContext = React.createContext(firebase);
 
 export class Ppoppi extends React.Component {
@@ -22,7 +22,7 @@ export class Ppoppi extends React.Component {
             userPicture: placeholderPicture
         }
         this.handleSignIn = handleSignIn.bind(this)
-
+        this.listenToUserInfo = listenToUserInfo.bind(this)
     }
 
     componentDidMount() {
@@ -34,6 +34,7 @@ export class Ppoppi extends React.Component {
 
                 this.db = firebase.firestore();
                 this.handleSignIn(user)
+                    .then(this.listenToUserInfo(user))
 
             } else {
                 //redirect to login page if not logged in

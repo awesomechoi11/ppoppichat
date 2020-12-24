@@ -14,24 +14,24 @@ import { Watch } from "./watch/watch";
 const mainroutes = [
     {
         id: "watch-wrapper",
-        path: '/watch',
-        page: <Watch ></Watch>
+        path: '/watch/:videoRoom',
+        page: (...props) => <Watch {...props} ></Watch>
 
     },
     {
         id: "notification-wrapper",
         path: '/notifications',
-        page: <div>123</div>
+        page: (...props) => <div>123</div>
     },
     {
         id: "friends-wrapper",
         path: '/friends',
-        page: <div>123</div>
+        page: (...props) => <div>123</div>
     },
     {
         id: "settings-wrapper",
         path: '/settings',
-        page: <div>123</div>
+        page: (...props) => <div>123</div>
     },
 ];
 
@@ -48,7 +48,7 @@ function Main() {
                 {mainroutes.map((item, index) => (
 
                     <Route key={index} path={url + item.path}>
-                        <div id={item.id}>{item.page}</div>
+                        <div id={item.id}>{item.page('hello')}</div>
 
                     </Route>
                 ))}

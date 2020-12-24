@@ -60,6 +60,7 @@
     height: 64px;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     .member-item-picture {
         width: 44px;
         height: 44px;
@@ -70,5 +71,6 @@
         font-size: 24px;
         width: 220px;
         height: 44px;
+        line-height: 175%;
     }
 }

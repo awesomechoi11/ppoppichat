@@ -14,6 +14,22 @@ function newUserDefaults(user) {
 
 }
 
+export function listenToUserInfo(user) {
+    this.db.collection("users").doc(user.uid)
+        .onSnapshot(function (doc) {
+            var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+            console.log(source, " data: ", doc.data());
+            var newstate = doc.data();
+            delete newstate['created']
+            delete newstate['last-login']
+            delete newstate['name']
+            //console.log(newstate)
+
+            this.setState(newstate)
+
+        }.bind(this));
+}
+
 
 export async function handleSignIn(user) {
     let userdoc = this.db.collection("users").doc(user.uid)
@@ -32,7 +48,7 @@ export async function handleSignIn(user) {
             })
         } else {
             //set state with user info
-            console.log('user found ', doc.data())
+            //console.log('user found ', doc.data())
             //set last login
             //set status
 
@@ -40,7 +56,8 @@ export async function handleSignIn(user) {
                 userName: doc.data().nickname ? doc.data().nickname : doc.data().displayName,
                 userStatus: 'status-online',
                 userPicture: doc.data().photoURL,
-                statusMessage: doc.data().statusMessage
+                statusMessage: doc.data().statusMessage,
+                'last-login': firebase.firestore.Timestamp.now()
             })
         }
     })
