@@ -12,6 +12,7 @@ import { Channels } from './sidebar/channels';
 import placeholderPicture from './poppi.png'
 import { handleSignIn, listenToUserInfo } from './firebaseFunctions'
 import { setUserOnline } from './presence';
+import { StatusMessage } from './statusmessage';
 
 
 
@@ -27,7 +28,8 @@ export class Ppoppi extends React.Component {
             loggedIn: false,
             userName: 'loading...',
             userStatus: 'status-offline',
-            userPicture: placeholderPicture
+            userPicture: placeholderPicture,
+            statusMessage: ''
         }
         this.handleSignIn = handleSignIn.bind(this)
         this.listenToUserInfo = listenToUserInfo.bind(this)
@@ -45,6 +47,8 @@ export class Ppoppi extends React.Component {
             if (user) {
                 // User is signed in.   
                 this.db = firebase.firestore();
+                this.userRef = this.db.collection('users').doc(user.uid)
+
                 this.handleSignIn(user)
                     .then(() => {
                         this.unsubUserInfo = this.listenToUserInfo(user)
@@ -88,8 +92,10 @@ export class Ppoppi extends React.Component {
                     </div>
                     <div id='status-message'>
 
+                        <StatusMessage userRef={this.userRef} >
+                            {this.state.statusMessage}
+                        </StatusMessage>
 
-                        {this.state.statusMessage}
 
                     </div>
                     <div id='channels-wrapper'>

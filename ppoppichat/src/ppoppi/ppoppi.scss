@@ -70,17 +70,29 @@ $sidebar-width: 310px;
 }
 
 #status-message {
-    height: 28px;
-    border-radius: 22px;
-    background: #5371a1;
-    color: var(--oxford-blue);
-    font-family: var(--fredoka);
-    text-align: left;
-    display: flex;
-    padding: 0 12px;
-    margin: 0 10px 15px 10px;
-    align-content: center;
-    line-height: 150%;
+    form {
+        &:focus {
+            border: red;
+        }
+    }
+    input {
+        height: 28px;
+        border-radius: 22px;
+        background: #5371a1;
+        color: var(--oxford-blue);
+        font-family: var(--fredoka);
+        text-align: left;
+        display: flex;
+        padding: 0 12px;
+        margin: 0 10px 15px 10px;
+        align-content: center;
+        line-height: 150%;
+        width: 84%;
+        &:focus {
+            border-color: $hunter-green;
+            outline: none;
+        }
+    }
 }
 
 #channels-wrapper {
