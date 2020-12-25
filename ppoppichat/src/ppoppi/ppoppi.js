@@ -8,8 +8,13 @@ import { Panel } from './sidebar/panel';
 import { Main } from './main/main';
 import { Channels } from './sidebar/channels';
 
+
 import placeholderPicture from './poppi.png'
 import { handleSignIn, listenToUserInfo } from './firebaseFunctions'
+import { setUserOnline } from './presence';
+
+
+
 const FireContext = React.createContext(firebase);
 
 export class Ppoppi extends React.Component {
@@ -26,6 +31,11 @@ export class Ppoppi extends React.Component {
         }
         this.handleSignIn = handleSignIn.bind(this)
         this.listenToUserInfo = listenToUserInfo.bind(this)
+
+
+        //connect to presence socket
+
+
     }
 
     componentDidMount() {
@@ -34,11 +44,12 @@ export class Ppoppi extends React.Component {
         firebase.auth().onAuthStateChanged(function (user) {
             if (user) {
                 // User is signed in.   
-
                 this.db = firebase.firestore();
                 this.handleSignIn(user)
                     .then(() => {
                         this.unsubUserInfo = this.listenToUserInfo(user)
+                    }).then(() => {
+                        setUserOnline(user.uid)
                     })
 
             } else {
@@ -51,6 +62,9 @@ export class Ppoppi extends React.Component {
 
     }
 
+    componentWillUnmount() {
+        this.unsubUserInfo()
+    }
 
     render() {
         return (

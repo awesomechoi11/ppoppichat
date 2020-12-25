@@ -60,15 +60,18 @@ function setDoc(docRef, obj) {
 export function listenToUserInfo(user) {
     return this.db.collection("users").doc(user.uid)
         .onSnapshot(function (doc) {
-            var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-            console.log(source, " data: ", doc.data());
-            var newstate = doc.data();
-            delete newstate['created']
-            delete newstate['last-login']
-            delete newstate['name']
-            //console.log(newstate)
+            if (doc) {
 
-            this.setState(newstate)
+                var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+                console.log(source, " data: ", doc.data());
+                var newstate = doc.data();
+                delete newstate['created']
+                delete newstate['last-login']
+                delete newstate['name']
+                //console.log(newstate)
+
+                this.setState(newstate)
+            }
 
         }.bind(this));
 }
@@ -86,7 +89,8 @@ export async function getUserfromRef(userRef) {
 
 export async function handleSignIn(user) {
     let userdoc = this.db.collection("users").doc(user.uid)
-    userdoc.get().then((doc) => {
+    console.log('signing in')
+    await userdoc.get().then((doc) => {
         if (!doc.exists) {
             console.log('user does not exist')
             //show new user screen
@@ -120,5 +124,6 @@ export async function handleSignIn(user) {
             })
         }
     })
+    console.log('user signed in')
 }
 
