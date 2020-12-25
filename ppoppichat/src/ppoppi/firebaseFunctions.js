@@ -1,4 +1,16 @@
 import firebase from '../home/fire'
+var db = firebase.firestore();
+
+//list of fields that can be editted
+const validUserFields = [
+    'nickname',
+    'photoURL',
+    'statusColor',
+    'statusMessage',
+    'userStatus',
+    'last-login',
+    'new'
+]
 
 function newUserDefaults(user) {
     return {
@@ -9,9 +21,22 @@ function newUserDefaults(user) {
         statusMessage: '',
         userStatus: 'status-online',
         created: firebase.firestore.Timestamp.now(),
-        'last-login': firebase.firestore.Timestamp.now()
+        'last-login': firebase.firestore.Timestamp.now(),
+        new: true
     }
 
+}
+
+function createVideoroom() {
+
+}
+
+function setDoc(docRef, obj) {
+    if (typeof obj !== 'object') {
+        console.error('setDoc failed, not a object', obj)
+        return
+    }
+    return docRef.set(obj)
 }
 
 export function listenToUserInfo(user) {

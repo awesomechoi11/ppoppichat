@@ -74,3 +74,29 @@
         line-height: 175%;
     }
 }
+
+.queue-item-wrapper {
+    height: 64px;
+
+    padding: 0px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    .queue-item-picture {
+        width: 60px;
+        height: 35px;
+    }
+    .queue-item-data {
+        width: 186px;
+        height: 35px;
+        font-family: $font-actor;
+        display: flex;
+        align-content: space-between;
+        flex-direction: column;
+        .queue-data-under {
+            font-family: $font-fredoka;
+            display: flex;
+            justify-content: space-between;
+        }
+    }
+}

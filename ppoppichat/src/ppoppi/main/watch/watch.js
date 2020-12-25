@@ -76,9 +76,9 @@ function Watch(props) {
                         </div>
                         <div className='members-list'>
                             {value.data().members.map((member, index) => (
-                                <div key={index}>
-                                    <MemberItem userRef={member}></MemberItem>
-                                </div>
+
+                                <MemberItem key={index} userRef={member}></MemberItem>
+
 
                             ))}
 
@@ -94,9 +94,7 @@ function Watch(props) {
 
 
                                 value.data().queue.map((url, index) => (
-                                    <div key={index}>
-                                        {url}
-                                    </div>
+                                    <QueueItem key={index} url={url} />
 
                                 ))
 
@@ -119,7 +117,6 @@ export { Watch }
 function MemberItem(props) {
     //firebase.firestore()
     const [userData, setUserData] = useState(null);
-
 
     useEffect(() => {    // Update the document title using the browser API    
         //console.log(userData)
@@ -150,4 +147,29 @@ function MemberItem(props) {
         </div>
     )
 
+}
+
+function QueueItem(props) {
+    //get youtube video information
+    //assumes all info is correct
+    return (
+        <div className='queue-item-wrapper'>
+            <img className='queue-item-picture'
+                src={placeholderPicture}
+            />
+            <div className='queue-item-data'>
+                <div className='queue-data-title'>
+                    puppy gon wildin'
+                </div>
+                <div className='queue-data-under'>
+                    <div className='queue-data-user'>
+                        added by bchoister
+                </div>
+                    <div className='queue-data-length'>
+                        3:21
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
 }
