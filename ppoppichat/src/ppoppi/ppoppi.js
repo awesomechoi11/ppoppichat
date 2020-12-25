@@ -37,7 +37,9 @@ export class Ppoppi extends React.Component {
 
                 this.db = firebase.firestore();
                 this.handleSignIn(user)
-                    .then(this.unsubUserInfo = this.listenToUserInfo(user))
+                    .then(() => {
+                        this.unsubUserInfo = this.listenToUserInfo(user)
+                    })
 
             } else {
                 //redirect to login page if not logged in
@@ -78,7 +80,9 @@ export class Ppoppi extends React.Component {
                     </div>
                     <div id='channels-wrapper'>
                         <div id='channels-panel-wrapper'>
-                            <Panel />
+                            <Panel
+                                videoroomID={this.state.videoroomID}
+                            />
                         </div>
                         <hr className='divider'></hr>
                         <div id='channels-wrapper'>

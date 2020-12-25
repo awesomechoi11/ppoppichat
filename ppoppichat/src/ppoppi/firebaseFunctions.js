@@ -27,10 +27,28 @@ function newUserDefaults(user) {
 
 }
 
-function createVideoroom() {
-
+function createVideoroom(userRef) {
+    //get user info then create video room with default settings
+    const videoroomRef = db.collection('videorooms').doc()
+    const userInfo = userRef.get()
+    userInfo.then(user => {
+        videoroomRef.set({
+            owner: userRef,
+            roomName: user.get('name') + "'s room",
+            state: 'paused',
+            time: 0,
+            new: true,
+            members: [],
+            queue: []
+        }).then(() => {
+            //add new videoroom to user
+            userRef.update({
+                videoroomRef: videoroomRef,
+                videoroomID: videoroomRef.id
+            })
+        })
+    })
 }
-
 function setDoc(docRef, obj) {
     if (typeof obj !== 'object') {
         console.error('setDoc failed, not a object', obj)
@@ -75,6 +93,9 @@ export async function handleSignIn(user) {
 
             //set defaults for firebase and state
             userdoc.set(newUserDefaults(user))
+                .then(() => {
+                    createVideoroom(userdoc)
+                })
             this.setState({
                 userName: user.displayName,
                 userStatus: 'status-online',
@@ -82,6 +103,7 @@ export async function handleSignIn(user) {
                 statusMessage: '',
                 loggedIn: true,
             })
+
         } else {
             //set state with user info
             //console.log('user found ', doc.data())

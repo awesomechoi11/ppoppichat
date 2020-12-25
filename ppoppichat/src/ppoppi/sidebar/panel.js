@@ -41,35 +41,35 @@ const friendsvg = (
 
 
 
-const panelconfig = [
-    {
-        id: "watch",
-        svg: watchsvg,
-        path: '/watch',
 
-    },
-    {
-        id: "notification",
-        svg: notificationsvg,
-        path: '/notifications',
-    },
 
-    {
-        id: "friends",
-        svg: friendsvg,
-        path: '/friends',
-    },
-    {
-        id: "settings",
-        svg: settingsvg,
-        path: '/settings',
-    },
-];
-
-function Panel() {
+function Panel(props) {
 
     let { url } = useRouteMatch();
+    var panelconfig = [
+        {
+            id: "watch",
+            svg: watchsvg,
+            path: '/watch/' + props.videoroomID,
 
+        },
+        {
+            id: "notification",
+            svg: notificationsvg,
+            path: '/notifications',
+        },
+
+        {
+            id: "friends",
+            svg: friendsvg,
+            path: '/friends',
+        },
+        {
+            id: "settings",
+            svg: settingsvg,
+            path: '/settings',
+        },
+    ];
 
     return (
 

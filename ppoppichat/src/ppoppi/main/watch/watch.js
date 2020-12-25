@@ -39,34 +39,19 @@ const plusSvg = (
 
 function Watch(props) {
     let { videoRoom } = useParams();
-    console.log(videoRoom)
+    //console.log(videoRoom)
     //set a listener for watchroom
-
     const [value, loading, error] = useDocument(
         //firebase.firestore().doc('videorooms/' + videoRoom),
-        firebase.firestore().doc('videorooms/8Pj3RI1MteLxUzEFiCu3'),
+        firebase.firestore().doc('videorooms/' + videoRoom),
         {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
     );
-    /*
-    
-                    <span>
-                    Collection:{' '}
-                    {value.docs.map(doc => (
-                        <div key={doc.id}>
-                            {console.log(doc.data().channel.path)}
-                        </div>
-                    ))}
-                </span>
-    */
-    return (
-
-        <div id='watch-inner'>
-            {loading && <span>Loading...</span>}
-            {error && <strong>Error: {JSON.stringify(error)}</strong>}
-
-            {value && (
+    var videoroomSidebar = <div>err</div>
+    if (value) {
+        if (value.exists) {
+            videoroomSidebar = (
                 <div className='video-room-sidebar'>
                     <div className='title-wrapper'> {value.data().roomName}</div>
                     <div className='members-wrapper'>
@@ -103,6 +88,21 @@ function Watch(props) {
                         </div>
                     </div>
                 </div>
+            )
+        } else {
+            videoroomSidebar = <div>err video room does not exist</div>
+        }
+    }
+    //send a join request
+
+    return (
+
+        <div id='watch-inner'>
+            {loading && <span>Loading...</span>}
+            {error && <strong>Error: {JSON.stringify(error)}</strong>}
+
+            {value && (
+                videoroomSidebar
             )}
             <div className='video-room-media-wrapper'>
 
