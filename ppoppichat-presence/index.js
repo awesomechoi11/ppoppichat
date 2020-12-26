@@ -63,7 +63,7 @@ io.on('connection', (socket) => {
   // when the user disconnects.. perform this
   socket.on('disconnect', () => {
     if (addedUser) {
-     console.log('a user disconnected: ',uid)
+     console.log('a user disconnected: ',socket.uid)
 	updateOnline(false,socket.uid)
       //update firebase that user is offline
       

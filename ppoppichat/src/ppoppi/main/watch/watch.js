@@ -4,7 +4,7 @@ import firebase from "firebase/app"
 //fetch from firebase 
 import placeholderPicture from './unknown.png'
 import { useDocument } from 'react-firebase-hooks/firestore';
-import { getUserfromRef } from '../../firebaseFunctions'
+import { getUserfromRef, joinVideoroom } from '../../firebaseFunctions'
 import {
     useParams
 } from "react-router-dom";
@@ -48,9 +48,12 @@ function Watch(props) {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
     );
+
+
     var videoroomSidebar = <div>err</div>
     if (value) {
         if (value.exists) {
+            joinVideoroom(props[0].userRef, value.id)
             videoroomSidebar = (
                 <div className='video-room-sidebar'>
                     <div className='title-wrapper'> {value.data().roomName}</div>
@@ -95,6 +98,8 @@ function Watch(props) {
     }
     //send a join request
 
+
+
     return (
 
         <div id='watch-inner'>
@@ -116,19 +121,18 @@ export { Watch }
 
 function MemberItem(props) {
     //firebase.firestore()
-    const [userData, setUserData] = useState(null);
+    const [userData, loading, error] = useDocument(
+        //firebase.firestore().doc('videorooms/' + videoRoom),
+        props.userRef,
+        {
+            snapshotListenOptions: { includeMetadataChanges: true },
+        }
+    );
+    console.log(loading, userData)
 
-    useEffect(() => {    // Update the document title using the browser API    
-        //console.log(userData)
-        getUserfromRef(props.userRef)
-            .then(userDataa => {
-                setUserData(userDataa)
-                //console.log(userData)
-            })
-    });
     var imgsrc = placeholderPicture
     var username = 'Loading...'
-    if (userData === null) {
+    if (loading) {
         return (
             <div className='member-item-wrapper'>
                 <img className='member-item-picture' src={placeholderPicture}></img>
@@ -140,9 +144,9 @@ function MemberItem(props) {
     }
     return (
         <div className='member-item-wrapper'>
-            <img className='member-item-picture' src={userData.photoURL}></img>
+            <img className='member-item-picture' alt='user profile' src={userData.data().photoURL}></img>
             <div className='member-item-name'>
-                {userData.nickname}
+                {userData.data().nickname}
             </div>
         </div>
     )

@@ -22,7 +22,8 @@ function newUserDefaults(user) {
         userStatus: 'status-online',
         created: firebase.firestore.Timestamp.now(),
         'last-login': firebase.firestore.Timestamp.now(),
-        new: true
+        new: true,
+        online: true
     }
 
 }
@@ -30,8 +31,7 @@ function newUserDefaults(user) {
 function createVideoroom(userRef) {
     //get user info then create video room with default settings
     const videoroomRef = db.collection('videorooms').doc()
-    const userInfo = userRef.get()
-    userInfo.then(user => {
+    return userRef.get().then(user => {
         videoroomRef.set({
             owner: userRef,
             roomName: user.get('name') + "'s room",
@@ -58,6 +58,7 @@ function setDoc(docRef, obj) {
 }
 
 export function listenToUserInfo(user) {
+    console.log('listening to userinfo updates')
     return this.db.collection("users").doc(user.uid)
         .onSnapshot(function (doc) {
             if (doc) {
@@ -87,19 +88,17 @@ export async function getUserfromRef(userRef) {
     //firebase.firestore().doc(userRef.path)
 }
 
-export async function handleSignIn(user) {
+export function handleSignIn(user) {
     let userdoc = this.db.collection("users").doc(user.uid)
     console.log('signing in')
-    await userdoc.get().then((doc) => {
-        if (!doc.exists) {
-            console.log('user does not exist')
-            //show new user screen
+    //attempt to get doc with uid
+    return userdoc.get().then((doc) => {
 
-            //set defaults for firebase and state
-            userdoc.set(newUserDefaults(user))
-                .then(() => {
-                    createVideoroom(userdoc)
-                })
+        //if user does not exist then it is a new account
+        if (!doc.exists) {
+
+
+            //show new user screen
             this.setState({
                 userName: user.displayName,
                 userStatus: 'status-online',
@@ -107,13 +106,20 @@ export async function handleSignIn(user) {
                 statusMessage: '',
                 loggedIn: true,
             })
+            //set defaults for firebase and state
+
+            console.log('creating new user: ', user.uid)
+            return userdoc.set(newUserDefaults(user))
+                .then(() => {
+                    console.log('user signed in')
+                    createVideoroom(userdoc)
+                })
+
 
         } else {
-            //set state with user info
-            //console.log('user found ', doc.data())
-            //set last login
-            //set status
 
+
+            //not a new account/
             this.setState({
                 userName: doc.data().nickname ? doc.data().nickname : doc.data().displayName,
                 userStatus: 'status-online',
@@ -122,8 +128,60 @@ export async function handleSignIn(user) {
                 'last-login': firebase.firestore.Timestamp.now(),
                 loggedIn: true,
             })
+            return new Promise((resolve, reject) => {
+                console.log('user signed in')
+                resolve()
+            })
+
         }
+
     })
-    console.log('user signed in')
 }
 
+
+
+export function joinVideoroom(userRef, videoroomID) {
+    //if user not already in room, join
+    userRef.get().then(userdata => {
+        if (userdata.get('currentVideoroom') === videoroomID) {
+            console.log('user is already in room')
+        } else {
+            userRef.update({
+                currentVideoroom: videoroomID
+            }).then(() => {
+                db.collection('videorooms').doc(videoroomID).update({
+                    members: firebase.firestore.FieldValue.arrayUnion(userRef)
+                }).then(() => {
+                    console.log('user successfully joined room')
+                }).catch(err => {
+                    console.log('err joining videoroom: ', err)
+                })
+            })
+        }
+    })
+
+}
+export function leaveVideoroom(userRef) {
+    //get currentRoom
+    userRef.get()
+        .then(userdata => {
+            const videoroomID = userdata.get('currentVideoroom')
+            if (videoroomID === 'none') {
+                console.log('user is not in a room!')
+                return
+            }
+            db.collection('videorooms').doc(videoroomID).update({
+                members: firebase.firestore.FieldValue.arrayRemove(userRef)
+            }).then(() => {
+                userRef.update({
+                    currentVideoroom: 'none'
+                }).then(() => {
+                    console.log('user successfully left room')
+                }).catch(err => {
+                    console.log('err updating current videoroom: ', err)
+                })
+            }).catch(err => {
+                console.log('err leaving videoroom: ', err)
+            })
+        })
+}

@@ -117,7 +117,7 @@ export class Ppoppi extends React.Component {
                     <div id='topbar'>
 
                     </div>
-                    <Main loggedin={this.state.loggedIn} ></Main>
+                    <Main loggedin={this.state.loggedIn} userRef={this.userRef}></Main>
                 </div>
             </div>
         )

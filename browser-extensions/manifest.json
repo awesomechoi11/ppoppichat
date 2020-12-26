@@ -1,0 +1,15 @@
+{
+  "name": "PPoPPi",
+  "description" : "click to add url to your chatroom!!",
+  "version": "1.0",
+  "manifest_version": 2,
+  
+	"permissions": [
+		"activeTab",
+		"clipboardWrite"
+	],
+  "browser_action": {
+  "default_icon": "ppoppi-pawpaws.png",
+    "default_popup": "popup.html"
+  }
+}
