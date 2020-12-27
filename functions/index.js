@@ -13,13 +13,13 @@ const vimeoKey = '2417858829570c04c1358511aac6eb3c'
 const unauthdVimeoKey = '126864d9f48da089b0af0f87444b43ee'
 
 const usersCol = admin.firestore().collection('users')
-
+const db = admin.firestore()
 
 function fetchYoutubeVid(id) {
 	//console.log(id)
 
 	return axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&key=' + youtubeKey + '&query=&id=' + id)
-		.then(function (response) {
+		.then((response)=>{
 			// handle success
 			var owo = response.data.items[0].snippet
 			return {
@@ -28,7 +28,7 @@ function fetchYoutubeVid(id) {
 				time: response.data.items[0].contentDetails.duration
 			}
 		})
-		.catch(function (error) {
+		.catch((error)=>{
 			// handle error
 			functions.logger.error("error getting youtube video", { structuredData: true });
 			console.log(error.response.data);
@@ -91,9 +91,9 @@ function getVideoInfo(link) {
 		url: link,
 		videoInfo: '123',
 	}
-
+	var vidid
 	if (ytobj.includes(myURL.hostname)) {
-		var vidid = myURL.searchParams.get('v')
+		vidid = myURL.searchParams.get('v')
 		return fetchYoutubeVid(vidid)
 			.then(youtubedata => {
 				if (youtubedata) {
@@ -105,7 +105,7 @@ function getVideoInfo(link) {
 			})
 
 	} else if (ytshort.includes(myURL.hostname)) {
-		var vidid = myURL.pathname.split('/').pop()
+		vidid = myURL.pathname.split('/').pop()
 		return fetchYoutubeVid(vidid)
 			.then(youtubedata => {
 				if (youtubedata) {
@@ -153,10 +153,12 @@ exports.addVideoToList = functions.https.onRequest((request, response) => {
 			if (result.videoInfo) {
 				result.addedBy = username
 				//console.log(result)
-				addToQueue(videoroomID, result)
+				return addToQueue(videoroomID, result)
 					.then(() => {
+						
 						response.send("success");
 						console.log('successfully added video to queue')
+						return
 					}).catch(err => {
 						console.log(err)
 						response.send("uh oh video room may not exist");
@@ -166,6 +168,7 @@ exports.addVideoToList = functions.https.onRequest((request, response) => {
 			} else {
 
 				response.send("err occured!! check logs");
+				return
 			}
 		}).catch(err => {
 			console.log(err)
@@ -178,7 +181,7 @@ exports.addVideoToList = functions.https.onRequest((request, response) => {
 
 	//response.send("uh oh howd u get here?");
 });
-/*
+
 
 function addToQueue(videoroomID, videoData) {
 	const docRef = admin.firestore().collection('videorooms').doc(videoroomID)
@@ -188,7 +191,7 @@ function addToQueue(videoroomID, videoData) {
 	})
 }
 
-
+/*
 exports.addVideoToQueue = functions.https.onRequest((request, response) => {
 
 	addToQueue('testdoc', {
@@ -206,7 +209,7 @@ exports.addVideoToQueue = functions.https.onRequest((request, response) => {
 	//response.send("uh oh howd u get here?");
 });
 
-*/
+
 
 
 exports.addUserToVideoroom = functions.https.onRequest((request, response) => {
@@ -241,6 +244,20 @@ function joinVideoroom(userID, videoroomID) {
     })
 
 }
+*/
+exports.removeUserFromVideoroom = functions.https.onRequest((request, response) => {
+	const userID = request.query.userID;
+	if(userID){
+		leaveVideoroom(userID)
+		response.send('removing user')
+	}else{
+		response.send('missing userID')
+	}
+
+	//response.send("uh oh howd u get here?");
+});
+
+
 function leaveVideoroom(userID) {
     //get currentRoom
 	var userRef = usersCol.doc(userID)
@@ -251,18 +268,19 @@ function leaveVideoroom(userID) {
                 console.log('user is not in a room!')
                 return
             }
-            db.collection('videorooms').doc(videoroomID).update({
+            return db.collection('videorooms').doc(videoroomID).update({
                 members: firebase.firestore.FieldValue.arrayRemove(userRef)
             }).then(() => {
-                userRef.update({
+                return userRef.update({
                     currentVideoroom: 'none'
-                }).then(() => {
-                    console.log('user successfully left room')
-                }).catch(err => {
-                    console.log('err updating current videoroom: ', err)
                 })
+            }).then(() => {
+				console.log('user successfully left room')
+				return
             }).catch(err => {
                 console.log('err leaving videoroom: ', err)
             })
-        })
+        }).catch(err => {
+                console.log('err getting userdata: ', err)
+            })
 }

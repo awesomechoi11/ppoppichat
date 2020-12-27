@@ -1,5 +1,5 @@
-import firebase from '../home/fire'
-var db = firebase.firestore();
+import { fire } from '../firebasecontext'
+var db = fire.firestore();
 
 //list of fields that can be editted
 const validUserFields = [
@@ -20,8 +20,8 @@ function newUserDefaults(user) {
         statusColor: "#32EA44",
         statusMessage: '',
         userStatus: 'status-online',
-        created: firebase.firestore.Timestamp.now(),
-        'last-login': firebase.firestore.Timestamp.now(),
+        created: fire.firestore.Timestamp.now(),
+        'last-login': fire.firestore.Timestamp.now(),
         new: true,
         online: true
     }
@@ -63,15 +63,19 @@ export function listenToUserInfo(user) {
         .onSnapshot(function (doc) {
             if (doc) {
 
-                var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
-                console.log(source, " data: ", doc.data());
+                //var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
+
+                //console.log(source, " data: ", doc.data());
+                console.log('user info updated setstate')
                 var newstate = doc.data();
                 delete newstate['created']
                 delete newstate['last-login']
                 delete newstate['name']
+                delete newstate['statusMessage']
                 //console.log(newstate)
 
                 this.setState(newstate)
+
             }
 
         }.bind(this));
@@ -85,7 +89,7 @@ export async function getUserfromRef(userRef) {
     } else {
         console.error('user does not exist!!!')
     }
-    //firebase.firestore().doc(userRef.path)
+    //fire.firestore().doc(userRef.path)
 }
 
 export function handleSignIn(user) {
@@ -97,15 +101,6 @@ export function handleSignIn(user) {
         //if user does not exist then it is a new account
         if (!doc.exists) {
 
-
-            //show new user screen
-            this.setState({
-                userName: user.displayName,
-                userStatus: 'status-online',
-                userPicture: user.photoURL,
-                statusMessage: '',
-                loggedIn: true,
-            })
             //set defaults for firebase and state
 
             console.log('creating new user: ', user.uid)
@@ -118,16 +113,7 @@ export function handleSignIn(user) {
 
         } else {
 
-
-            //not a new account/
-            this.setState({
-                userName: doc.data().nickname ? doc.data().nickname : doc.data().displayName,
-                userStatus: 'status-online',
-                userPicture: doc.data().photoURL,
-                statusMessage: doc.data().statusMessage,
-                'last-login': firebase.firestore.Timestamp.now(),
-                loggedIn: true,
-            })
+            //not a new account
             return new Promise((resolve, reject) => {
                 console.log('user signed in')
                 resolve()
@@ -140,48 +126,60 @@ export function handleSignIn(user) {
 
 
 
-export function joinVideoroom(userRef, videoroomID) {
+export function joinVideoroom(userData, videoroomID) {
     //if user not already in room, join
-    userRef.get().then(userdata => {
-        if (userdata.get('currentVideoroom') === videoroomID) {
-            console.log('user is already in room')
-        } else {
-            userRef.update({
-                currentVideoroom: videoroomID
+
+    console.log(userData.currentVideoroom, ' ', videoroomID)
+    if (userData.currentVideoroom === videoroomID) {
+        console.log('user is already in room')
+    } else {
+
+        userData.userRef.update({
+            currentVideoroom: videoroomID
+        }).then(() => {
+            db.collection('videorooms').doc(videoroomID).update({
+                members: fire.firestore.FieldValue.arrayUnion(userData.userRef)
             }).then(() => {
-                db.collection('videorooms').doc(videoroomID).update({
-                    members: firebase.firestore.FieldValue.arrayUnion(userRef)
-                }).then(() => {
-                    console.log('user successfully joined room')
-                }).catch(err => {
-                    console.log('err joining videoroom: ', err)
-                })
+                console.log('user successfully joined room')
+            }).catch(err => {
+                console.log('err joining videoroom: ', err)
             })
-        }
-    })
+        }).catch(err => {
+            console.log('err updating user currentvideoroom ', err)
+        })
+
+    }
+
+
+
 
 }
-export function leaveVideoroom(userRef) {
+export function leaveVideoroom(userData) {
     //get currentRoom
-    userRef.get()
-        .then(userdata => {
-            const videoroomID = userdata.get('currentVideoroom')
-            if (videoroomID === 'none') {
-                console.log('user is not in a room!')
-                return
-            }
-            db.collection('videorooms').doc(videoroomID).update({
-                members: firebase.firestore.FieldValue.arrayRemove(userRef)
+    if (userData.currentVideoroom === undefined) {
+        return
+    }
+    if (userData.currentVideoroom === 'none') {
+        console.log('user is not in a room!')
+    } else {
+        console.log('leave video room')
+        console.log(userData.currentVideoroom)
+        db.collection('videorooms').doc(userData.currentVideoroom).update({
+            members: fire.firestore.FieldValue.arrayRemove(userData.userRef)
+        }).then(() => {
+            userData.userRef.update({
+                currentVideoroom: 'none'
             }).then(() => {
-                userRef.update({
-                    currentVideoroom: 'none'
-                }).then(() => {
-                    console.log('user successfully left room')
-                }).catch(err => {
-                    console.log('err updating current videoroom: ', err)
-                })
+                console.log('user successfully left room')
             }).catch(err => {
-                console.log('err leaving videoroom: ', err)
+                console.log('err updating current videoroom: ', err)
             })
+        }).catch(err => {
+            console.log('err leaving videoroom: ', err)
         })
+    }
+
+
+
+
 }

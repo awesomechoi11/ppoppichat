@@ -3,14 +3,16 @@ import React from 'react';
 
 import { Login } from './home/login';
 import { Ppoppi } from './ppoppi/ppoppi';
-//import { Login } from './home/login';
-//import { Login } from './home/login';
+
 import {
   BrowserRouter as Router,
   Switch,
   Route,
   Link
 } from "react-router-dom";
+
+import { FirebaseContext, fire } from './firebasecontext'
+
 
 //obj for the home navbar
 const routes = [
@@ -38,7 +40,10 @@ const routes = [
   {
     id: "login",
     text: 'login/ sign up',
-    main: <Login />
+    main:
+      <FirebaseContext.Provider value={fire}>
+        <Login />
+      </FirebaseContext.Provider>
   },
 ];
 
@@ -89,9 +94,7 @@ class App extends React.Component {
             ))}
 
             <Route path='/ppoppi'>
-
               <Ppoppi />
-
             </Route>
 
           </Switch>

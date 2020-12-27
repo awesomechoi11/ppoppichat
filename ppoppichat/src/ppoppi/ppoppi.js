@@ -2,7 +2,7 @@ import React from 'react';
 
 import './ppoppi.scss';
 
-import firebase from '../home/fire'
+//import firebase from '../home/fire'
 
 import { Panel } from './sidebar/panel';
 import { Main } from './main/main';
@@ -15,8 +15,8 @@ import { setUserOnline } from './presence';
 import { StatusMessage } from './statusmessage';
 
 
+import { FirebaseContext, UserContext } from '../firebasecontext'
 
-const FireContext = React.createContext(firebase);
 
 export class Ppoppi extends React.Component {
 
@@ -24,9 +24,10 @@ export class Ppoppi extends React.Component {
 
     constructor() {
         super()
+        console.log('ppoppi called')
         this.state = {
             loggedIn: false,
-            userName: 'loading...',
+            nickname: 'loading...',
             userStatus: 'status-offline',
             userPicture: placeholderPicture,
             statusMessage: ''
@@ -35,22 +36,35 @@ export class Ppoppi extends React.Component {
         this.listenToUserInfo = listenToUserInfo.bind(this)
 
 
-        //connect to presence socket
-
 
     }
 
     componentDidMount() {
+
         //check if logged in,
         //redirect to login page if not logged in
-        firebase.auth().onAuthStateChanged(function (user) {
+        this.fire = this.context
+
+        //check user login state
+        this.fire.auth().onAuthStateChanged(function (user) {
             if (user) {
                 // User is signed in.   
-                this.db = firebase.firestore();
-                this.userRef = this.db.collection('users').doc(user.uid)
+                this.db = this.fire.firestore();
+
+                //this.userRef = this.db.collection('users').doc(user.uid)
+                // console.log('setstate userref set')
+                // this.setState({
+                //     userRef: this.db.collection('users').doc(user.uid)
+                // })
+
 
                 this.handleSignIn(user)
                     .then(() => {
+                        console.log('setstate called loggedin true and userREf')
+                        this.setState({
+                            loggedIn: true,
+                            userRef: this.db.collection('users').doc(user.uid)
+                        })
                         this.unsubUserInfo = this.listenToUserInfo(user)
                     }).then(() => {
                         setUserOnline(user.uid)
@@ -87,14 +101,15 @@ export class Ppoppi extends React.Component {
                         </img>
 
                         <div id='user-name'>
-                            {this.state.userName}
+                            {this.state.nickname}
                         </div>
                     </div>
                     <div id='status-message'>
 
-                        <StatusMessage userRef={this.userRef} >
+                        <StatusMessage userRef={this.state.userRef} >
                             {this.state.statusMessage}
                         </StatusMessage>
+
 
 
                     </div>
@@ -117,9 +132,11 @@ export class Ppoppi extends React.Component {
                     <div id='topbar'>
 
                     </div>
-                    <Main loggedin={this.state.loggedIn} userRef={this.userRef}></Main>
+                    {this.state.online && <Main userData={this.state} />}
                 </div>
             </div>
         )
     }
 }
+
+Ppoppi.contextType = FirebaseContext

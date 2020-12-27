@@ -12,6 +12,9 @@ import { Placeholder } from "./placeholder";
 import './watch/watch'
 import { Watch } from "./watch/watch";
 
+//import { UserContext } from '../firebasecontext'
+
+
 const mainroutes = [
     {
         id: "watch-wrapper",
@@ -41,19 +44,19 @@ function Main(props) {
     let { path, url } = useRouteMatch();
     //let url = '/ppoppi'
     //console.log(path, url)
-    console.log(props)
+    console.log('main called')
     return (
 
         <div id='main-inner'>
-            {props.loggedin &&
+            {props.userData.loggedIn &&
                 <Switch>
 
                     {mainroutes.map((item, index) => (
 
                         <Route key={index} path={url + item.path}>
                             <div id={item.id}>{item.page({
-                                hello: 123,
-                                userRef: props.userRef
+                                userData: props.userData,
+                                key: item.id
                             })}</div>
 
                         </Route>

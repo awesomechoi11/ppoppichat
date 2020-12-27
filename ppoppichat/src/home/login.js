@@ -1,11 +1,10 @@
 import React from 'react';
 import { useHistory } from "react-router-dom";
-import firebase from './fire'
+//import fire from './fire'
 
 import './login.scss';
 
-//import { useAuthState } from 'react-firebase-hooks/auth';
-
+import { FirebaseContext } from '../firebasecontext'
 
 function EnterButton(props) {
     //const isLoggedIn = props.isLoggedIn;
@@ -29,22 +28,24 @@ export class Login extends React.Component {
 
     constructor(props) {
         super(props)
-        //console.log(this.context)
-        this.provider = new firebase.auth.GoogleAuthProvider();
+        console.log(this.context)
+
+
         this.state = { loginStatus: 'loading' }
+
     }
 
 
 
     opensigninpopup() {
 
-        firebase.auth().signInWithPopup(this.provider).then(function (result) {
+        this.fire.auth().signInWithPopup(this.provider).then(function (result) {
             // This gives you a Google Access Token. You can use it to access the Google API.
             //var token = result.credential.accessToken;
             // The signed-in user info.
             //var user = result.user;
             // ...
-            console.log(firebase)
+            //console.log(fire)
         }).catch(function (error) {
             // Handle Errors here.
             //var errorCode = error.code;
@@ -52,7 +53,7 @@ export class Login extends React.Component {
             console.log(error)
             // The email of the user's account used.
             //var email = error.email;
-            // The firebase.auth.AuthCredential type that was used.
+            // The this.fire.auth.AuthCredential type that was used.
             //var credential = error.credential;
             // ...
         });
@@ -62,7 +63,7 @@ export class Login extends React.Component {
             loginStatus: 'signing out'
         })
         //reset login message
-        firebase.auth().signOut().then(function () {
+        this.fire.auth().signOut().then(function () {
             this.setState({
                 loginStatus: 'not signed in, click to sign in',
                 onclick: this.opensigninpopup.bind(this),
@@ -75,7 +76,10 @@ export class Login extends React.Component {
     }
 
     componentDidMount() {
-        firebase.auth().onAuthStateChanged(function (user) {
+        //this.fire replaces firebase 
+        this.fire = this.context
+        this.provider = new this.fire.auth.GoogleAuthProvider();
+        this.fire.auth().onAuthStateChanged(function (user) {
             if (user) {
                 //console.log(user)
                 // User is signed in.   
@@ -124,3 +128,4 @@ export class Login extends React.Component {
     }
 }
 
+Login.contextType = FirebaseContext;

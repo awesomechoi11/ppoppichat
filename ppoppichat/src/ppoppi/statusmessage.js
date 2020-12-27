@@ -1,6 +1,5 @@
 
 import React from 'react';
-import firebase from '../home/fire'
 
 export class StatusMessage extends React.Component {
     constructor(props) {

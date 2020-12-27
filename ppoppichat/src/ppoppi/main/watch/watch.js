@@ -4,11 +4,11 @@ import firebase from "firebase/app"
 //fetch from firebase 
 import placeholderPicture from './unknown.png'
 import { useDocument } from 'react-firebase-hooks/firestore';
-import { getUserfromRef, joinVideoroom } from '../../firebaseFunctions'
+import { joinVideoroom } from '../../firebaseFunctions'
 import {
     useParams
 } from "react-router-dom";
-import React, { useState, useEffect } from 'react';
+
 
 
 const membersDivider = (
@@ -24,8 +24,33 @@ const queueDivider = (
     </svg>
 
 )
+
+function PlusSvg(props) {
+
+    function handleClick(e) {
+        console.log(e)
+    }
+
+    return (
+        <div className='sidebar-add-button'
+            onClick={handleClick}
+
+        >
+
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path className='add-path' d="M15 9H3" strokeWidth="3" strokeLinecap="round" />
+                <path className='add-path' d="M9 3V9V15" strokeWidth="3" strokeLinecap="round" />
+            </svg>
+        </div>
+    )
+}
 const plusSvg = (
-    <div className='sidebar-add-button'>
+    <div className='sidebar-add-button'
+        onClick={() => {
+            console.log(123)
+        }}
+
+    >
 
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path className='add-path' d="M15 9H3" strokeWidth="3" strokeLinecap="round" />
@@ -41,6 +66,7 @@ function Watch(props) {
     let { videoRoom } = useParams();
     //console.log(videoRoom)
     //set a listener for watchroom
+
     const [value, loading, error] = useDocument(
         //firebase.firestore().doc('videorooms/' + videoRoom),
         firebase.firestore().doc('videorooms/' + videoRoom),
@@ -53,7 +79,8 @@ function Watch(props) {
     var videoroomSidebar = <div>err</div>
     if (value) {
         if (value.exists) {
-            joinVideoroom(props[0].userRef, value.id)
+            console.log('join room start')
+            joinVideoroom(props[0].userData, value.id)
             videoroomSidebar = (
                 <div className='video-room-sidebar'>
                     <div className='title-wrapper'> {value.data().roomName}</div>
@@ -81,8 +108,8 @@ function Watch(props) {
                             {
 
 
-                                value.data().queue.map((url, index) => (
-                                    <QueueItem key={index} url={url} />
+                                value.data().queue.map((video, index) => (
+                                    <QueueItem key={index} videoData={video} />
 
                                 ))
 
@@ -95,6 +122,8 @@ function Watch(props) {
         } else {
             videoroomSidebar = <div>err video room does not exist</div>
         }
+    } else {
+        console.log('watch called value not set')
     }
     //send a join request
 
@@ -128,7 +157,7 @@ function MemberItem(props) {
             snapshotListenOptions: { includeMetadataChanges: true },
         }
     );
-    console.log(loading, userData)
+    //console.log(loading, userData)
 
     var imgsrc = placeholderPicture
     var username = 'Loading...'
@@ -156,22 +185,24 @@ function MemberItem(props) {
 function QueueItem(props) {
     //get youtube video information
     //assumes all info is correct
+    console.log(props.videoData)
+
     return (
         <div className='queue-item-wrapper'>
             <img className='queue-item-picture'
-                src={placeholderPicture}
+                src={props.videoData.videoInfo.thumbnail}
             />
             <div className='queue-item-data'>
                 <div className='queue-data-title'>
-                    puppy gon wildin'
+                    {props.videoData.videoInfo.title}
                 </div>
                 <div className='queue-data-under'>
                     <div className='queue-data-user'>
-                        added by bchoister
-                </div>
+                        added by {props.videoData.addedBy}
+                    </div>
                     <div className='queue-data-length'>
                         3:21
-                    </div>
+            </div>
                 </div>
             </div>
         </div>
