@@ -93,10 +93,20 @@
         display: flex;
         align-content: space-between;
         flex-direction: column;
+
+        .queue-data-title {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
         .queue-data-under {
             font-family: $font-fredoka;
             display: flex;
             justify-content: space-between;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
         }
     }
 }

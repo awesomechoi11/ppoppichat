@@ -1,6 +1,6 @@
 const functions = require('firebase-functions');
 const axios = require('axios');
-
+//const cors = require('cors')({ origin: true });
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
 //
@@ -19,7 +19,7 @@ function fetchYoutubeVid(id) {
 	//console.log(id)
 
 	return axios.get('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&key=' + youtubeKey + '&query=&id=' + id)
-		.then((response)=>{
+		.then((response) => {
 			// handle success
 			var owo = response.data.items[0].snippet
 			return {
@@ -28,7 +28,7 @@ function fetchYoutubeVid(id) {
 				time: response.data.items[0].contentDetails.duration
 			}
 		})
-		.catch((error)=>{
+		.catch((error) => {
 			// handle error
 			functions.logger.error("error getting youtube video", { structuredData: true });
 			console.log(error.response.data);
@@ -142,6 +142,9 @@ function getVideoInfo(link) {
 
 
 exports.addVideoToList = functions.https.onRequest((request, response) => {
+	//cors(request, response, () => {
+	// your function body here - use the provided req and res from cors
+	response.set('Access-Control-Allow-Origin', '*');
 	functions.logger.info("addVideoToList", { structuredData: true });
 
 	const queryurl = request.query.url;
@@ -155,7 +158,7 @@ exports.addVideoToList = functions.https.onRequest((request, response) => {
 				//console.log(result)
 				return addToQueue(videoroomID, result)
 					.then(() => {
-						
+
 						response.send("success");
 						console.log('successfully added video to queue')
 						return
@@ -178,7 +181,7 @@ exports.addVideoToList = functions.https.onRequest((request, response) => {
 		response.send('invalid query stuff')
 	}
 
-
+	//})
 	//response.send("uh oh howd u get here?");
 });
 
@@ -223,34 +226,34 @@ exports.addUserToVideoroom = functions.https.onRequest((request, response) => {
 
 
 function joinVideoroom(userID, videoroomID) {
-    //if user not already in room, join
+	//if user not already in room, join
 	var userRef = usersCol.doc(userID)
-    userRef.get().then(userdata => {
-        if (userdata.get('videoroomID') === videoroomID) {
-            console.log('user is already in room')
-        } else {
-            userRef.update({
-                currentVideoroom: videoroomID
-            }).then(() => {
-                db.collection('videorooms').doc(videoroomID).update({
-                    members: firebase.firestore.FieldValue.arrayUnion(userRef)
-                }).then(() => {
-                    console.log('user successfully joined room')
-                }).catch(err => {
-                    console.log('err joining videoroom: ', err)
-                })
-            })
-        }
-    })
+	userRef.get().then(userdata => {
+		if (userdata.get('videoroomID') === videoroomID) {
+			console.log('user is already in room')
+		} else {
+			userRef.update({
+				currentVideoroom: videoroomID
+			}).then(() => {
+				db.collection('videorooms').doc(videoroomID).update({
+					members: firebase.firestore.FieldValue.arrayUnion(userRef)
+				}).then(() => {
+					console.log('user successfully joined room')
+				}).catch(err => {
+					console.log('err joining videoroom: ', err)
+				})
+			})
+		}
+	})
 
 }
 */
 exports.removeUserFromVideoroom = functions.https.onRequest((request, response) => {
 	const userID = request.query.userID;
-	if(userID){
+	if (userID) {
 		leaveVideoroom(userID)
 		response.send('removing user')
-	}else{
+	} else {
 		response.send('missing userID')
 	}
 
@@ -259,28 +262,28 @@ exports.removeUserFromVideoroom = functions.https.onRequest((request, response) 
 
 
 function leaveVideoroom(userID) {
-    //get currentRoom
+	//get currentRoom
 	var userRef = usersCol.doc(userID)
-    userRef.get()
-        .then(userdata => {
-            const videoroomID = userdata.get('currentVideoroom')
-            if (videoroomID === 'none') {
-                console.log('user is not in a room!')
-                return
-            }
-            return db.collection('videorooms').doc(videoroomID).update({
-                members: firebase.firestore.FieldValue.arrayRemove(userRef)
-            }).then(() => {
-                return userRef.update({
-                    currentVideoroom: 'none'
-                })
-            }).then(() => {
+	userRef.get()
+		.then(userdata => {
+			const videoroomID = userdata.get('currentVideoroom')
+			if (videoroomID === 'none') {
+				console.log('user is not in a room!')
+				return
+			}
+			return db.collection('videorooms').doc(videoroomID).update({
+				members: firebase.firestore.FieldValue.arrayRemove(userRef)
+			}).then(() => {
+				return userRef.update({
+					currentVideoroom: 'none'
+				})
+			}).then(() => {
 				console.log('user successfully left room')
 				return
-            }).catch(err => {
-                console.log('err leaving videoroom: ', err)
-            })
-        }).catch(err => {
-                console.log('err getting userdata: ', err)
-            })
+			}).catch(err => {
+				console.log('err leaving videoroom: ', err)
+			})
+		}).catch(err => {
+			console.log('err getting userdata: ', err)
+		})
 }

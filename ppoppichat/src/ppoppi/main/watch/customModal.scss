@@ -1,0 +1,39 @@
+@import "../../../variables.scss";
+
+.add-video-modal {
+    width: 670px;
+    height: 220px;
+    font-family: $font-fredoka;
+    font-size: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    .add-video-modal-title {
+        width: 570px;
+        margin-bottom: 20px;
+    }
+    .add-video-modal-input {
+        background: $oxford-blue;
+        width: 100%;
+        height: 65px;
+        border-radius: 24px;
+        outline: none;
+        border: none;
+        color: $glaucous;
+        font-size: 30px;
+        font-family: $font-fredoka;
+        text-align: center;
+    }
+    .add-video-modal-button {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 160px;
+        height: 50px;
+        background: $glaucous;
+        border-radius: 12px;
+        margin-top: 28px;
+    }
+}

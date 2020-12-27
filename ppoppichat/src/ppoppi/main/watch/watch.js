@@ -9,6 +9,9 @@ import {
     useParams
 } from "react-router-dom";
 
+import React from 'react'
+
+import { SmallModal } from './customModal'
 
 
 const membersDivider = (
@@ -25,18 +28,37 @@ const queueDivider = (
 
 )
 
+
+
 function PlusSvg(props) {
+    //console.log(props.modalKey)
+    const [modalIsOpen, setIsOpen] = React.useState(false);
 
     function handleClick(e) {
-        console.log(e)
+        if (!modalIsOpen) {
+            //if modal is not open/ set to open
+            setIsOpen(!modalIsOpen)
+        }
+        //console.log(e)
     }
+
+    function closeModal() {
+        setIsOpen(false)
+    }
+
+
 
     return (
         <div className='sidebar-add-button'
             onClick={handleClick}
 
         >
-
+            <SmallModal
+                modalIsOpen={modalIsOpen}
+                closeModal={closeModal}
+                userData={props.userData}
+                modalKey={props.modalKey}
+            />
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path className='add-path' d="M15 9H3" strokeWidth="3" strokeLinecap="round" />
                 <path className='add-path' d="M9 3V9V15" strokeWidth="3" strokeLinecap="round" />
@@ -44,22 +66,6 @@ function PlusSvg(props) {
         </div>
     )
 }
-const plusSvg = (
-    <div className='sidebar-add-button'
-        onClick={() => {
-            console.log(123)
-        }}
-
-    >
-
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path className='add-path' d="M15 9H3" strokeWidth="3" strokeLinecap="round" />
-            <path className='add-path' d="M9 3V9V15" strokeWidth="3" strokeLinecap="round" />
-        </svg>
-    </div>
-)
-
-
 
 
 function Watch(props) {
@@ -87,9 +93,12 @@ function Watch(props) {
                     <div className='members-wrapper'>
                         <div className='members-divider video-room-sidebar-divider'>
                             {membersDivider}
-                            {plusSvg}
+                            {
+                                <PlusSvg modalKey='members' userData={props[0].userData} />
+                            }
                         </div>
                         <div className='members-list'>
+
                             {value.data().members.map((member, index) => (
 
                                 <MemberItem key={index} userRef={member}></MemberItem>
@@ -102,7 +111,7 @@ function Watch(props) {
                     <div className='queue-wrapper'>
                         <div className='queue-divider video-room-sidebar-divider'>
                             {queueDivider}
-                            {plusSvg}
+                            {<PlusSvg modalKey='queue' userData={props[0].userData} />}
                         </div>
                         <div className='queue-list'>
                             {
