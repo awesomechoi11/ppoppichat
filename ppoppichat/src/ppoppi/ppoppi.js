@@ -85,34 +85,30 @@ export class Ppoppi extends React.Component {
     }
 
     render() {
+        //console.log(this.state.statusMessage)
         return (
 
             <div id='ppoppi-wrapper' className="" >
                 <div id='sidebar'>
+
                     <div id='main-user-wrapper'>
                         <div id='user-status' className={this.state.userStatus}></div>
-
                         <img
                             id='user-picture'
                             alt='User profile'
                             src={this.state.userPicture}
-                        >
-
-                        </img>
-
+                        />
                         <div id='user-name'>
                             {this.state.nickname}
                         </div>
                     </div>
+
+
                     <div id='status-message'>
-
-                        <StatusMessage userRef={this.state.userRef} >
-                            {this.state.statusMessage}
-                        </StatusMessage>
-
-
-
+                        <StatusMessage userRef={this.state.userRef} statusMessage={this.state.statusMessage} />
                     </div>
+
+
                     <div id='channels-wrapper'>
                         <div id='channels-panel-wrapper'>
                             <Panel

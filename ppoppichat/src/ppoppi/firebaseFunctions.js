@@ -2,15 +2,15 @@ import { fire } from '../firebasecontext'
 var db = fire.firestore();
 
 //list of fields that can be editted
-const validUserFields = [
-    'nickname',
-    'photoURL',
-    'statusColor',
-    'statusMessage',
-    'userStatus',
-    'last-login',
-    'new'
-]
+// const validUserFields = [
+//     'nickname',
+//     'photoURL',
+//     'statusColor',
+//     'statusMessage',
+//     'userStatus',
+//     'last-login',
+//     'new'
+// ]
 
 function newUserDefaults(user) {
     return {
@@ -49,13 +49,13 @@ function createVideoroom(userRef) {
         })
     })
 }
-function setDoc(docRef, obj) {
-    if (typeof obj !== 'object') {
-        console.error('setDoc failed, not a object', obj)
-        return
-    }
-    return docRef.set(obj)
-}
+// function setDoc(docRef, obj) {
+//     if (typeof obj !== 'object') {
+//         console.error('setDoc failed, not a object', obj)
+//         return
+//     }
+//     return docRef.set(obj)
+// }
 
 export function listenToUserInfo(user) {
     console.log('listening to userinfo updates')
@@ -71,7 +71,7 @@ export function listenToUserInfo(user) {
                 delete newstate['created']
                 delete newstate['last-login']
                 delete newstate['name']
-                delete newstate['statusMessage']
+                //delete newstate['statusMessage']
                 //console.log(newstate)
 
                 this.setState(newstate)

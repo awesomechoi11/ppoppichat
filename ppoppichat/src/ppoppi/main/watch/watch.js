@@ -12,6 +12,7 @@ import {
 import React from 'react'
 
 import { SmallModal } from './customModal'
+import { VideoPlayer } from './videoplayer';
 
 
 const membersDivider = (
@@ -82,76 +83,88 @@ function Watch(props) {
     );
 
 
-    var videoroomSidebar = <div>err</div>
+    var watchInner = (<div>err</div>)
     if (value) {
         if (value.exists) {
             console.log('join room start')
             joinVideoroom(props[0].userData, value.id)
-            videoroomSidebar = (
-                <div className='video-room-sidebar'>
-                    <div className='title-wrapper'> {value.data().roomName}</div>
-                    <div className='members-wrapper'>
-                        <div className='members-divider video-room-sidebar-divider'>
-                            {membersDivider}
-                            {
-                                <PlusSvg modalKey='members' userData={props[0].userData} />
-                            }
+            return (
+                <div id='watch-inner'>
+
+
+                    <div className='video-room-sidebar'>
+                        <div className='title-wrapper'> {value.data().roomName}</div>
+                        <div className='members-wrapper'>
+                            <div className='members-divider video-room-sidebar-divider'>
+                                {membersDivider}
+                                {
+                                    <PlusSvg modalKey='members' userData={props[0].userData} />
+                                }
+                            </div>
+                            <div className='members-list'>
+
+                                {value.data().members.map((member, index) => (
+
+                                    <MemberItem key={index} userRef={member}></MemberItem>
+
+
+                                ))}
+
+                            </div>
                         </div>
-                        <div className='members-list'>
+                        <div className='queue-wrapper'>
+                            <div className='queue-divider video-room-sidebar-divider'>
+                                {queueDivider}
+                                {<PlusSvg modalKey='queue' userData={props[0].userData} />}
+                            </div>
+                            <div className='queue-list'>
+                                {
 
-                            {value.data().members.map((member, index) => (
 
-                                <MemberItem key={index} userRef={member}></MemberItem>
+                                    value.data().queue.map((video, index) => (
+                                        <QueueItem key={index} videoData={video} />
+
+                                    ))
 
 
-                            ))}
-
+                                }
+                            </div>
                         </div>
                     </div>
-                    <div className='queue-wrapper'>
-                        <div className='queue-divider video-room-sidebar-divider'>
-                            {queueDivider}
-                            {<PlusSvg modalKey='queue' userData={props[0].userData} />}
-                        </div>
-                        <div className='queue-list'>
-                            {
-
-
-                                value.data().queue.map((video, index) => (
-                                    <QueueItem key={index} videoData={video} />
-
-                                ))
-
-
-                            }
-                        </div>
+                    <div className='video-room-media-wrapper'>
+                        <VideoPlayer />
                     </div>
-                </div>
+                </div >
             )
         } else {
-            videoroomSidebar = <div>err video room does not exist</div>
+            return (<div>err video room does not exist</div>)
         }
+    } else if (loading) {
+        return (<span>Loading...</span>)
+    } else if (error) {
+        return (<strong>Error: {JSON.stringify(error)}</strong>)
     } else {
         console.log('watch called value not set')
+        return (<div>uwu</div>)
     }
     //send a join request
 
+    // return(<div>uwu</div>)
 
+    // return (
 
-    return (
+    //     <div id='watch-inner'>
+    //         {loading && <span>Loading...</span>}
+    //         {error && <strong>Error: {JSON.stringify(error)}</strong>}
 
-        <div id='watch-inner'>
-            {loading && <span>Loading...</span>}
-            {error && <strong>Error: {JSON.stringify(error)}</strong>}
-
-            {value && (
-                videoroomSidebar
-            )}
-            <div className='video-room-media-wrapper'>
-
-            </div>
-        </div >
-    )
+    //         {value && (
+    //             watchInner
+    //         )}
+    //         <div className='video-room-media-wrapper'>
+    //             <VideoPlayer />
+    //         </div>
+    //     </div >
+    // )
 }
 
 export { Watch }
@@ -194,7 +207,7 @@ function MemberItem(props) {
 function QueueItem(props) {
     //get youtube video information
     //assumes all info is correct
-    console.log(props.videoData)
+    //console.log(props.videoData)
 
     return (
         <div className='queue-item-wrapper'>
