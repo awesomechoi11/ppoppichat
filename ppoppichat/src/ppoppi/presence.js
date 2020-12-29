@@ -28,19 +28,17 @@ function debounce(func, wait, immediate) {
 
 socket.on('videoControl', (videoState) => {
     if (window.plyr) {
-        console.log(window.plyr.playing !== videoState.playing, Math.abs(window.plyr.currentTime - videoState.currentTime) > 0.3)
-        //console.log(Math.abs(window.plyr.currentTime - videoState.currentTime) > 0.3)
-        if (
-            (Math.abs(window.plyr.currentTime - videoState.currentTime) > 0.3) ||
-            (window.plyr.playing !== videoState.playing)
-        ) {
-            console.log('need to update ', videoState)
-            if (window.plyr.playing !== videoState.playing) {
-                window.plyr.playing ? window.plyr.pause() : window.plyr.play();
-            }
-            if (Math.abs(window.plyr.currentTime - videoState.currentTime) > 0.3) {
-                window.plyr.currentTime = videoState.currentTime
-            }
+        if (window.plyr.playing !== videoState.playing) {
+            console.log('need to update playing')
+            window.plyr.playing ? window.plyr.pause() : window.plyr.play();
+        }
+        if (Math.abs(window.plyr.currentTime - videoState.currentTime) > 0.3) {
+            console.log('need to update time')
+            window.plyr.currentTime = videoState.currentTime
+        }
+        if (window.plyr.speed !== videoState.speed) {
+            console.log('need to update speed')
+            window.plyr.speed = videoState.speed
         }
     }
 })
@@ -59,7 +57,6 @@ export function setUserOnline(uid) {
 
 export function joinVideoroomSocket(id) {
     socket.emit('joinVideoroom', id)
-
 }
 
 

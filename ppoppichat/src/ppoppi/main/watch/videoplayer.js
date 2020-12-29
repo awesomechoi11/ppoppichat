@@ -28,16 +28,6 @@ function debounce(func, wait, immediate) {
 const defaultVideoUrl = 'https://www.youtube.com/watch?v=Gspl9LFjPZc'
 
 export class VideoPlayer extends React.Component {
-
-
-    setVideoState(videoplayer) {
-        window.videoState = {
-            currentTime: videoplayer.currentTime,
-            playing: videoplayer.playing,
-            speed: videoplayer.speed
-        }
-    }
-
     constructor(props) {
         super(props)
         this.player = React.createRef()
@@ -54,6 +44,13 @@ export class VideoPlayer extends React.Component {
                 ]
             }
         }
+        this.unsub = fire.firestore().doc('videorooms/' + this.videoroomID + '/videoState/videoState')
+            .onSnapshot(function (value) {
+                //console.log("Current data: ", value.data());
+                this.value = value
+            }.bind(this));
+
+
         //default state
         window.videoState = {
             currentTime: 0,
@@ -61,13 +58,14 @@ export class VideoPlayer extends React.Component {
             speed: 1,
             currentVideo: defaultVideoUrl
         }
+
         this.owo = debounce(function (uwu) {
             if (window.plyr !== this.player.current.plyr) {
                 window.plyr = this.player.current.plyr
             }
-            this.setVideoState(this.player.current.plyr)
+            this.setVideoState(window.plyr)
             videoControl(window.videoState)
-            console.log('play ', window.videoState)
+            console.log('owo ', window.videoState)
             //console.log(uwu)
         }, 100)
 
@@ -121,10 +119,17 @@ export class VideoPlayer extends React.Component {
         }
     }
 
-
+    setVideoState(videoplayer) {
+        window.videoState = {
+            currentTime: videoplayer.currentTime,
+            playing: videoplayer.playing,
+            speed: videoplayer.speed
+        }
+    }
 
     componentDidMount() {
         //this.plyr = this.player.current.plyr
+        this.owo()
     }
 
     setCurrentVideo = (source) => {
@@ -165,52 +170,3 @@ export class VideoPlayer extends React.Component {
 }
 
 
-class VideoControls extends React.Component {
-    constructor(props) {
-        super(props)
-        this.player = this.props.plyr.plyr
-
-        console.log('video controls called')
-        //console.log(this.state.player)
-    }
-
-
-    componentDidMount() {
-        //console.log(this.props.videoroomID)
-        if (this.player) {
-            // this.player.on('play', event => {
-            //     event.preventDefault()
-            //     console.log('play ', event)
-            // });
-            // this.unsub = fire.firestore().doc('videorooms/' + this.props.videoroomID + '/videoState/videoState')
-            //     .onSnapshot(function (value) {
-            //         console.log(value.metadata)
-            //         console.log("Current data: ", value.data());
-            //         this.value = value
-            //     }.bind(this));
-            console.log(this.player)
-            this.player.once('ready', event => {
-                console.log('player is ready')
-            });
-        }
-
-
-    }
-
-    componentWillUnmount() {
-
-        if (this.player) {
-            this.player.destroy()
-            // this.unsub()
-        }
-    }
-
-    render() {
-
-        return (
-            <div></div>
-        )
-    }
-
-
-}

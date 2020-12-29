@@ -134,6 +134,9 @@ export function joinVideoroom(userData, videoroomID) {
     if (userData.currentVideoroom === videoroomID) {
         console.log('user is already in room')
     } else {
+
+        joinVideoroomSocket(videoroomID)
+
         userData.userRef.update({
             currentVideoroom: videoroomID
         }).then(() => {
@@ -141,7 +144,7 @@ export function joinVideoroom(userData, videoroomID) {
                 members: fire.firestore.FieldValue.arrayUnion(userData.userRef)
             }).then(() => {
 
-                joinVideoroomSocket(videoroomID)
+
 
                 console.log('user successfully joined room')
             }).catch(err => {
@@ -168,6 +171,7 @@ export function leaveVideoroom(userData) {
         console.log('leave video room')
         console.log(userData.currentVideoroom)
 
+        leaveVideoroomSocket(userData.currentVideoroom)
 
         db.doc('/videorooms/' + userData.currentVideoroom + '/videoState/members').update({
             members: fire.firestore.FieldValue.arrayRemove(userData.userRef)
@@ -176,7 +180,7 @@ export function leaveVideoroom(userData) {
                 currentVideoroom: 'none'
             }).then(() => {
 
-                leaveVideoroomSocket(userData.currentVideoroom)
+
 
                 console.log('user successfully left room')
             }).catch(err => {
