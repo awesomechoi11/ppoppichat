@@ -100,7 +100,8 @@
             overflow: hidden;
         }
 
-        .queue-data-under {
+        .queue-data-under,
+        .queue-data-user {
             font-family: $font-fredoka;
             display: flex;
             justify-content: space-between;

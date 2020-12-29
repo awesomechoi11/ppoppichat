@@ -1,0 +1,8 @@
+.video-room-media-wrapper {
+    > * {
+        height: 100%;
+        > * {
+            height: 100%;
+        }
+    }
+}

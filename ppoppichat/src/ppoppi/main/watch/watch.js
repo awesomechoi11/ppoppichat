@@ -13,7 +13,8 @@ import React from 'react'
 
 import { SmallModal } from './customModal'
 import { VideoPlayer } from './videoplayer';
-
+import { VideoMembers } from './videomembers';
+import { VideoQueue } from './videoqueue';
 
 const membersDivider = (
     <svg width="240" height="24" viewBox="0 0 240 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -75,15 +76,10 @@ function Watch(props) {
     //set a listener for watchroom
 
     const [value, loading, error] = useDocument(
-        //firebase.firestore().doc('videorooms/' + videoRoom),
-        firebase.firestore().doc('videorooms/' + videoRoom),
-        {
-            snapshotListenOptions: { includeMetadataChanges: true },
-        }
+        firebase.firestore().doc('videorooms/' + videoRoom)
     );
 
 
-    var watchInner = (<div>err</div>)
     if (value) {
         if (value.exists) {
             console.log('join room start')
@@ -103,12 +99,9 @@ function Watch(props) {
                             </div>
                             <div className='members-list'>
 
-                                {value.data().members.map((member, index) => (
-
-                                    <MemberItem key={index} userRef={member}></MemberItem>
-
-
-                                ))}
+                                <VideoMembers
+                                    videoroomID={videoRoom}
+                                />
 
                             </div>
                         </div>
@@ -118,16 +111,11 @@ function Watch(props) {
                                 {<PlusSvg modalKey='queue' userData={props[0].userData} />}
                             </div>
                             <div className='queue-list'>
-                                {
 
+                                <VideoQueue
+                                    videoroomID={videoRoom}
+                                />
 
-                                    value.data().queue.map((video, index) => (
-                                        <QueueItem key={index} videoData={video} />
-
-                                    ))
-
-
-                                }
                             </div>
                         </div>
                     </div>
@@ -147,86 +135,7 @@ function Watch(props) {
         console.log('watch called value not set')
         return (<div>uwu</div>)
     }
-    //send a join request
-
-    // return(<div>uwu</div>)
-
-    // return (
-
-    //     <div id='watch-inner'>
-    //         {loading && <span>Loading...</span>}
-    //         {error && <strong>Error: {JSON.stringify(error)}</strong>}
-
-    //         {value && (
-    //             watchInner
-    //         )}
-    //         <div className='video-room-media-wrapper'>
-    //             <VideoPlayer />
-    //         </div>
-    //     </div >
-    // )
 }
 
 export { Watch }
 
-
-function MemberItem(props) {
-    //firebase.firestore()
-    const [userData, loading, error] = useDocument(
-        //firebase.firestore().doc('videorooms/' + videoRoom),
-        props.userRef,
-        {
-            snapshotListenOptions: { includeMetadataChanges: true },
-        }
-    );
-    //console.log(loading, userData)
-
-    var imgsrc = placeholderPicture
-    var username = 'Loading...'
-    if (loading) {
-        return (
-            <div className='member-item-wrapper'>
-                <img className='member-item-picture' src={placeholderPicture}></img>
-                <div className='member-item-name'>
-                    Loading...
-                </div>
-            </div>
-        )
-    }
-    return (
-        <div className='member-item-wrapper'>
-            <img className='member-item-picture' alt='user profile' src={userData.data().photoURL}></img>
-            <div className='member-item-name'>
-                {userData.data().nickname}
-            </div>
-        </div>
-    )
-
-}
-
-function QueueItem(props) {
-    //get youtube video information
-    //assumes all info is correct
-    //console.log(props.videoData)
-
-    return (
-        <div className='queue-item-wrapper'>
-            <img className='queue-item-picture'
-                src={props.videoData.videoInfo.thumbnail}
-            />
-            <div className='queue-item-data'>
-                <div className='queue-data-title'>
-                    {props.videoData.videoInfo.title}
-                </div>
-                <div className='queue-data-under'>
-                    <div className='queue-data-user'>
-                        added by {props.videoData.addedBy}
-                    </div>
-                    <div className='queue-data-length'>
-                        3:21
-            </div>
-                </div>
-            </div>
-        </div>
-    )
-}

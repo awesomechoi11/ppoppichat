@@ -35,11 +35,7 @@ function createVideoroom(userRef) {
         videoroomRef.set({
             owner: userRef,
             roomName: user.get('name') + "'s room",
-            state: 'paused',
-            time: 0,
-            new: true,
-            members: [],
-            queue: []
+            new: true
         }).then(() => {
             //add new videoroom to user
             userRef.update({
@@ -47,6 +43,9 @@ function createVideoroom(userRef) {
                 videoroomID: videoroomRef.id
             })
         })
+        videoroomRef.collection('videoState').doc('queue').set({ queue: [] })
+        videoroomRef.collection('videoState').doc('videoState').set({ videoState: [] })
+        videoroomRef.collection('videoState').doc('members').set({ members: [] })
     })
 }
 // function setDoc(docRef, obj) {
@@ -137,7 +136,7 @@ export function joinVideoroom(userData, videoroomID) {
         userData.userRef.update({
             currentVideoroom: videoroomID
         }).then(() => {
-            db.collection('videorooms').doc(videoroomID).update({
+            db.doc('/videorooms/' + videoroomID + '/videoState/members').update({
                 members: fire.firestore.FieldValue.arrayUnion(userData.userRef)
             }).then(() => {
                 console.log('user successfully joined room')
@@ -164,7 +163,7 @@ export function leaveVideoroom(userData) {
     } else {
         console.log('leave video room')
         console.log(userData.currentVideoroom)
-        db.collection('videorooms').doc(userData.currentVideoroom).update({
+        db.doc('/videorooms/' + userData.currentVideoroom + '/videoState/members').update({
             members: fire.firestore.FieldValue.arrayRemove(userData.userRef)
         }).then(() => {
             userData.userRef.update({

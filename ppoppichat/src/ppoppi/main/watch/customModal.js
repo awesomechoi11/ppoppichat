@@ -4,8 +4,9 @@ import React, { useState } from "react";
 import './customModal.scss'
 import axios from 'axios';
 
-
-
+const localurl = 'http://localhost:5001/ppoppi/us-central1/addVideoToList?'
+const produrl = 'https://us-central1-ppoppi.cloudfunctions.net/addVideoToList?'
+var currUrl = produrl
 
 const customStyles = {
     content: {
@@ -45,8 +46,7 @@ export function SmallModal(props) {
                         console.log(props.userData.nickname, ' is adding ', url, ' to ', props.userData.videoroomID)
                         axios({
                             method: 'get',
-                            url: 'https://us-central1-ppoppi.cloudfunctions.net/addVideoToList?' +
-                                'url=' + url +
+                            url: currUrl + 'url=' + url +
                                 '&username=' + props.userData.nickname +
                                 '&videoroom=' + props.userData.videoroomID,
                             headers: {

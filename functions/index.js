@@ -84,7 +84,16 @@ const acceptedFormats = [
 
 
 function getVideoInfo(link) {
-	const myURL = new URL(link);
+
+	var myURL
+	try {
+		myURL = new URL(link);
+	} catch (err) {
+		console.log(err)
+		return new Promise((resolve, reject) => {
+			resolve(false)
+		})
+	}
 
 	var data = {
 		type: 'youtube',
@@ -152,42 +161,44 @@ exports.addVideoToList = functions.https.onRequest((request, response) => {
 	const videoroomID = request.query.videoroom
 	if (username && queryurl && videoroomID) {
 		const videodata = getVideoInfo(request.query.url);
-		videodata.then(result => {
-			if (result.videoInfo) {
-				result.addedBy = username
-				//console.log(result)
-				return addToQueue(videoroomID, result)
-					.then(() => {
+		if (videodata) {
 
-						response.send("success");
-						console.log('successfully added video to queue')
-						return
-					}).catch(err => {
-						console.log(err)
-						response.send("uh oh video room may not exist");
-					})
-				//sent result to database
+			videodata.then(result => {
+				if (result.videoInfo) {
+					result.addedBy = username
+					//console.log(result)
+					return addToQueue(videoroomID, result)
+						.then(() => {
 
-			} else {
+							response.send("success");
+							console.log('successfully added video to queue')
+							return
+						}).catch(err => {
+							console.log(err)
+							response.send("uh oh video room may not exist");
+						})
+					//sent result to database
 
-				response.send("err occured!! check logs");
-				return
-			}
-		}).catch(err => {
-			console.log(err)
-			response.send("uh oh !! err occured!! check logs");
-		})
+				} else {
+					response.send("err occured!! check logs");
+					return
+				}
+			}).catch(err => {
+				console.log(err)
+				response.send("uh oh !! err occured!! check logs");
+			})
+		} else {
+			response.send('invalid url')
+		}
 	} else {
-		response.send('invalid query stuff')
+		response.send('invalid query')
 	}
 
-	//})
-	//response.send("uh oh howd u get here?");
 });
 
 
 function addToQueue(videoroomID, videoData) {
-	const docRef = admin.firestore().collection('videorooms').doc(videoroomID)
+	const docRef = admin.firestore().doc('/videorooms/' + videoroomID + '/videoState/queue')
 	//console.log(docRef)
 	return docRef.update({
 		queue: admin.firestore.FieldValue.arrayUnion(videoData)
