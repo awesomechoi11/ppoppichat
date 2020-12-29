@@ -4,7 +4,7 @@ import { fire } from '../../../firebasecontext'
 
 
 export function VideoMembers(props) {
-    const [value, loading, error] = useDocument(
+    const [value] = useDocument(
         fire.firestore().doc('/videorooms/' + props.videoroomID + '/videoState/members')
     );
     if (value) {
@@ -36,7 +36,7 @@ export function VideoMembers(props) {
 
 function MemberItem(props) {
     //firebase.firestore()
-    const [userData, loading, error] = useDocument(
+    const [userData, loading] = useDocument(
         //firebase.firestore().doc('videorooms/' + videoRoom),
         props.userRef,
         {

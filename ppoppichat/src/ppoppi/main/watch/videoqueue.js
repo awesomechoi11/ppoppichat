@@ -45,6 +45,7 @@ function QueueItem(props) {
     return (
         <div className='queue-item-wrapper'>
             <img className='queue-item-picture'
+                alt='owo'
                 src={props.videoData.videoInfo.thumbnail}
             />
             <div className='queue-item-data'>

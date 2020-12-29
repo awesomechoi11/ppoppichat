@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import './customModal.scss'
 import axios from 'axios';
 
-const localurl = 'http://localhost:5001/ppoppi/us-central1/addVideoToList?'
+//const localurl = 'http://localhost:5001/ppoppi/us-central1/addVideoToList?'
 const produrl = 'https://us-central1-ppoppi.cloudfunctions.net/addVideoToList?'
 var currUrl = produrl
 

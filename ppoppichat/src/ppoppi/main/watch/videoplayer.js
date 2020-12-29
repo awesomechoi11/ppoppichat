@@ -7,26 +7,125 @@ import Plyr from 'plyr-react'
 import 'plyr-react/dist/sass/plyr.scss'
 import './videoplayer.scss'
 
+import { videoControl } from '../../presence'
+
+function debounce(func, wait, immediate) {
+    var timeout;
+    return function () {
+        var context = this, args = arguments;
+        var later = function () {
+            timeout = null;
+            if (!immediate) func.apply(context, args);
+        };
+        var callNow = immediate && !timeout;
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+        if (callNow) func.apply(context, args);
+    };
+};
+
+
+const defaultVideoUrl = 'https://www.youtube.com/watch?v=Gspl9LFjPZc'
+
 export class VideoPlayer extends React.Component {
+
+
+    setVideoState(videoplayer) {
+        window.videoState = {
+            currentTime: videoplayer.currentTime,
+            playing: videoplayer.playing,
+            speed: videoplayer.speed
+        }
+    }
+
     constructor(props) {
         super(props)
         this.player = React.createRef()
-        console.log('video player const')
+        console.log('video player called')
         this.videoroomID = window.location.pathname.split('/').pop();
         this.state = {//default video
             source: {
                 type: 'video',
                 sources: [
                     {
-                        src: 'https://www.youtube.com/watch?v=Gspl9LFjPZc',
+                        src: defaultVideoUrl,
                         provider: 'youtube',
                     },
                 ]
             }
         }
-        //console.log(this.state.player)
+        //default state
+        window.videoState = {
+            currentTime: 0,
+            playing: false,
+            speed: 1,
+            currentVideo: defaultVideoUrl
+        }
+        this.owo = debounce(function (uwu) {
+            if (window.plyr !== this.player.current.plyr) {
+                window.plyr = this.player.current.plyr
+            }
+            this.setVideoState(this.player.current.plyr)
+            videoControl(window.videoState)
+            console.log('play ', window.videoState)
+            //console.log(uwu)
+        }, 100)
+
+        this.options = {
+            listeners: {//listen to user controls and emit 
+                play: (e) => {
+                    this.owo()
+                },
+                pause: (e) => {
+                    this.owo()
+
+                },
+                seek: (e) => {
+                    this.owo()
+                },
+                restart: (e) => {
+                    this.owo()
+                },
+                rewind: (e) => {
+                    this.owo()
+                },
+                fastForward: (e) => {
+                    this.owo()
+                },
+                speed: (e) => {
+                    this.owo()
+                },
+                fullscreen: (e) => {
+                    //slider bar input
+                    e.preventDefault()
+                    console.log('seek ', e)
+
+                },
+            },
+            keyboard: { focused: false, global: false },
+            controls: [
+                'play-large', // The large play button in the center
+                'restart', // Restart playback
+                'rewind', // Rewind by the seek time (default 10 seconds)
+                'play', // Play/pause playback
+                'fast-forward', // Fast forward by the seek time (default 10 seconds)
+                'progress', // The progress bar and scrubber for playback and buffering
+                'current-time', // The current time of playback
+                'duration', // The full duration of the media
+                'volume', // Volume control
+                'settings', // Settings menu
+                'fullscreen', // Toggle fullscreen
+            ],
+            seekTime: 5,
+            autoplay: true
+        }
     }
 
+
+
+    componentDidMount() {
+        //this.plyr = this.player.current.plyr
+    }
 
     setCurrentVideo = (source) => {
         this.setState({
@@ -34,42 +133,21 @@ export class VideoPlayer extends React.Component {
         })
     }
 
-    componentDidMount() {
-        console.log('videoplayer mounted')
-
-        console.log(this.player)
-        //console.log(this.player)
-        //this.setState({ player: this.player })
-        //console.log(this.state.player)
-
-    }
-    //                        ref={(player) => (!this.state.player && this.setState({ player: player }))}
-    //this.setState(player => ({ player: player ?? plyr }))
-    //                    <VideoControls videoroomID={this.videoroomID} plyr={this.player.current.plyr} setCurrentVideo={this.setCurrentVideo} />
-
     render() {
-        console.log(this.state.player)
+        //console.log(this.state.player)
         if (this.state.source) {
-            if (this.state.player) {
-                return (
-                    <div>
-                        <Plyr
-                            source={this.state.source}
-                        />
-                        <VideoControls videoroomID={this.videoroomID} plyr={this.state.player} setCurrentVideo={this.setCurrentVideo} />
-                    </div>
-                )
-            } else {
 
-                return (
-                    <div>
-                        <Plyr
-                            ref={(player) => (this.setState({ player: player }))}
-                            source={this.state.source}
-                        />
-                    </div>
-                )
-            }
+
+            return (
+                <div>
+                    <Plyr
+                        ref={(player) => (this.player.current = player)}
+                        source={this.state.source}
+                        options={this.options}
+                    />
+                </div>
+            )
+
         } else {
             return (
                 <div>
@@ -78,47 +156,7 @@ export class VideoPlayer extends React.Component {
             )
         }
 
-        //console.log(value)
-        // if (this.value) {
-        //     if (this.value.exists) {
-        //         console.log(this.value.data().queue[0])
-        //         return (
-        //             <div>
-        //                 <Plyr
-        //                     ref={this.setPlayer}
-        //                     source={
-        //                         {
 
-        //                             type: 'video',
-        //                             sources: [
-        //                                 {
-        //                                     src: this.value.data().queue[0].id,
-        //                                     provider: this.value.data().queue[0].type,
-        //                                 },
-        //                             ],
-        //                             previewThumbnails: {
-        //                                 src: this.value.data().queue[0].videoInfo.thumbnail,
-        //                             },
-        //                         }
-        //                     }
-        //                 />
-        //                 <VideoControls player={this.state.player} setCurrentVideo={this.setCurrentVideo} />
-        //             </div>
-        //         )
-        //     } else {
-        //         return (
-        //             <div>
-        //                 error!!!
-        //             </div>
-        //         )
-        //     }
-        // } else {
-        //     return (
-        //         <div>
-        //             pls add a video
-        //         </div>
-        //     )
-        // }
     };
 
 
@@ -130,59 +168,40 @@ export class VideoPlayer extends React.Component {
 class VideoControls extends React.Component {
     constructor(props) {
         super(props)
-        this.player = this.props.player
-        console.log(this.props)
+        this.player = this.props.plyr.plyr
 
+        console.log('video controls called')
         //console.log(this.state.player)
     }
 
+
     componentDidMount() {
         //console.log(this.props.videoroomID)
-        if (this.props.player) {
-            console.log(this.props.player)
-            this.unsub = fire.firestore().doc('videorooms/' + this.props.videoroomID + '/videoState/videoState')
-                .onSnapshot(function (value) {
-                    console.log(value.metadata)
-                    console.log("Current data: ", value.data());
-                    this.value = value
-                }.bind(this));
-
-            this.player = this.props.player
+        if (this.player) {
+            // this.player.on('play', event => {
+            //     event.preventDefault()
+            //     console.log('play ', event)
+            // });
+            // this.unsub = fire.firestore().doc('videorooms/' + this.props.videoroomID + '/videoState/videoState')
+            //     .onSnapshot(function (value) {
+            //         console.log(value.metadata)
+            //         console.log("Current data: ", value.data());
+            //         this.value = value
+            //     }.bind(this));
             console.log(this.player)
+            this.player.once('ready', event => {
+                console.log('player is ready')
+            });
         }
-        // console.log(player)
-        // player.once('ready', event => {
-        //     const instance = event.detail.plyr;
-        //     console.log(1232131231323)
-        //     player.on('ended', event => {
-        //         console.log('video ended')
-        //     });
-        //     player.on('seeked', event => {
 
-        //         console.log('seek')
-        //     });
-        //     player.on('pause', event => {
-
-        //         console.log('pause')
-        //     });
-        //     player.on('play', event => {
-
-        //         console.log('play ', event)
-        //     });
-        //     player.on('ratechange', event => {
-
-        //         console.log('speed')
-        //     });
-        // });
 
     }
 
     componentWillUnmount() {
-        if (this.unsub) {
-            this.unsub()
-        }
-        if (this.player) {
 
+        if (this.player) {
+            this.player.destroy()
+            // this.unsub()
         }
     }
 
