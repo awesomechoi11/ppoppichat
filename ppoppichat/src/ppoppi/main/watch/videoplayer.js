@@ -3,7 +3,7 @@ import React from 'react';
 //import { useDocument } from 'react-firebase-hooks/firestore';
 import { fire } from '../../../firebasecontext'
 // Only loads the YouTube player
-import Plyr from 'plyr-react'
+import PlyrJs from 'plyr'
 import 'plyr-react/dist/sass/plyr.scss'
 import './videoplayer.scss'
 
@@ -30,10 +30,68 @@ const defaultVideoUrl = 'https://www.youtube.com/watch?v=Gspl9LFjPZc'
 export class VideoPlayer extends React.Component {
     constructor(props) {
         super(props)
-        this.player = React.createRef()
+        //this.player = React.createRef()
         console.log('video player called')
+
+    }
+
+
+
+    componentDidMount() {
         this.videoroomID = window.location.pathname.split('/').pop();
-        this.state = {//default video
+        //default state
+        // window.videoState = {
+        //     currentTime: 0,
+        //     playing: false,
+        //     speed: 1,
+        //     currentVideo: defaultVideoUrl
+        // }
+
+        // this.owo = debounce(function (uwu) {
+        //     if (window.plyr !== this.player.current.plyr) {
+        //         window.plyr = this.player.current.plyr
+        //     }
+        //     this.setVideoState(window.plyr)
+        //     videoControl(window.videoState)
+        //     console.log('owo ', window.videoState)
+        //     //console.log(uwu)
+        // }, 100)
+
+
+        // this.unsub = fire.firestore().doc('videorooms/' + this.videoroomID + '/videoState/videoState')
+        //     .onSnapshot(function (value) {
+        //         //console.log("Current data: ", value.data());
+        //         this.value = value
+        //     }.bind(this));
+        // console.log(this.player.current)
+        // //this.plyr = this.player.current.plyr
+        // setTimeout(() => {
+        //     window.plyr = this.player.current.plyr
+        // }, 300)
+    }
+
+
+
+
+    render() {
+
+        return (
+            <div>
+                <PlyrWrapper videoroomID={this.videoroomID} />
+            </div>
+        )
+
+
+
+
+    };
+}
+
+class PlyrWrapper extends React.Component {
+
+    constructor(props) {
+        super(props)
+        this.state = {
             source: {
                 type: 'video',
                 sources: [
@@ -42,27 +100,29 @@ export class VideoPlayer extends React.Component {
                         provider: 'youtube',
                     },
                 ]
-            }
+            },
+            mediaprovider: 'youtube'
         }
-        this.unsub = fire.firestore().doc('videorooms/' + this.videoroomID + '/videoState/videoState')
-            .onSnapshot(function (value) {
-                //console.log("Current data: ", value.data());
-                this.value = value
-            }.bind(this));
+        this.playerRef = React.createRef();
+    }
 
+    setCurrentVideo = (source) => {
+        this.setState({
+            source: source
+        })
+    }
 
-        //default state
+    setVideoState(videoplayer) {
         window.videoState = {
-            currentTime: 0,
-            playing: false,
-            speed: 1,
-            currentVideo: defaultVideoUrl
+            currentTime: videoplayer.currentTime,
+            playing: videoplayer.playing,
+            speed: videoplayer.speed
         }
+    }
+
+    componentDidMount() {
 
         this.owo = debounce(function (uwu) {
-            if (window.plyr !== this.player.current.plyr) {
-                window.plyr = this.player.current.plyr
-            }
             this.setVideoState(window.plyr)
             videoControl(window.videoState)
             console.log('owo ', window.videoState)
@@ -117,56 +177,55 @@ export class VideoPlayer extends React.Component {
             seekTime: 5,
             autoplay: true
         }
-    }
 
-    setVideoState(videoplayer) {
-        window.videoState = {
-            currentTime: videoplayer.currentTime,
-            playing: videoplayer.playing,
-            speed: videoplayer.speed
-        }
-    }
+        this.player = new PlyrJs(this.playerRef.current, this.options);
+        console.log(this.owo, this.playerRef.current)
 
-    componentDidMount() {
-        //this.plyr = this.player.current.plyr
-        this.owo()
-    }
+        this.player.on('ready', e => {
+            console.log('ready')
+            window.plyr = this.player
 
-    setCurrentVideo = (source) => {
-        this.setState({
-            source: source
         })
+
+
     }
 
     render() {
-        //console.log(this.state.player)
-        if (this.state.source) {
-
-
+        console.log(this.state.source)
+        if (this.state.mediaprovider === 'youtube') {
             return (
-                <div>
-                    <Plyr
-                        ref={(player) => (this.player.current = player)}
-                        source={this.state.source}
-                        options={this.options}
-                    />
+                <div ref={this.playerRef} className="plyr__video-embed" id="player">
+                    <iframe
+                        title='youtube player'
+                        src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1"
+                        allowfullscreen
+                        allowtransparency
+                        allow="autoplay"
+                    ></iframe>
+                </div>
+
+            )
+        } else if (this.state.mediaprovider === 'vimeo') {
+            return (
+                <div ref={this.playerRef} id="player">
+                    hello
                 </div>
             )
-
+        } else if (this.state.mediaprovider === 'html5') {
+            return (
+                <div ref={this.playerRef} id="player">
+                    hello
+                </div>
+            )
         } else {
             return (
-                <div>
-                    pls add a video
+                <div ref={this.playerRef} id="player">
+                    hello
                 </div>
             )
         }
 
-
-    };
-
-
-
+    }
 
 }
-
 

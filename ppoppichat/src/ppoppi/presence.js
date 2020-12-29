@@ -7,44 +7,37 @@ socket.on("connect", () => {
 })
 
 
-function debounce(func, wait, immediate) {
-    var timeout;
-    return function () {
-        var context = this, args = arguments;
-        var later = function () {
-            timeout = null;
-            if (!immediate) func.apply(context, args);
-        };
-        var callNow = immediate && !timeout;
-        clearTimeout(timeout);
-        timeout = setTimeout(later, wait);
-        if (callNow) func.apply(context, args);
-    };
-};
-
-
-//const uwu = debounce()
-
+function setVideoState(videoState) {
+    if (window.plyr.playing !== videoState.playing) {
+        console.log('need to update playing')
+        window.plyr.playing ? window.plyr.pause() : window.plyr.play();
+    }
+    if (Math.abs(window.plyr.currentTime - videoState.currentTime) > 0.3) {
+        console.log('need to update time')
+        window.plyr.currentTime = videoState.currentTime
+    }
+    if (window.plyr.speed !== videoState.speed) {
+        console.log('need to update speed')
+        window.plyr.speed = videoState.speed
+    }
+}
 
 socket.on('videoControl', (videoState) => {
     if (window.plyr) {
-        if (window.plyr.playing !== videoState.playing) {
-            console.log('need to update playing')
-            window.plyr.playing ? window.plyr.pause() : window.plyr.play();
+        if (window.prevState) {
+            videoState = window.prevState
         }
-        if (Math.abs(window.plyr.currentTime - videoState.currentTime) > 0.3) {
-            console.log('need to update time')
-            window.plyr.currentTime = videoState.currentTime
+        if (!window.plyr.ready) {
+            return
         }
-        if (window.plyr.speed !== videoState.speed) {
-            console.log('need to update speed')
-            window.plyr.speed = videoState.speed
-        }
+        setTimeout(() => { setVideoState(videoState) }, 100)
+    } else {
+        window.prevState = videoState;
     }
 })
 
 socket.on("requestVideoState", () => {
-    console.log('connected to socket server')
+    console.log('requested videostate, emitting')
     socket.emit('videoControl', window.videoState)
 })
 

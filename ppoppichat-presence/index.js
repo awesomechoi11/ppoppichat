@@ -71,10 +71,10 @@ class roomstracker {
 
   //assumes room exists
   isFirst(roomid) {
-    return this.roomlist[roomid].size < 2
+    return this.roomlist.get(roomid).size < 2
   }
   getSomeguy(socket, roomid) {
-    for (const user of rooms.get(roomid).values()) {
+    for (const user of rooms.roomlist.get(roomid).values()) {
       if (user !== socket.id) {
         return user
       }
@@ -98,81 +98,54 @@ io.on('connection', (socket) => {
     // we store the username in the socket session for this client
     socket.uid = uid;
     addedUser = true;
-
     //update firebase of user status
     updateOnline(true, uid)
 
-    console.log(socket.uid)
-    if (rooms.isInRoom(socket)) {
-      console.log(socket.id, ' is joining back to videoroom ', socket.videoroomID)
-      socket.join(socket.videoroomID)
-    }
+
+    socket.on('joinVideoroom', (videoroomID) => {
+      socket.videoroomID = videoroomID;
+      // if (rooms.isInRoom(socket, videoroomID)) {
+      //   return
+      // }
+      console.log(socket.uid, ' is joining room: ', videoroomID)
+      socket.videoroomID = videoroomID
+      //socket.emit('requestVideoState')
+      socket.join(videoroomID)
+
+
+      rooms.addRoom(videoroomID)
+      rooms.addUserToRoom(socket, videoroomID)
+      //if somone else is already in room.
+      //request new times
+      if (!rooms.isFirst(videoroomID)) {
+        //request to someguy for videostate with my id
+        console.log('not first, need to request videostate')
+        socket.to(rooms.getSomeguy(socket, videoroomID)).emit('requestVideoState', socket.id)
+      }
+
+    });
+
+    socket.on('leaveVideoroom', (videoroomID) => {
+      console.log(socket.uid, ' is leaving room: ', videoroomID)
+      if (rooms.isInRoom(socket, socket.videoroomID)) {
+        rooms.removeUserFromRoom(socket, socket.videoroomID)
+      }
+      socket.leave(socket.videoroomID)
+    });
+    socket.on('videoControl', (videoState) => {
+      //console.log(socket.uid, ' ', videoroomID)
+      //socket.leave(videoroomID)
+      console.log(videoState)
+      socket.to(socket.videoroomID).emit('videoControl', videoState)
+    });
 
   });
-
-  // // when the client emits 'typing', we broadcast it to others
-  // socket.on('typing', () => {
-  //   socket.broadcast.emit('typing', {
-  //     username: socket.username
-  //   });
-  // });
-
-  // // when the client emits 'stop typing', we broadcast it to others
-  // socket.on('stop typing', () => {
-  //   socket.broadcast.emit('stop typing', {
-  //     username: socket.username
-  //   });
-  // });
-
-  socket.on('joinVideoroom', (videoroomID) => {
-    socket.videoroomID = videoroomID;
-    if (rooms.isInRoom(socket, videoroomID)) {
-      return
-    }
-    console.log(socket.uid, ' is joining room: ', videoroomID)
-    socket.videoroomID = videoroomID
-    //socket.emit('requestVideoState')
-    socket.join(videoroomID)
-
-
-    rooms.addRoom(videoroomID)
-    rooms.addUserToRoom(socket.id, videoroomID)
-    //if somone else is already in room.
-    //request new times
-    if (!rooms.isFirst(videoroomID)) {
-      //request to someguy for videostate with my id
-      socket.to(rooms.getSomeguy(socket.id, videoroomID)).emit('requestVideoState', socket.id)
-    }
-
-  });
-
-  socket.on('leaveVideoroom', (videoroomID) => {
-    console.log(socket.uid, ' is leaving room: ', videoroomID)
-    if (rooms.isInRoom(socket.id, socket.videoroomID)) {
-      rooms.removeUserFromRoom(socket.id, socket.videoroomID)
-    }
-    socket.leave(socket.videoroomID)
-  });
-  socket.on('videoControl', (videoState) => {
-    //console.log(socket.uid, ' ', videoroomID)
-    //socket.leave(videoroomID)
-    console.log(videoState)
-    socket.to(socket.videoroomID).emit('videoControl', videoState)
-  });
-
   // when the user disconnects.. perform this
   socket.on('disconnect', () => {
     if (addedUser) {
       console.log('a user disconnected: ', socket.uid)
       updateOnline(false, socket.uid)
       //update firebase that user is offline
-
-      // if (rooms.isInRoom(socket.id, socket.videoroomID)) {
-      //   rooms.removeUserFromRoom(socket.id, socket.videoroomID)
-      // }
-      // socket.leave(socket.videoroomID)
-
-
     }
   });
 });
@@ -180,3 +153,18 @@ io.on('connection', (socket) => {
 
 io.listen(port)
 console.log('listening on port ', port);
+
+
+    // // when the client emits 'typing', we broadcast it to others
+    // socket.on('typing', () => {
+    //   socket.broadcast.emit('typing', {
+    //     username: socket.username
+    //   });
+    // });
+
+    // // when the client emits 'stop typing', we broadcast it to others
+    // socket.on('stop typing', () => {
+    //   socket.broadcast.emit('stop typing', {
+    //     username: socket.username
+    //   });
+    // });
