@@ -2,7 +2,7 @@ import './watch.scss'
 import firebase from "firebase/app"
 //when connected to this url
 //fetch from firebase 
-import placeholderPicture from './unknown.png'
+//import placeholderPicture from './unknown.png'
 import { useDocument } from 'react-firebase-hooks/firestore';
 import { joinVideoroom } from '../../firebaseFunctions'
 import {
@@ -79,6 +79,7 @@ function Watch(props) {
         firebase.firestore().doc('videorooms/' + videoRoom)
     );
 
+    console.log('watch room updated')
 
     if (value) {
         if (value.exists) {

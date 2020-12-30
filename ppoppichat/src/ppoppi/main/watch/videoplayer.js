@@ -7,7 +7,12 @@ import PlyrJs from 'plyr'
 import 'plyr-react/dist/sass/plyr.scss'
 import './videoplayer.scss'
 
+import { joinVideoroomSocket, requestNextVideo } from '../../presence'
+
 import { videoControl } from '../../presence'
+
+
+import isEqual from 'lodash.isequal'
 
 function debounce(func, wait, immediate) {
     var timeout;
@@ -32,46 +37,8 @@ export class VideoPlayer extends React.Component {
         super(props)
         //this.player = React.createRef()
         console.log('video player called')
-
-    }
-
-
-
-    componentDidMount() {
         this.videoroomID = window.location.pathname.split('/').pop();
-        //default state
-        // window.videoState = {
-        //     currentTime: 0,
-        //     playing: false,
-        //     speed: 1,
-        //     currentVideo: defaultVideoUrl
-        // }
-
-        // this.owo = debounce(function (uwu) {
-        //     if (window.plyr !== this.player.current.plyr) {
-        //         window.plyr = this.player.current.plyr
-        //     }
-        //     this.setVideoState(window.plyr)
-        //     videoControl(window.videoState)
-        //     console.log('owo ', window.videoState)
-        //     //console.log(uwu)
-        // }, 100)
-
-
-        // this.unsub = fire.firestore().doc('videorooms/' + this.videoroomID + '/videoState/videoState')
-        //     .onSnapshot(function (value) {
-        //         //console.log("Current data: ", value.data());
-        //         this.value = value
-        //     }.bind(this));
-        // console.log(this.player.current)
-        // //this.plyr = this.player.current.plyr
-        // setTimeout(() => {
-        //     window.plyr = this.player.current.plyr
-        // }, 300)
     }
-
-
-
 
     render() {
 
@@ -80,10 +47,6 @@ export class VideoPlayer extends React.Component {
                 <PlyrWrapper videoroomID={this.videoroomID} />
             </div>
         )
-
-
-
-
     };
 }
 
@@ -100,10 +63,13 @@ class PlyrWrapper extends React.Component {
                         provider: 'youtube',
                     },
                 ]
-            },
-            mediaprovider: 'youtube'
+            }
         }
         this.playerRef = React.createRef();
+
+
+
+
     }
 
     setCurrentVideo = (source) => {
@@ -120,45 +86,63 @@ class PlyrWrapper extends React.Component {
         }
     }
 
+    buildSource(data) {
+        var source = {}
+        if (data.type === 'youtube' ||
+            data.type === 'vimeo') {
+            source.type = 'video'
+            source.title = data.videoInfo.title
+            source.poster = data.videoInfo.thumbnail
+            source.sources = [
+                {
+                    provider: 'youtube',
+                    src: data.url
+                }
+            ]
+        } else if (data.type === 'html5') {
+            source.type = 'video'
+        } else {
+            source = {
+                type: 'video',
+                sources: [
+                    {
+                        src: defaultVideoUrl,
+                        provider: 'youtube',
+                    },
+                ]
+            }
+        }
+        return source
+    }
+
     componentDidMount() {
 
         this.owo = debounce(function (uwu) {
             this.setVideoState(window.plyr)
             videoControl(window.videoState)
-            console.log('owo ', window.videoState)
+            console.log('sending videostate ', window.videoState)
             //console.log(uwu)
         }, 100)
 
         this.options = {
             listeners: {//listen to user controls and emit 
-                play: (e) => {
-                    this.owo()
-                },
-                pause: (e) => {
-                    this.owo()
-
-                },
-                seek: (e) => {
-                    this.owo()
-                },
-                restart: (e) => {
-                    this.owo()
-                },
-                rewind: (e) => {
-                    this.owo()
-                },
-                fastForward: (e) => {
-                    this.owo()
-                },
-                speed: (e) => {
-                    this.owo()
-                },
+                play: (e) => { this.owo() },
+                pause: (e) => { this.owo() },
+                seek: (e) => { this.owo() },
+                restart: (e) => { this.owo() },
+                rewind: (e) => { this.owo() },
+                fastForward: (e) => { this.owo() },
+                speed: (e) => { this.owo() },
                 fullscreen: (e) => {
                     //slider bar input
                     e.preventDefault()
-                    console.log('seek ', e)
+                    //console.log('seek ', e)
 
                 },
+                ended: (e) => {
+                    console.log('video ended, requesting next video')
+                    requestNextVideo(this.currentVideo, this.videoroomID)
+                }
             },
             keyboard: { focused: false, global: false },
             controls: [
@@ -175,55 +159,93 @@ class PlyrWrapper extends React.Component {
                 'fullscreen', // Toggle fullscreen
             ],
             seekTime: 5,
-            autoplay: true
+            //autoplay: true
         }
 
-        this.player = new PlyrJs(this.playerRef.current, this.options);
-        console.log(this.owo, this.playerRef.current)
+        this.player = new PlyrJs('#player', this.options);
 
-        this.player.on('ready', e => {
-            console.log('ready')
+        this.player.once('ready', e => {
+            console.log('video player is ready')
             window.plyr = this.player
 
+            joinVideoroomSocket(this.props.videoroomID)
+
+            this.player.on('ended', e => {
+                console.log('video ended, requesting next video')
+                requestNextVideo(this.currentVideo, this.props.videoroomID)
+            })
+
+            this.unsub = fire.firestore().doc('/videorooms/' + this.props.videoroomID + '/videoState/queue')
+                .onSnapshot(function (value) {
+                    if (value.exists) {
+                        if (!isEqual(this.buildSource(value.data().queue[0]), this.state.source)) {
+                            this.currentVideo = value.data().queue[0]
+                            console.log('new source ', this.buildSource(this.currentVideo))
+                            this.setState({
+                                source: this.buildSource(this.currentVideo)
+                            })
+                        }
+
+
+                        //this.player.source = this.buildSource(value.data().currentVideo)
+                    }
+                }.bind(this));
         })
+
 
 
     }
 
-    render() {
-        console.log(this.state.source)
-        if (this.state.mediaprovider === 'youtube') {
-            return (
-                <div ref={this.playerRef} className="plyr__video-embed" id="player">
-                    <iframe
-                        title='youtube player'
-                        src="https://www.youtube.com/embed/bTqVqk7FSmY?origin=https://plyr.io&amp;iv_load_policy=3&amp;modestbranding=1&amp;playsinline=1&amp;showinfo=0&amp;rel=0&amp;enablejsapi=1"
-                        allowfullscreen
-                        allowtransparency
-                        allow="autoplay"
-                    ></iframe>
-                </div>
+    componentDidUpdate() {
+        console.log('did update')
+        if (window.plyr.source !== this.state.source) {
+            console.log('this')
+            window.plyr.source = this.state.source
+        }
+    }
 
-            )
-        } else if (this.state.mediaprovider === 'vimeo') {
-            return (
-                <div ref={this.playerRef} id="player">
-                    hello
-                </div>
-            )
-        } else if (this.state.mediaprovider === 'html5') {
-            return (
-                <div ref={this.playerRef} id="player">
-                    hello
-                </div>
-            )
+    render() {
+        //this.source = this.state.source
+        //console.log(this.source)
+        console.log('render video player ', this.state)
+        if (this.state.source) {
+            if (this.state.source.type === 'video') {
+                if (this.state.source.sources[0].provider === 'youtube' ||
+                    this.state.source.sources[0].provider === 'vimeo') {
+                    console.log(this.state.source.sources[0].src)
+                    return (
+                        <div class="plyr__video-embed" id="player">
+                            <iframe
+                                title='video player'
+                                src={this.state.source.sources[0].src}
+                                allowfullscreen
+                                allowtransparency
+                                allow="autoplay"
+                            ></iframe>
+                        </div>
+                    )
+                } else {
+                    <video id="player" playsinline controls >
+                        <source src={this.state.source.sources[0].src} type="video/mp4" />
+                    </video>
+                }
+            } else if (this.state.source.type === 'audio') {
+
+            } else {
+                return (
+                    <div ref={this.playerRef} id="player">
+                        source object error
+                    </div>
+                )
+            }
         } else {
             return (
                 <div ref={this.playerRef} id="player">
-                    hello
+                    please add a video
                 </div>
             )
         }
+
 
     }
 

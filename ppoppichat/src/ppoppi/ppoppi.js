@@ -15,7 +15,7 @@ import { setUserOnline } from './presence';
 import { StatusMessage } from './statusmessage';
 
 
-import { FirebaseContext, UserContext } from '../firebasecontext'
+import { FirebaseContext } from '../firebasecontext'
 
 
 export class Ppoppi extends React.Component {

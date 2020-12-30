@@ -1,7 +1,6 @@
 import {
     useRouteMatch,
-    Link,
-    Route
+    Link
 } from "react-router-dom";
 import './panel.scss';
 

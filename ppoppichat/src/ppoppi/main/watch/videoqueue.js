@@ -1,14 +1,15 @@
 import { useDocument } from 'react-firebase-hooks/firestore';
-import placeholderPicture from './unknown.png'
+//import placeholderPicture from './unknown.png'
 import { fire } from '../../../firebasecontext'
 
 
 export function VideoQueue(props) {
-    const [value, loading, error] = useDocument(
+    const [value] = useDocument(
         fire.firestore().doc('/videorooms/' + props.videoroomID + '/videoState/queue')
     );
     if (value) {
         if (value.exists) {
+            console.log(value.data())
             return (
                 <div className='members-list-inner'>
                     {

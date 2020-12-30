@@ -8,6 +8,9 @@ socket.on("connect", () => {
 
 
 function setVideoState(videoState) {
+    if (!videoState) {
+        return
+    }
     if (window.plyr.playing !== videoState.playing) {
         console.log('need to update playing')
         window.plyr.playing ? window.plyr.pause() : window.plyr.play();
@@ -24,12 +27,15 @@ function setVideoState(videoState) {
 
 socket.on('videoControl', (videoState) => {
     if (window.plyr) {
-        if (window.prevState) {
-            videoState = window.prevState
-        }
-        if (!window.plyr.ready) {
-            return
-        }
+        // if (window.prevState) {
+        //     videoState = window.prevState
+        // }
+
+        // if (!window.plyr.ready) {
+        //     window.prevState = videoState
+        //     console.log('player not ready')
+        //     return
+        // }
         setTimeout(() => { setVideoState(videoState) }, 100)
     } else {
         window.prevState = videoState;
@@ -49,6 +55,7 @@ export function setUserOnline(uid) {
 
 
 export function joinVideoroomSocket(id) {
+    console.log('attempting to join room')
     socket.emit('joinVideoroom', id)
 }
 
@@ -61,3 +68,6 @@ export function videoControl(videoState) {
     socket.emit('videoControl', videoState)
 }
 
+export function requestNextVideo(currentVideo, videoroomID) {
+    socket.emit('requestNextVideo', { currentVideo: currentVideo, videoroomID: videoroomID })
+}

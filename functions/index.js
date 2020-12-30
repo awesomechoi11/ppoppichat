@@ -205,61 +205,9 @@ function addToQueue(videoroomID, videoData) {
 	})
 }
 
-/*
-exports.addVideoToQueue = functions.https.onRequest((request, response) => {
 
-	addToQueue('testdoc', {
-		type: 'youtube',
-		url: 'https://www.youtube.com/watch?v=q_mo3zKsW1A&ab_channel=TheDailyDose',
-		videoInfo: {
-			title: 'Jaguar Sun | Best Of',
-			thumbnail: 'https://i.ytimg.com/vi/q_mo3zKsW1A/default.jpg',
-			time: 'PT1H1M5S'
-		},
-		id: 'q_mo3zKsW1A',
-		addedBy: 'testuser'
-	})
-	response.send('litty')
-	//response.send("uh oh howd u get here?");
-});
-
-
-
-
-exports.addUserToVideoroom = functions.https.onRequest((request, response) => {
-	const userID = request.query.userID;
-	const videoroomID = request.query.videoroomID
-	joinVideoroom(userID,videoroomID)
-	response.send('litty')
-	//response.send("uh oh howd u get here?");
-});
-
-
-
-function joinVideoroom(userID, videoroomID) {
-	//if user not already in room, join
-	var userRef = usersCol.doc(userID)
-	userRef.get().then(userdata => {
-		if (userdata.get('videoroomID') === videoroomID) {
-			console.log('user is already in room')
-		} else {
-			userRef.update({
-				currentVideoroom: videoroomID
-			}).then(() => {
-				db.collection('videorooms').doc(videoroomID).update({
-					members: firebase.firestore.FieldValue.arrayUnion(userRef)
-				}).then(() => {
-					console.log('user successfully joined room')
-				}).catch(err => {
-					console.log('err joining videoroom: ', err)
-				})
-			})
-		}
-	})
-
-}
-*/
 exports.removeUserFromVideoroom = functions.https.onRequest((request, response) => {
+	response.set('Access-Control-Allow-Origin', '*');
 	const userID = request.query.userID;
 	if (userID) {
 		leaveVideoroom(userID)
@@ -298,3 +246,13 @@ function leaveVideoroom(userID) {
 			console.log('err getting userdata: ', err)
 		})
 }
+
+exports.setCurrentVideo = functions.https.onRequest((request, response) => {
+	response.set('Access-Control-Allow-Origin', '*');
+
+	const queryurl = request.query.url;
+	const username = request.query.username
+	const videoroomID = request.query.videoroom
+
+	//response.send("uh oh howd u get here?");
+});

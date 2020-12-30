@@ -1,5 +1,5 @@
 var admin = require("firebase-admin");
-
+var isEqual = require('lodash.isequal');
 var serviceAccount = require("./ppoppi-firebase-adminsdk-lav8j-8443ea803c.json");
 
 admin.initializeApp({
@@ -26,6 +26,28 @@ function updateOnline(bool, uid) {
     online: bool
   })
 }
+
+function setNextVideo(currentVideo, videoroomID) {
+  let docRef = db.doc('/videorooms/' + videoroomID + '/videoState/queue')
+  docRef.get().then(value => {
+    if (value.exists) {
+      //console.log(value.data().queue[0])
+      //console.log(currentVideo)
+      if (value.data().queue.length > 1) {
+
+        if (isEqual(value.data().queue[0], currentVideo)) {
+          docRef.update({
+            queue: admin.firestore.FieldValue.arrayRemove(currentVideo)
+          })
+        }
+      }
+
+
+      //this.player.source = this.buildSource(value.data().currentVideo)
+    }
+  })
+}
+
 
 //manual tracker of google uid and socket ids and people in room
 class roomstracker {
@@ -104,12 +126,9 @@ io.on('connection', (socket) => {
 
     socket.on('joinVideoroom', (videoroomID) => {
       socket.videoroomID = videoroomID;
-      // if (rooms.isInRoom(socket, videoroomID)) {
-      //   return
-      // }
+
       console.log(socket.uid, ' is joining room: ', videoroomID)
       socket.videoroomID = videoroomID
-      //socket.emit('requestVideoState')
       socket.join(videoroomID)
 
 
@@ -119,7 +138,7 @@ io.on('connection', (socket) => {
       //request new times
       if (!rooms.isFirst(videoroomID)) {
         //request to someguy for videostate with my id
-        console.log('not first, need to request videostate')
+        console.log('not first, need to request videostate ', rooms.getSomeguy(socket, videoroomID))
         socket.to(rooms.getSomeguy(socket, videoroomID)).emit('requestVideoState', socket.id)
       }
 
@@ -133,11 +152,16 @@ io.on('connection', (socket) => {
       socket.leave(socket.videoroomID)
     });
     socket.on('videoControl', (videoState) => {
-      //console.log(socket.uid, ' ', videoroomID)
-      //socket.leave(videoroomID)
       console.log(videoState)
       socket.to(socket.videoroomID).emit('videoControl', videoState)
     });
+
+    socket.on('requestNextVideo', (data) => {
+      console.log('requesting next video for ', data.videoroomID)
+      //socket.to(socket.videoroomID).emit('videoControl', videoState)
+      setNextVideo(data.currentVideo, data.videoroomID)
+    });
+
 
   });
   // when the user disconnects.. perform this
@@ -146,6 +170,12 @@ io.on('connection', (socket) => {
       console.log('a user disconnected: ', socket.uid)
       updateOnline(false, socket.uid)
       //update firebase that user is offline
+
+      console.log(socket.uid, ' is leaving room: ', socket.videoroomID)
+      if (rooms.isInRoom(socket, socket.videoroomID)) {
+        rooms.removeUserFromRoom(socket, socket.videoroomID)
+      }
+      socket.leave(socket.videoroomID)
     }
   });
 });

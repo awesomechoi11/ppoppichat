@@ -1,5 +1,5 @@
 import { fire } from '../firebasecontext'
-import { leaveVideoroomSocket, joinVideoroomSocket } from './presence';
+import { leaveVideoroomSocket } from './presence';
 var db = fire.firestore();
 
 
@@ -131,11 +131,12 @@ export function joinVideoroom(userData, videoroomID) {
     //if user not already in room, join
 
     console.log(userData.currentVideoroom, ' ', videoroomID)
+
     if (userData.currentVideoroom === videoroomID) {
         console.log('user is already in room')
     } else {
 
-        joinVideoroomSocket(videoroomID)
+
 
         userData.userRef.update({
             currentVideoroom: videoroomID
@@ -165,13 +166,14 @@ export function leaveVideoroom(userData) {
     if (userData.currentVideoroom === undefined) {
         return
     }
+    leaveVideoroomSocket(userData.currentVideoroom)
     if (userData.currentVideoroom === 'none') {
         console.log('user is not in a room!')
     } else {
         console.log('leave video room')
         console.log(userData.currentVideoroom)
 
-        leaveVideoroomSocket(userData.currentVideoroom)
+
 
         db.doc('/videorooms/' + userData.currentVideoroom + '/videoState/members').update({
             members: fire.firestore.FieldValue.arrayRemove(userData.userRef)
