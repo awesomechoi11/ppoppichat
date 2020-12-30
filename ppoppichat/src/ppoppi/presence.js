@@ -1,6 +1,8 @@
 import openSocket from 'socket.io-client';
 
-const socket = openSocket('http://localhost:3001');
+//production
+const socket = openSocket('https://presence.ppoppichat.xyz');
+//const socket = openSocket('http://localhost:8086');
 
 socket.on("connect", () => {
     console.log('connected to socket server')

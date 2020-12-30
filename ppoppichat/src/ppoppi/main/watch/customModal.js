@@ -48,7 +48,7 @@ export function SmallModal(props) {
                             method: 'get',
                             url: currUrl + 'url=' + url +
                                 '&username=' + props.userData.nickname +
-                                '&videoroom=' + props.userData.videoroomID,
+                                '&videoroom=' + props.userData.currentVideoroom,
                             headers: {
                                 'Content-Type': null
                             }

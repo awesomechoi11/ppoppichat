@@ -12,11 +12,11 @@ const db = admin.firestore()
 
 const io = require('socket.io')({
   cors: {
-    origin: "http://localhost:3000",
+    origin: "http://localhost:8085",
     methods: ["GET", "POST"]
   }
 });
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 8086;
 
 
 // Chatroom
