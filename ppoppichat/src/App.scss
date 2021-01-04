@@ -13,6 +13,14 @@ html,
 
 #home-navbar {
   position: absolute;
+  z-index: 1;
+}
+
+.app-page-wrapper {
+  pointer-events: none;
+  > * {
+    pointer-events: all;
+  }
 }
 
 .app-page {
@@ -21,6 +29,9 @@ html,
 }
 
 .navbar-button {
+  -webkit-user-select: none;
+  cursor: pointer;
+  padding: 5px;
   text-decoration: none;
   * {
     transition: color 1s;
@@ -62,4 +73,29 @@ html,
     font-size: calcvw(30);
     color: black;
   }
+}
+
+#app {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: 100vw;
+}
+
+#app-background {
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: white;
+}
+
+#myCanvas {
+  width: 175vw;
+  height: 200vw;
+  transform: rotate(-28deg) translateY(20vw);
 }

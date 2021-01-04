@@ -14,9 +14,10 @@
 :root {
     --hunter-green: #3a5a40;
     --oxford-blue: #001b2e;
-    --glaucous: #5f7fb3;
-    --light-blue: #a5b7d4;
+    --glaucous: #a3c1f0;
+    --light-blue: #a3c1f0;
     --beige: #eddcc0;
+    --dutch-white: #eddcc0;
 
     --actor: "Actor", sans-serif;
     --varela: "Varela Round", sans-serif;
@@ -28,6 +29,7 @@ $oxford-blue: var(--oxford-blue);
 $glaucous: var(--glaucous);
 $light-blue: var(--light-blue);
 $beige: var(--beige);
+$dutch-white: var(--dutch-white);
 
 $font-actor: var(--actor);
 $font-varela: var(--varela);
@@ -53,4 +55,8 @@ $font-fredoka: var(--fredoka);
     left: 50vw;
     top: 50vh;
     transform: translate(-1px * $width/2, -1px * $height/2);
+}
+
+.dutch-white {
+    color: $dutch-white;
 }

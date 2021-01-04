@@ -18,6 +18,9 @@ import { StatusMessage } from './statusmessage';
 import { FirebaseContext } from '../firebasecontext'
 
 
+import anime from 'animejs/lib/anime.es.js';
+
+
 export class Ppoppi extends React.Component {
 
     //this.unsubUserInfo function to close subscription to user info updates
@@ -77,6 +80,8 @@ export class Ppoppi extends React.Component {
                 window.location = loc + '/login'
             }
         }.bind(this));
+
+        //anime()
 
     }
 

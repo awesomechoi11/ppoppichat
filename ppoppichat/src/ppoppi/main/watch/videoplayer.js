@@ -198,9 +198,12 @@ class PlyrWrapper extends React.Component {
 
     componentDidUpdate() {
         console.log('did update')
-        if (window.plyr.source !== this.state.source) {
-            console.log('this')
-            window.plyr.source = this.state.source
+        if (window.plyr) {
+
+            if (window.plyr.source !== this.state.source) {
+                console.log('this')
+                window.plyr.source = this.state.source
+            }
         }
     }
 
