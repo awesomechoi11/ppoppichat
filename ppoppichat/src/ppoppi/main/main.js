@@ -13,7 +13,6 @@ import './watch/watch'
 import { Watch } from "./watch/watch";
 
 //import { UserContext } from '../firebasecontext'
-import { motion } from "framer-motion";
 
 const mainroutes = [
     {

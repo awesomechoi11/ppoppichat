@@ -2,12 +2,26 @@
 #panel-inner {
     display: flex;
     justify-content: space-between;
-    padding: 20px;
+    padding: 10px;
+    flex-direction: column;
+    margin-top: 40px;
+    align-items: center;
+    a:last-of-type {
+        margin-bottom: 24px;
+    }
     img {
         height: 28px;
     }
-}
-
-.svg-path {
-    fill: $oxford-blue;
+    .panel-item {
+        user-select: none;
+        outline: none;
+        margin-bottom: 48px;
+        svg {
+            fill: $oxford-blue;
+            transition: fill 200ms;
+            &:hover {
+                fill: $dutch-white;
+            }
+        }
+    }
 }
