@@ -108,8 +108,6 @@ class App extends React.Component {
 
       <Router>
         <div id='app'>
-
-
           <RouterWrapper />
         </div>
         <div id='app-background'>
@@ -162,33 +160,56 @@ function RouterWrapper() {
     )
 
   return (
-    <AnimatePresence exitBeforeEnter>
-      <Switch location={location} key={location.pathname}>
+    <Switch >
+      <Route path='/ppoppi'>
+        <Ppoppi />
+      </Route>
+      <Route path='/'>
+        {homenavbar}
+        <AnimatePresence
+        //exitBeforeEnter
+        >
+          <Switch location={location} key={location.pathname}>
 
-        {routes.map((route, index) => (
+            {routes.map((route, index) => (
 
-          <Route key={index} exact path={(route.path ? route.path : '/' + route.id)}>
-            {homenavbar}
-            <motion.div
-              key={index}
-              variants={pageVariants}
-              initial='initial'
-              animate='in'
-              exit='out'
+              <Route key={index} exact path={(route.path ? route.path : '/' + route.id)}>
 
-              className='app-page-wrapper'
-            >
-              {route.main}
-            </motion.div>
-          </Route>
+                <motion.div
+                  key={index}
+                  variants={pageVariants}
+                  initial='initial'
+                  animate='in'
+                  exit='out'
 
-        ))}
-        <Route path='/ppoppi'>
-          <Ppoppi />
-        </Route>
+                  className='app-page-wrapper'
+                >
+                  {route.main}
+                </motion.div>
+              </Route>
 
-      </Switch>
-    </AnimatePresence>
+            ))}
+
+            <Route key='notfound'>
+
+              <motion.div
+                key='notfound'
+                variants={pageVariants}
+                initial='initial'
+                animate='in'
+                exit='out'
+
+                className='not-found'
+              >
+                hello not found!!
+              </motion.div>
+            </Route>
+          </Switch>
+        </AnimatePresence>
+
+      </Route>
+
+    </Switch>
   )
 }
 

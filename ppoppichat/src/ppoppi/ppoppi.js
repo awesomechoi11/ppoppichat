@@ -18,7 +18,8 @@ import { StatusMessage } from './statusmessage';
 import { FirebaseContext } from '../firebasecontext'
 
 
-import anime from 'animejs/lib/anime.es.js';
+import { motion } from "framer-motion";
+
 
 
 export class Ppoppi extends React.Component {
@@ -90,10 +91,15 @@ export class Ppoppi extends React.Component {
     }
 
     render() {
-        //console.log(this.state.statusMessage)
+        console.log(this.state.online)
         return (
 
-            <div id='ppoppi-wrapper' className="" >
+            <div
+                // key={'ppoppi'}
+                // initial={{ opacity: 0 }}
+                // animate={{ opacity: 1 }}
+                // exit={{ opacity: 0 }}
+                id='ppoppi-wrapper' className="" >
                 <div id='sidebar'>
 
                     <div id='main-user-wrapper'>

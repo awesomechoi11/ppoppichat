@@ -13,7 +13,7 @@ import './watch/watch'
 import { Watch } from "./watch/watch";
 
 //import { UserContext } from '../firebasecontext'
-
+import { motion } from "framer-motion";
 
 const mainroutes = [
     {
@@ -44,7 +44,7 @@ function Main(props) {
     let { path, url } = useRouteMatch();
     //let url = '/ppoppi'
     //console.log(path, url)
-    console.log('main called')
+    console.log('main called ', props.userData.loggedIn)
     return (
 
         <div id='main-inner'>
@@ -53,7 +53,7 @@ function Main(props) {
 
                     {mainroutes.map((item, index) => (
 
-                        <Route key={index} path={url + item.path}>
+                        <Route key={'mainroutes' + index} path={url + item.path}>
                             <div id={item.id}>{item.page({
                                 userData: props.userData,
                                 key: item.id
@@ -64,7 +64,11 @@ function Main(props) {
                     <Route exact path={url}>
                         <Redirect to={path + defaultPage} />
                     </Route>
-
+                    <Route exact path={url + '/test'}>
+                        <div>
+                            helloasdasd
+                        </div>
+                    </Route>
                 </Switch>
             }
         </div >

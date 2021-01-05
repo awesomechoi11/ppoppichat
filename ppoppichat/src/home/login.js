@@ -14,6 +14,9 @@ import anonpng from './anon.png';
 import fbpng from './facebook.png';
 import gpng from './google.png';
 
+import { motion, AnimatePresence } from "framer-motion";
+
+
 
 const loginButtonSvg = (
     <svg id='loginButtonSvg' width="120" height="120" viewBox="0 0 120 120" >
@@ -27,19 +30,41 @@ const loginButtonSvg = (
 function EnterButton(props) {
     //const isLoggedIn = props.isLoggedIn;
     let history = useHistory();
-    if ('signed in, click to sign out' === props.isLoggedIn) {
+
+    if (props.loginType === 'email') {
         return (
 
-            <button
-                onClick={function () {
-                    history.push("/ppoppi");
-                }}
-            >
-                heloo click to enter!!
+            <button id='loginbutton' type="submit" form='login-form'>
+                {loginButtonSvg}
             </button>
         )
+    } else if (props.loginType === 'google') {
+        return (
+
+            <button id='loginbutton' onClick={() => { history.push('/ppoppi') }}>
+                {loginButtonSvg}
+            </button>
+        )
+    } else if (props.loginType === 'facebook') {
+        return (
+
+            null
+        )
+    } else if (props.loginType === 'anon') {
+        return (
+
+            null
+        )
+    } else {
+        return (
+
+            <div>
+                uwu
+            </div>
+        )
     }
-    return null;
+
+
 }
 
 export class Login extends React.Component {
@@ -47,8 +72,10 @@ export class Login extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { loginStatus: 'loading' }
+        this.state = { loggedIn: false, loginType: 'email' }
         this.handleChange = this.handleChange.bind(this);
+        this.googlesignin = this.googlesignin.bind(this)
+        this.signout = this.signout.bind(this)
     }
 
     handleChange(event) {
@@ -62,38 +89,45 @@ export class Login extends React.Component {
     }
 
 
-    opensigninpopup() {
+    googlesignin() {
+        this.provider = new this.fire.auth.GoogleAuthProvider();
+        this.fire.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                //console.log(user)
+                // User is signed in.   
+                this.setState({ loggedIn: true, username: user.displayName, loginType: 'google' })
+            } else {
+                // No user is signed in.
+                //this.onclick = this.openpopup
+                this.setState({ loggedIn: false })
+                this.fire.auth().signInWithPopup(this.provider).then(function (result) {
+                    // This gives you a Google Access Token. You can use it to access the Google API.
+                    //var token = result.credential.accessToken;
+                    // The signed-in user info.
+                    var user = result.user;
+                    this.setState({ loggedIn: true, username: user.displayName, loginType: 'google' })
+                    // ...
+                    //console.log(fire)
+                }).catch(function (error) {
+                    // Handle Errors here.
+                    //var errorCode = error.code;
+                    //var errorMessage = error.message;
+                    console.log(error)
+                    // The email of the user's account used.
+                    //var email = error.email;
+                    // The this.fire.auth.AuthCredential type that was used.
+                    //var credential = error.credential;
+                    // ...
+                });
+            }
+        }.bind(this));
 
-        this.fire.auth().signInWithPopup(this.provider).then(function (result) {
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            //var token = result.credential.accessToken;
-            // The signed-in user info.
-            //var user = result.user;
-            // ...
-            //console.log(fire)
-        }).catch(function (error) {
-            // Handle Errors here.
-            //var errorCode = error.code;
-            //var errorMessage = error.message;
-            console.log(error)
-            // The email of the user's account used.
-            //var email = error.email;
-            // The this.fire.auth.AuthCredential type that was used.
-            //var credential = error.credential;
-            // ...
-        });
     }
     signout() {
-        this.setState({
-            loginStatus: 'signing out'
-        })
+
         //reset login message
         this.fire.auth().signOut().then(function () {
-            this.setState({
-                loginStatus: 'not signed in, click to sign in',
-                onclick: this.opensigninpopup.bind(this),
-                message: 'pls log in >:))'
-            })
+            this.setState({ loggedIn: false })
         }).catch(function (error) {
             // An error happened.
         });
@@ -101,29 +135,10 @@ export class Login extends React.Component {
     }
 
     componentDidMount() {
-        console.log(this.context)
+        //console.log(this.context)
         //this.fire replaces firebase 
         this.fire = this.context
-        this.provider = new this.fire.auth.GoogleAuthProvider();
-        this.fire.auth().onAuthStateChanged(function (user) {
-            if (user) {
-                //console.log(user)
-                // User is signed in.   
-                this.setState({
-                    loginStatus: 'signed in, click to sign out',
-                    onclick: this.signout.bind(this),
-                    message: 'Hello owo ' + user.displayName
-                })
-            } else {
-                // No user is signed in.
-                //this.onclick = this.openpopup
-                this.setState({
-                    loginStatus: 'not signed in',
-                    onclick: this.opensigninpopup.bind(this),
-                    message: 'pls log in >:))'
-                })
-            }
-        }.bind(this));
+
 
 
         var myObject = {
@@ -159,59 +174,90 @@ export class Login extends React.Component {
             <div
                 className="login app-page" >
                 <div id='login-platform'>
-                    <div className='login-platform-left'>
+                    <AnimatePresence>
+                        {!this.state.loggedIn ? (
+                            <div className='login-platform-left'>
+                                <motion.div
+                                    key={this.state.loggedIn ? 'loggedIn' : 'loggedOut'}
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className='signed-in'
+                                >
+                                    <div className='login-form-title dutch-white'>
+                                        sign up
+                                    </div>
+                                    <Formik
+                                        initialValues={{
+                                            email: '',
+                                            username: '',
+                                            password: '',
+                                        }}
+                                        onSubmit={(values) => {
+                                            //need to implement email login
+                                            console.log(values)
 
+                                        }}
+                                    >
+                                        <Form id='login-form' >
+                                            <div className="login-form-wrapper">
+                                                <label className="login-form-label" htmlFor="email">EMAIL</label>
+                                                <Field id="email" name="email" type="email" className="login-form" />
+                                            </div>
+                                            <div className="login-form-wrapper">
+                                                <label className="login-form-label" htmlFor="username">USERNAME</label>
+                                                <Field id="username" name="username" className="login-form" />
 
-                        <div className='login-form-title dutch-white'>
-                            sign up
-                    </div>
-                        <Formik
-                            initialValues={{
-                                email: '',
-                                username: '',
-                                password: '',
-                            }}
-                            onSubmit={(values) => {
-                                //need to implement email login
-                                console.log(values)
-                            }}
-                        >
-                            <Form id='login-form' >
-                                <div className="login-form-wrapper">
-                                    <label className="login-form-label" htmlFor="email">EMAIL</label>
-                                    <Field id="email" name="email" type="email" className="login-form" />
+                                                <label className="login-form-label" htmlFor="password">PASSWORD</label>
+                                                <Field id="password" name="password" type="password" className="login-form" />
+                                            </div>
+                                            {/* <button id='loginbutton' type="submit">Submit</button> */}
+                                        </Form>
+                                    </Formik>
+                                    <div className='alternate-login'>
+                                        <div className='alternate-login-label'>
+                                            <span className='dutch-white'>OR</span> SIGN IN WITH:
+                                        </div>
+                                        <img className='alternate-login-png' src={gpng}
+                                            onClick={this.googlesignin}
+                                        />
+                                        <img className='alternate-login-png' src={fbpng} />
+                                        <img className='alternate-login-png' src={anonpng} />
+                                    </div>
+                                    <div>
+                                        <span>DONT</span> HAVE AN ACCOUNT? SIGN UP <span className='dutch-white'>HERE</span>
+                                    </div>
+
+                                </motion.div>
+                            </div>
+                        ) : (
+                                <div className='login-platform-left'>
+                                    <motion.div
+                                        key={this.state.loggedIn ? 'loggedIn' : 'loggedOut'}
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className='signed-out'
+                                    >
+                                        <div className='login-form-title dutch-white'>
+                                            welcome!
+                                        </div>
+                                        <div className='login-username-title'>
+                                            USERNAME
+                                        </div>
+                                        <div className='login-username'>
+                                            {this.state.username}
+                                        </div>
+                                        <div className="login-signout" onClick={this.signout}>
+                                            <span>NOT</span> YOUR ACCOUNT? SIGN <span className='dutch-white'>OUT</span>
+                                        </div>
+                                    </motion.div>
                                 </div>
-                                <div className="login-form-wrapper">
-                                    <label className="login-form-label" htmlFor="username">USERNAME</label>
-                                    <Field id="username" name="username" className="login-form" />
-
-                                    <label className="login-form-label" htmlFor="password">PASSWORD</label>
-                                    <Field id="password" name="password" type="password" className="login-form" />
-                                </div>
-                                {/* <button id='loginbutton' type="submit">Submit</button> */}
-                            </Form>
-                        </Formik>
-                        <div className='alternate-login'>
-                            <div className='alternate-login-label'>
-                                <span className='dutch-white'>OR</span> SIGN IN WITH:
-                        </div>
-                            <img className='alternate-login-png' src={gpng}
-                                onClick={this.opensigninpopup}
-                            />
-                            <img className='alternate-login-png' src={fbpng} />
-                            <img className='alternate-login-png' src={anonpng} />
-                        </div>
-                        <div>
-                            <span>DONT</span> HAVE AN ACCOUNT? SIGN UP <span className='dutch-white'>HERE</span>
-                        </div>
-
-
-                    </div>
+                            )}
+                    </AnimatePresence>
                     <div className='login-platform-right'>
                         <span >
-                            <button id='loginbutton' type="submit" form='login-form'>
-                                {loginButtonSvg}
-                            </button>
+                            <EnterButton loginType={this.state.loginType} />
                         </span>
                     </div>
 
