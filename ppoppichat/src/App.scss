@@ -17,6 +17,7 @@ html,
 }
 
 .app-page-wrapper {
+  position: absolute;
   pointer-events: none;
   > * {
     pointer-events: all;

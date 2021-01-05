@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 socket.on("connect", () => {
-    console.log('connected to socket server')
+    console.log(process.env.NODE_ENV, 'connected to socket server')
 })
 
 
