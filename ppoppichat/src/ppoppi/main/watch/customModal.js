@@ -50,7 +50,7 @@ export function SmallModal(props) {
                             onClick={(e) => {
                                 try {
                                     var uwu = new URL(url)
-                                    console.log(value.nickname, ' is adding ', url, ' to ', props.videoroomID)
+                                    //console.log(value.nickname, ' is adding ', url, ' to ', props.videoroomID)
                                     axios({
                                         method: 'get',
                                         url: currUrl + 'url=' + url +
