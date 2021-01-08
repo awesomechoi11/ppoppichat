@@ -42,7 +42,7 @@ function PlusSvg(props) {
             //if modal is not open/ set to open
             setIsOpen(!modalIsOpen)
         }
-        console.log(modalIsOpen)
+        //console.log(modalIsOpen)
     }
 
     function closeModal() {
