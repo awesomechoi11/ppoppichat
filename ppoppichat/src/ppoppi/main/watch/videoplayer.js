@@ -159,7 +159,7 @@ class PlyrWrapper extends React.Component {
                 'fullscreen', // Toggle fullscreen
             ],
             seekTime: 5,
-            //autoplay: true
+            autoplay: true
         }
 
         this.player = new PlyrJs('#player', this.options);
