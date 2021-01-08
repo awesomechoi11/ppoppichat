@@ -15,6 +15,7 @@ import { SmallModal } from './customModal'
 import { VideoPlayer } from './videoplayer';
 import { VideoMembers } from './videomembers';
 import { VideoQueue } from './videoqueue';
+import { UserContext } from '../../../firebasecontext';
 
 const membersDivider = (
     <svg width="240" height="24" viewBox="0 0 240 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -31,9 +32,9 @@ const queueDivider = (
 )
 
 
+//console.log(props.modalKey)
 
 function PlusSvg(props) {
-    //console.log(props.modalKey)
     const [modalIsOpen, setIsOpen] = React.useState(false);
 
     function handleClick(e) {
@@ -41,7 +42,7 @@ function PlusSvg(props) {
             //if modal is not open/ set to open
             setIsOpen(!modalIsOpen)
         }
-        //console.log(e)
+        console.log(modalIsOpen)
     }
 
     function closeModal() {
@@ -57,9 +58,9 @@ function PlusSvg(props) {
         >
             <SmallModal
                 modalIsOpen={modalIsOpen}
-                closeModal={closeModal}
-                userData={props.userData}
                 modalKey={props.modalKey}
+                closeModal={closeModal}
+                videoroomID={props.videoroomID}
             />
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path className='add-path' d="M15 9H3" strokeWidth="3" strokeLinecap="round" />
@@ -72,7 +73,6 @@ function PlusSvg(props) {
 
 function Watch(props) {
     let { videoRoom } = useParams();
-    //console.log(videoRoom)
     //set a listener for watchroom
 
     const [value, loading, error] = useDocument(
@@ -84,38 +84,33 @@ function Watch(props) {
     if (value) {
         if (value.exists) {
             console.log('join room start')
-            joinVideoroom(props[0].userData, value.id)
+
             return (
                 <div id='watch-inner'>
-
-
+                    <UserContext.Consumer>
+                        {value => joinVideoroom(value.userRef, value.id)}
+                    </UserContext.Consumer>
                     <div className='video-room-sidebar'>
                         <div className='title-wrapper'> {value.data().roomName}</div>
                         <div className='members-wrapper'>
                             <div className='members-divider video-room-sidebar-divider'>
                                 {membersDivider}
-                                {
-                                    <PlusSvg modalKey='members' userData={props[0].userData} />
-                                }
+                                <PlusSvg modalKey='members' videoroomID={videoRoom} />
                             </div>
                             <div className='members-list'>
 
-                                <VideoMembers
-                                    videoroomID={videoRoom}
-                                />
+                                <VideoMembers videoroomID={videoRoom} />
 
                             </div>
                         </div>
                         <div className='queue-wrapper'>
                             <div className='queue-divider video-room-sidebar-divider'>
                                 {queueDivider}
-                                {<PlusSvg modalKey='queue' userData={props[0].userData} />}
+                                <PlusSvg modalKey='queue' videoroomID={videoRoom} />
                             </div>
                             <div className='queue-list'>
 
-                                <VideoQueue
-                                    videoroomID={videoRoom}
-                                />
+                                <VideoQueue videoroomID={videoRoom} />
 
                             </div>
                         </div>

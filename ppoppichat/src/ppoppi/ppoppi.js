@@ -15,7 +15,7 @@ import { setUserOnline } from './presence';
 import { StatusMessage } from './statusmessage';
 
 
-import { FirebaseContext } from '../firebasecontext'
+import { FirebaseContext, UserContext } from '../firebasecontext'
 
 
 const settingsvg = (
@@ -51,26 +51,23 @@ export class Ppoppi extends React.Component {
         //check if logged in,
         //redirect to login page if not logged in
         this.fire = this.context
-
         //check user login state
         this.fire.auth().onAuthStateChanged(function (user) {
             if (user) {
                 // User is signed in.   
                 this.db = this.fire.firestore();
 
-                //this.userRef = this.db.collection('users').doc(user.uid)
-                // console.log('setstate userref set')
-                // this.setState({
-                //     userRef: this.db.collection('users').doc(user.uid)
-                // })
-
-
                 this.handleSignIn(user)
-                    .then(() => {
+                    .then((data) => {
+                        console.log(data)
                         console.log('setstate called loggedin true and userREf')
                         this.setState({
                             loggedIn: true,
-                            userRef: this.db.collection('users').doc(user.uid)
+                            userRef: this.db.collection('users').doc(user.uid),
+                            online: data.online,
+                            videoroomID: data.videoroomID,
+                            statusMessage: data.statusMessage,
+                            nickname: data.nickname
                         })
                         this.unsubUserInfo = this.listenToUserInfo(user)
                     }).then(() => {
@@ -85,19 +82,19 @@ export class Ppoppi extends React.Component {
             }
         }.bind(this));
 
-        //anime()
-
     }
 
     componentWillUnmount() {
         this.unsubUserInfo()
     }
 
+
     render() {
-        console.log(this.state.online)
         return (
 
             <div id='ppoppi-wrapper' className="" >
+
+
                 <div id='topbar'>
                     <div className='topbar-logo'>
                         <svg width="46" height="28" viewBox="0 0 46 28" style={{ marginRight: '15px' }} >
@@ -114,41 +111,21 @@ export class Ppoppi extends React.Component {
                 </div>
                 <div id='sidebar'>
 
-                    {/* <div id='main-user-wrapper'>
-                        <div id='user-status' className={this.state.userStatus}></div>
-                        <img
-                            id='user-picture'
-                            alt='User profile'
-                            src={this.state.userPicture}
-                        />
-                        <div id='user-name'>
-                            {this.state.nickname}
-                        </div>
-                    </div> */}
-
-
-
-
-
-
                     <div id='channels-panel-wrapper'>
-                        <Panel
-                            videoroomID={this.state.videoroomID}
-                        />
+                        <Panel videoroomID={this.state.videoroomID} />
                     </div>
                     <div id='channels-wrapper'>
-
-                        <Channels channels={this.state.channels} />
-
-
+                        {/* <Channels channels={this.state.channels} /> */}
                     </div>
                     {settingsvg}
 
                 </div>
                 <div id='main-wrapper'>
-
-                    {this.state.online && <Main userData={this.state} />}
+                    <UserContext.Provider value={this.state}>
+                        {this.state.online && <Main />}
+                    </UserContext.Provider>
                 </div>
+
             </div>
         )
     }

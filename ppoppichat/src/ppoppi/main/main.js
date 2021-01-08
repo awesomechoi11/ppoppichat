@@ -12,7 +12,9 @@ import { Placeholder } from "./placeholder";
 import './watch/watch'
 import { Watch } from "./watch/watch";
 
-//import { UserContext } from '../firebasecontext'
+//import { UserContext } from '../../firebasecontext'
+//import { useDocument } from 'react-firebase-hooks/firestore';
+
 
 const mainroutes = [
     {
@@ -39,37 +41,38 @@ const mainroutes = [
 ];
 
 function Main(props) {
+
     const defaultPage = '/watch'
     let { path, url } = useRouteMatch();
     //let url = '/ppoppi'
     //console.log(path, url)
-    console.log('main called ', props.userData.loggedIn)
+    console.log('main called ', props)
+
+
+
+
     return (
 
         <div id='main-inner'>
-            {props.userData.loggedIn &&
-                <Switch>
 
-                    {mainroutes.map((item, index) => (
 
-                        <Route key={'mainroutes' + index} path={url + item.path}>
-                            <div id={item.id}>{item.page({
-                                userData: props.userData,
-                                key: item.id
-                            })}</div>
+            <Switch>
 
-                        </Route>
-                    ))}
-                    <Route exact path={url}>
-                        <Redirect to={path + defaultPage} />
+                {mainroutes.map((item, index) => (
+
+                    <Route key={'mainroutes' + index} path={url + item.path}>
+                        <div id={item.id}>{item.page({
+                            key: item.id
+                        })}</div>
+
                     </Route>
-                    <Route exact path={url + '/test'}>
-                        <div>
-                            helloasdasd
-                        </div>
-                    </Route>
-                </Switch>
-            }
+                ))}
+                <Route exact path={url}>
+                    <Redirect to={path + defaultPage} />
+                </Route>
+            </Switch>
+
+
         </div >
     )
 }

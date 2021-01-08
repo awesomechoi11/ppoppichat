@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export class StatusMessage extends React.Component {
@@ -15,7 +14,7 @@ export class StatusMessage extends React.Component {
         this.setState({ value: event.target.value });
     }
 
-    handleSubmit(event) {
+    handleSubmit(event, fire) {
         event.preventDefault();
         //update to firebase
         this.props.userRef.update({
@@ -26,12 +25,20 @@ export class StatusMessage extends React.Component {
     render() {
         //console.log('status message called ', this.state.value, this.props.statusMessage)
         return (
-            <form onSubmit={this.handleSubmit}>
+
+            <form onSubmit={(e) => this.handleSubmit(e)}>
+
+
                 <input type="text"
                     value={this.state.value ? this.state.value : this.props.statusMessage}
                     onChange={this.handleChange}
                 />
+
+
             </form>
+
+
+
         );
     }
 }

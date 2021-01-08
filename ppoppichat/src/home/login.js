@@ -76,6 +76,7 @@ export class Login extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.googlesignin = this.googlesignin.bind(this)
         this.signout = this.signout.bind(this)
+
     }
 
     handleChange(event) {
@@ -90,37 +91,28 @@ export class Login extends React.Component {
 
 
     googlesignin() {
-        this.provider = new this.fire.auth.GoogleAuthProvider();
-        this.fire.auth().onAuthStateChanged(function (user) {
-            if (user) {
-                //console.log(user)
-                // User is signed in.   
-                this.setState({ loggedIn: true, username: user.displayName, loginType: 'google' })
-            } else {
-                // No user is signed in.
-                //this.onclick = this.openpopup
-                this.setState({ loggedIn: false })
-                this.fire.auth().signInWithPopup(this.provider).then(function (result) {
-                    // This gives you a Google Access Token. You can use it to access the Google API.
-                    //var token = result.credential.accessToken;
-                    // The signed-in user info.
-                    var user = result.user;
-                    this.setState({ loggedIn: true, username: user.displayName, loginType: 'google' })
-                    // ...
-                    //console.log(fire)
-                }).catch(function (error) {
-                    // Handle Errors here.
-                    //var errorCode = error.code;
-                    //var errorMessage = error.message;
-                    console.log(error)
-                    // The email of the user's account used.
-                    //var email = error.email;
-                    // The this.fire.auth.AuthCredential type that was used.
-                    //var credential = error.credential;
-                    // ...
-                });
-            }
-        }.bind(this));
+
+
+        //this.setState({ loggedIn: false })
+        this.fire.auth().signInWithPopup(this.provider).then(function (result) {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            //var token = result.credential.accessToken;
+            // The signed-in user info.
+            var user = result.user;
+            this.setState({ loggedIn: true, username: user.displayName, loginType: 'google' })
+            // ...
+            //console.log(fire)
+        }).catch(function (error) {
+            // Handle Errors here.
+            //var errorCode = error.code;
+            //var errorMessage = error.message;
+            console.log(error)
+            // The email of the user's account used.
+            //var email = error.email;
+            // The this.fire.auth.AuthCredential type that was used.
+            //var credential = error.credential;
+            // ...
+        });
 
     }
     signout() {
@@ -138,8 +130,14 @@ export class Login extends React.Component {
         //console.log(this.context)
         //this.fire replaces firebase 
         this.fire = this.context
-
-
+        this.provider = new this.fire.auth.GoogleAuthProvider();
+        this.fire.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                //console.log(user)
+                // User is signed in.   
+                this.setState({ loggedIn: true, username: user.displayName, loginType: 'google' })
+            }
+        }.bind(this));
 
         var myObject = {
             value: 0.1,

@@ -27,3 +27,9 @@ export const UserContext = React.createContext({
     userPicture: placeholderPicture,
     statusMessage: ''
 });
+
+export const UserRefContext = React.createContext()
+
+
+
+

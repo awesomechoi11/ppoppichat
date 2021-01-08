@@ -27,51 +27,6 @@ $sidebar-width: 58px;
     border-bottom: 1px solid $glaucous;
 }
 
-#main-user-wrapper {
-    font-family: $font-fredoka;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 30px;
-    height: 41px;
-    padding-top: 17px;
-    padding-bottom: 17px;
-
-    #user-picture {
-        width: 36px;
-        height: 36px;
-        border-radius: 100px;
-        //background: red;
-    }
-
-    #user-status {
-        width: 6px;
-        border-radius: 0 10px 10px 0;
-        height: 38px;
-    }
-
-    #user-name {
-        width: 230px;
-        margin-right: 14px;
-    }
-
-    .status-online {
-        background: #3ddb39;
-    }
-    .status-busy {
-        background: yellow;
-    }
-    .status-dnd {
-        background: red;
-    }
-    .status-offline {
-        background: grey;
-    }
-    .status-custom {
-        background: rgb(177, 75, 180);
-    }
-}
-
 #status-message {
     form {
         &:focus {

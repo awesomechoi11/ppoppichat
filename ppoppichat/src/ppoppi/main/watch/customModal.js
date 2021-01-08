@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import './customModal.scss'
 import axios from 'axios';
 
+import { UserContext } from '../../../firebasecontext';
+
 //const localurl = 'http://localhost:5001/ppoppi/us-central1/addVideoToList?'
 const produrl = 'https://us-central1-ppoppi.cloudfunctions.net/addVideoToList?'
 var currUrl = produrl
@@ -41,29 +43,35 @@ export function SmallModal(props) {
             <div className='add-video-modal'>
                 <div className='add-video-modal-title'>add a video</div>
                 <input onChange={handleInput} placeholder='hello' className='add-video-modal-input' />
-                <div
-                    onClick={(e) => {
-                        console.log(props.userData.nickname, ' is adding ', url, ' to ', props.userData.videoroomID)
-                        axios({
-                            method: 'get',
-                            url: currUrl + 'url=' + url +
-                                '&username=' + props.userData.nickname +
-                                '&videoroom=' + props.userData.currentVideoroom,
-                            headers: {
-                                'Content-Type': null
-                            }
-                        }).then(res => {
-                            console.log(res.data)
-                        }).catch(err => {
-                            console.log(err)
-                        })
+                <UserContext.Consumer>
+                    {value => (
 
-                    }}
-                    className='add-video-modal-button'>add</div>
+                        <div
+                            onClick={(e) => {
+                                try {
+                                    var uwu = new URL(url)
+                                    console.log(props.userData.nickname, ' is adding ', url, ' to ', props.userData.videoroomID)
+                                    axios({
+                                        method: 'get',
+                                        url: currUrl + 'url=' + url +
+                                            '&username=' + value.nickname +
+                                            '&videoroom=' + props.videoroomID,
+                                        headers: {
+                                            'Content-Type': null
+                                        }
+                                    }).then(res => {
+                                        console.log(res.data)
+                                    }).catch(err => {
+                                        console.log(err)
+                                    })
+                                } catch (e) { console.log(e) }
+                            }}
+                            className='add-video-modal-button'>add</div>
+                    )}
+                </UserContext.Consumer>
             </div>
         )
     }
-
     return (
 
         <ReactModal

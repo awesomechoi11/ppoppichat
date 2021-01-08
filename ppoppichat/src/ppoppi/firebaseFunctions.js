@@ -68,19 +68,23 @@ export function listenToUserInfo(user) {
 
                 //console.log(source, " data: ", doc.data());
                 console.log('user info updated setstate')
-                var newstate = doc.data();
-                delete newstate['created']
-                delete newstate['last-login']
-                delete newstate['name']
-                //delete newstate['statusMessage']
-                //console.log(newstate)
-
-                this.setState(newstate)
+                // var newstate = doc.data();
+                // // delete newstate['created']
+                // // delete newstate['last-login']
+                // // delete newstate['name']
+                // // // delete newstate['currentVideoroom']
+                // // // delete newstate['new']
+                // // // delete newstate['photoURL']
+                // // //delete newstate['statusMessage']
+                // // //console.log(newstate)
+                if (this.state.online !== doc.data().online)
+                    this.setState({ online: doc.data().online })
 
             }
 
         }.bind(this));
 }
+
 
 export async function getUserfromRef(userRef) {
     let user = await userRef.get()
@@ -103,12 +107,12 @@ export function handleSignIn(user) {
         if (!doc.exists) {
 
             //set defaults for firebase and state
-
             console.log('creating new user: ', user.uid)
             return userdoc.set(newUserDefaults(user))
                 .then(() => {
                     console.log('user signed in')
                     createVideoroom(userdoc)
+                    return newUserDefaults(user);
                 })
 
 
@@ -117,50 +121,49 @@ export function handleSignIn(user) {
             //not a new account
             return new Promise((resolve, reject) => {
                 console.log('user signed in')
-                resolve()
+                resolve(doc.data())
             })
 
         }
+        //always retruns user data
 
     })
 }
 
 
 
-export function joinVideoroom(userData, videoroomID) {
+export function joinVideoroom(userRef, videoroomID) {
     //if user not already in room, join
+    //console.log(userData.currentVideoroom, ' ', videoroomID)
+    userRef.get().then(data => {
+        if (data.currentVideoroom === videoroomID) {
+            console.log('user is already in room')
 
-    console.log(userData.currentVideoroom, ' ', videoroomID)
-
-    if (userData.currentVideoroom === videoroomID) {
-        console.log('user is already in room')
-    } else {
+        } else {
 
 
-
-        userData.userRef.update({
-            currentVideoroom: videoroomID
-        }).then(() => {
-            db.doc('/videorooms/' + videoroomID + '/videoState/members').update({
-                members: fire.firestore.FieldValue.arrayUnion(userData.userRef)
+            userRef.update({
+                currentVideoroom: videoroomID
             }).then(() => {
+                db.doc('/videorooms/' + videoroomID + '/videoState/members').update({
+                    members: fire.firestore.FieldValue.arrayUnion(userRef)
+                }).then(() => {
 
 
 
-                console.log('user successfully joined room')
+                    console.log('user successfully joined room')
+                }).catch(err => {
+                    console.log('err joining videoroom: ', err)
+                })
             }).catch(err => {
-                console.log('err joining videoroom: ', err)
+                console.log('err updating user currentvideoroom ', err)
             })
-        }).catch(err => {
-            console.log('err updating user currentvideoroom ', err)
-        })
 
-    }
-
-
-
+        }
+    })
 
 }
+
 export function leaveVideoroom(userData) {
     //get currentRoom
     if (userData.currentVideoroom === undefined) {
