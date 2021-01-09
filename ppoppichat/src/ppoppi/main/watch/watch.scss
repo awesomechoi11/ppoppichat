@@ -68,10 +68,12 @@
     }
     .member-item-name {
         font-family: $font-fredoka;
-        font-size: 24px;
+        font-size: 18px;
         width: 220px;
         height: 44px;
-        line-height: 175%;
+        line-height: 220%;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 }
 
@@ -87,17 +89,21 @@
         height: 35px;
     }
     .queue-item-data {
-        width: 186px;
-        height: 35px;
+        $queue-item-width: 186px;
+        width: $queue-item-width;
+        height: 40px;
         font-family: $font-actor;
         display: flex;
         align-content: space-between;
         flex-direction: column;
-
+        overflow: hidden;
         .queue-data-title {
             white-space: nowrap;
-            text-overflow: ellipsis;
-            overflow: hidden;
+            transform: translateX(0);
+            transition: 1.3s;
+            &:hover {
+                transform: translateX(-$queue-item-width);
+            }
         }
 
         .queue-data-under,
@@ -106,7 +112,6 @@
             display: flex;
             justify-content: space-between;
             white-space: nowrap;
-            text-overflow: ellipsis;
             overflow: hidden;
         }
     }

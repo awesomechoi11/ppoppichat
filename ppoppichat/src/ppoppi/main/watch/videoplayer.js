@@ -30,7 +30,7 @@ function debounce(func, wait, immediate) {
 };
 
 
-const defaultVideoUrl = 'https://www.youtube.com/watch?v=Gspl9LFjPZc'
+const defaultVideoUrl = 'https://youtu.be/Er7PfXBZg6o'
 
 export class VideoPlayer extends React.Component {
     constructor(props) {
@@ -88,6 +88,21 @@ class PlyrWrapper extends React.Component {
 
     buildSource(data) {
         var source = {}
+        const defaultVideo = {
+            type: 'video',
+            sources: [
+                {
+                    src: defaultVideoUrl,
+                    provider: 'youtube',
+                },
+            ]
+        }
+        if (!data) {
+            return defaultVideo;
+        }
+        if (data.length < 1) {
+            return defaultVideo;
+        }
         if (data.type === 'youtube' ||
             data.type === 'vimeo') {
             source.type = 'video'
@@ -102,15 +117,7 @@ class PlyrWrapper extends React.Component {
         } else if (data.type === 'html5') {
             source.type = 'video'
         } else {
-            source = {
-                type: 'video',
-                sources: [
-                    {
-                        src: defaultVideoUrl,
-                        provider: 'youtube',
-                    },
-                ]
-            }
+            return defaultVideo;
         }
         return source
     }
@@ -178,6 +185,7 @@ class PlyrWrapper extends React.Component {
             this.unsub = fire.firestore().doc('/videorooms/' + this.props.videoroomID + '/videoState/queue')
                 .onSnapshot(function (value) {
                     if (value.exists) {
+                        //if item 0 is not equal to current video
                         if (!isEqual(this.buildSource(value.data().queue[0]), this.state.source)) {
                             this.currentVideo = value.data().queue[0]
                             console.log('new source ', this.buildSource(this.currentVideo))
@@ -185,9 +193,6 @@ class PlyrWrapper extends React.Component {
                                 source: this.buildSource(this.currentVideo)
                             })
                         }
-
-
-                        //this.player.source = this.buildSource(value.data().currentVideo)
                     }
                 }.bind(this));
         })

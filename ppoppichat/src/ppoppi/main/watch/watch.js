@@ -88,7 +88,7 @@ function Watch(props) {
             return (
                 <div id='watch-inner'>
                     <UserContext.Consumer>
-                        {value => joinVideoroom(value.userRef, value.id)}
+                        {value => joinVideoroom(value.userRef, value.videoroomID)}
                     </UserContext.Consumer>
                     <div className='video-room-sidebar'>
                         <div className='title-wrapper'> {value.data().roomName}</div>

@@ -41,9 +41,6 @@ function setNextVideo(currentVideo, videoroomID) {
           })
         }
       }
-
-
-      //this.player.source = this.buildSource(value.data().currentVideo)
     }
   })
 }
@@ -171,6 +168,8 @@ io.on('connection', (socket) => {
       updateOnline(false, socket.uid)
       //update firebase that user is offline
 
+      removeUserFromFireRooms(socket);
+
       console.log(socket.uid, ' is leaving room: ', socket.videoroomID)
       if (rooms.isInRoom(socket, socket.videoroomID)) {
         rooms.removeUserFromRoom(socket, socket.videoroomID)
@@ -179,6 +178,24 @@ io.on('connection', (socket) => {
     }
   });
 });
+
+function removeUserFromFireRooms(socket) {
+  var userRef = db.doc('/users/' + socket.uid);
+  userRef.get().then(data => {
+    var currRoom = data.get('currentVideoroom')
+    if (currRoom === 'none' || currRoom === undefined) {
+      console.log('user is not in a rom')
+    } else {
+      //update room to remove user
+      db.doc('/videorooms/' + currRoom + '/videoState/members').update({
+        members: admin.firestore.FieldValue.arrayRemove(userRef)
+      })
+      userRef.update({
+        currentVideoroom: 'none'
+      })
+    }
+  })
+}
 
 
 io.listen(port)

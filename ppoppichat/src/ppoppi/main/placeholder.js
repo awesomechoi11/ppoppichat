@@ -8,6 +8,9 @@ export function Placeholder(props) {
 
     return (
         <div>
+            <UserContext.Consumer>
+                {value => leaveVideoroom(value.userRef)}
+            </UserContext.Consumer>
             hello
         </div>
     )
