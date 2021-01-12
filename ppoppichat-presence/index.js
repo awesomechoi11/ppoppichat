@@ -49,7 +49,7 @@ function setNextVideo(currentVideo, videoroomID) {
 //manual tracker of google uid and socket ids and people in room
 class roomstracker {
   constructor() {
-    this.roomlist = new Map()//map of maps with roomid and uid as keys
+    this.roomlist = new Map()//map of maps with roomid as keys and array of uid as values
   }
 
   addRoom(roomid) {//creates room if it doenst exist
@@ -105,6 +105,8 @@ class roomstracker {
 
 var rooms = new roomstracker;
 
+var users = new Map;
+
 io.on('connection', (socket) => {
 
   let addedUser = false;
@@ -112,11 +114,19 @@ io.on('connection', (socket) => {
 
   // when the client emits 'add user', this listens and executes
   socket.on('add user', (uid) => {
+    if (users.has(uid)) {
+      //user is already conencted on a notehr tab!!!!!!!!
+      socket.emit('uwu', 'owo')
+    }
+
+
     if (addedUser) return;
-    console.log('a user connected: ', uid)
-    // we store the username in the socket session for this client
-    socket.uid = uid;
     addedUser = true;
+
+    // we store the username in the socket session for this client
+    console.log('a user connected: ', uid)
+    socket.uid = uid;
+
     //update firebase of user status
     updateOnline(true, uid)
 

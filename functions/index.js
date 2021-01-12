@@ -1,9 +1,6 @@
 const functions = require('firebase-functions');
 const axios = require('axios');
-//const cors = require('cors')({ origin: true });
-// // Create and Deploy Your First Cloud Functions
-// // https://firebase.google.com/docs/functions/write-firebase-functions
-//
+
 // The Firebase Admin SDK to access Cloud Firestore.
 const admin = require('firebase-admin');
 admin.initializeApp();
@@ -14,6 +11,9 @@ const unauthdVimeoKey = '126864d9f48da089b0af0f87444b43ee'
 
 const usersCol = admin.firestore().collection('users')
 const db = admin.firestore()
+
+
+
 
 function fetchYoutubeVid(id) {
 	//console.log(id)
@@ -247,12 +247,4 @@ function leaveVideoroom(userID) {
 		})
 }
 
-exports.setCurrentVideo = functions.https.onRequest((request, response) => {
-	response.set('Access-Control-Allow-Origin', '*');
 
-	const queryurl = request.query.url;
-	const username = request.query.username
-	const videoroomID = request.query.videoroom
-
-	//response.send("uh oh howd u get here?");
-});

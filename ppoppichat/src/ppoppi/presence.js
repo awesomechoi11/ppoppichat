@@ -1,5 +1,7 @@
 import openSocket from 'socket.io-client';
 
+function initSocket() {
+}
 var socket
 if (process.env.NODE_ENV === 'development') {
     socket = openSocket('http://localhost:8086');
@@ -9,6 +11,10 @@ if (process.env.NODE_ENV === 'development') {
 
 socket.on("connect", () => {
     console.log(process.env.NODE_ENV, 'connected to socket server')
+})
+
+socket.on("uwu", () => {
+    console.log('user is on another tab')
 })
 
 
@@ -32,15 +38,7 @@ function setVideoState(videoState) {
 
 socket.on('videoControl', (videoState) => {
     if (window.plyr) {
-        // if (window.prevState) {
-        //     videoState = window.prevState
-        // }
 
-        // if (!window.plyr.ready) {
-        //     window.prevState = videoState
-        //     console.log('player not ready')
-        //     return
-        // }
         setTimeout(() => { setVideoState(videoState) }, 100)
     } else {
         window.prevState = videoState;
