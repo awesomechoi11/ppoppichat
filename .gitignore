@@ -65,4 +65,4 @@ node_modules/
 # dotenv environment variables file
 .env
 ppoppichat-presence/ppoppi-firebase-adminsdk-lav8j-8443ea803c.json
-api
+api/
