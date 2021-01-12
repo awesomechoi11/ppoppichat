@@ -8,17 +8,13 @@ app.get('/fetchVideoInfo', function (req, res) {
   if (url) {
     youtubedl.getInfo(url, function (err, info) {
       if (err) {
-        console.log(err)
-        res.send('err')
+        res.send(err)
       } else {
-        console.log(info.fps)
-        const infofps = String(info.fps);
         res.send(info)
       }
     })
   } else res.send('missing url query');
 })
-
 
 app.get('*', function (req, res) {
   res.send('Hello World')
