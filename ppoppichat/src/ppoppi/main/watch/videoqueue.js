@@ -9,13 +9,19 @@ export function VideoQueue(props) {
     );
     if (value) {
         if (value.exists) {
-            console.log(value.data())
+            console.log(value.data().queue.length)
             return (
                 <div className='members-list-inner'>
-                    {
+                    {value.data().queue.length > 0 ?
                         value.data().queue.map((video, index) => (
                             <QueueItem key={index} videoData={video} />
                         ))
+                        :
+                        <div>
+                            show empty placeholder
+                            uh oh!!! u have no videos click here to add some
+                        </div>
+
                     }
                 </div>
             )

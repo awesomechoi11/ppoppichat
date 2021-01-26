@@ -166,11 +166,13 @@ class PlyrWrapper extends React.Component {
                 'fullscreen', // Toggle fullscreen
             ],
             seekTime: 5,
-            autoplay: true
+            autoplay: true,
+            settings: ['captions', 'quality', 'speed']
         }
 
         this.player = new PlyrJs('#player', this.options);
 
+        this.youtubeAutoplayState = false;
         this.player.once('ready', e => {
             console.log('video player is ready')
             window.plyr = this.player
@@ -180,6 +182,17 @@ class PlyrWrapper extends React.Component {
             this.player.on('ended', e => {
                 console.log('video ended, requesting next video')
                 requestNextVideo(this.currentVideo, this.props.videoroomID)
+            })
+
+            this.player.on('loadeddata', e => {
+                console.log('loaded132231123')
+            })
+            console.log(e)
+            this.player.on('statechange', e => {
+                console.log('youtube ', e)
+                if (e.detail.code === -1) {
+
+                }
             })
 
             this.unsub = fire.firestore().doc('/videorooms/' + this.props.videoroomID + '/videoState/queue')
