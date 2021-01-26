@@ -9,13 +9,17 @@ import {
     useParams
 } from "react-router-dom";
 
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { SmallModal } from './customModal'
 import { VideoPlayer } from './videoplayer';
 import { VideoMembers } from './videomembers';
 import { VideoQueue } from './videoqueue';
 import { UserContext } from '../../../firebasecontext';
+
+
+import 'react-perfect-scrollbar/dist/css/styles.css';
+import PerfectScrollbar from 'react-perfect-scrollbar'
 
 const membersDivider = (
     <svg width="240" height="24" viewBox="0 0 240 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -81,6 +85,14 @@ function Watch(props) {
 
     console.log('watch room updated')
 
+    var memberScroll;
+    var queueScroll;
+    useEffect(() => {
+
+        // memberScroll = new PerfectScrollbar('#members-list');
+        //queueScroll = new PerfectScrollbar('#queue-list')
+    }, []);
+
     if (value) {
         if (value.exists) {
             console.log('join room start')
@@ -97,21 +109,35 @@ function Watch(props) {
                                 {membersDivider}
                                 <PlusSvg modalKey='members' videoroomID={videoRoom} />
                             </div>
-                            <div className='members-list'>
+                            <PerfectScrollbar>
 
-                                <VideoMembers videoroomID={videoRoom} />
+                                <div id='members-list' className='list'>
 
-                            </div>
+                                    <VideoMembers videoroomID={videoRoom} />
+
+                                </div>
+                            </PerfectScrollbar>
                         </div>
                         <div className='queue-wrapper'>
                             <div className='queue-divider video-room-sidebar-divider'>
                                 {queueDivider}
                                 <PlusSvg modalKey='queue' videoroomID={videoRoom} />
                             </div>
-                            <div className='queue-list'>
+                            <PerfectScrollbar>
 
-                                <VideoQueue videoroomID={videoRoom} />
+                                <div id='queue-list' className='list'>
 
+                                    <VideoQueue videoroomID={videoRoom} />
+
+                                </div>
+                            </PerfectScrollbar>
+                        </div>
+                        <div className='video-room-buttons'>
+                            <div id='videoroom-settings'>
+                                room settings
+                            </div>
+                            <div id='videoroom-skip'>
+                                skip video
                             </div>
                         </div>
                     </div>

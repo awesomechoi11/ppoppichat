@@ -23,7 +23,7 @@
         }
         .members-wrapper,
         .queue-wrapper {
-            height: calc((100% - 39px) / 2);
+            height: calc((100% - 93px) / 2);
         }
     }
     .video-room-media-wrapper {
@@ -120,4 +120,8 @@
 
 .ReactModal__Overlay {
     z-index: 3;
+}
+
+.scrollbar-container {
+    height: calc(100% - 29px) !important;
 }
