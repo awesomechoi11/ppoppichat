@@ -30,6 +30,7 @@ export class StatusMessage extends React.Component {
 
 
                 <input type="text"
+                    placeholder='how are you??'
                     value={this.state.value ? this.state.value : this.props.statusMessage}
                     onChange={this.handleChange}
                 />
