@@ -33,6 +33,8 @@ ReactModal.setAppElement('#root')
 export function SmallModal(props) {
     const [url, setUrl] = useState(" ");
 
+
+
     const handleInput = event => {
         setUrl(event.target.value);
     };
@@ -61,6 +63,7 @@ export function SmallModal(props) {
                                         }
                                     }).then(res => {
                                         console.log(res.data)
+                                        props.closeModal()
                                     }).catch(err => {
                                         console.log(err)
                                     })
