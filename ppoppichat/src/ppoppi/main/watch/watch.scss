@@ -125,3 +125,16 @@
 .scrollbar-container {
     height: calc(100% - 29px) !important;
 }
+
+.video-room-buttons {
+    display: flex;
+    justify-content: space-evenly;
+    height: 70px;
+    align-items: center;
+    user-select: none;
+    > * {
+        width: 80px;
+        font-family: $font-fredoka;
+        cursor: pointer;
+    }
+}

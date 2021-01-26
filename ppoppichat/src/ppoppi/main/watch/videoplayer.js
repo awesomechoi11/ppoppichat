@@ -201,6 +201,7 @@ class PlyrWrapper extends React.Component {
                         //if item 0 is not equal to current video
                         if (!isEqual(this.buildSource(value.data().queue[0]), this.state.source)) {
                             this.currentVideo = value.data().queue[0]
+                            window.currentVideo = this.currentVideo
                             console.log('new source ', this.buildSource(this.currentVideo))
                             this.setState({
                                 source: this.buildSource(this.currentVideo)
