@@ -79,6 +79,19 @@ export class Login extends React.Component {
         this.githubsignin = this.githubsignin.bind(this)
         this.anonsignin = this.anonsignin.bind(this)
         this.emailsignin = this.emailsignin.bind(this)
+        this.emailsignup = this.emailsignup.bind(this)
+    }
+
+    toastErr(msg) {
+        toast.error(msg, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
     }
 
     handleChange(event) {
@@ -91,87 +104,54 @@ export class Login extends React.Component {
 
     }
 
+    handleSuccess(result) {
+        console.log(result)
+    }
+    handleError(err) {
+        this.toastErr(error.msg)
+    }
     anonsignin() {
-
+        this.fire.auth().signInAnonymously()
+            .then(this.handleSuccess)
+            .catch(this.handleError);
     }
 
     emailsignin() {
+        this.fire.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+            .then(this.handleSuccess)
+            .catch(this.handleError);
+    }
 
+    emailsignup() {
+        this.fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
+            .then(this.handleSuccess)
+            .catch(this.handleError);
     }
 
     githubsignin() {
         this.provider = new this.fire.auth.GithubAuthProvider();
-        //this.provider.addScope('email');
-        this.fire.auth().signInWithPopup(this.provider).then(function (result) {
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            //var token = result.credential.accessToken;
-            // The signed-in user info.
-            console.log(result)
-            var user = result.user;
-            this.setState({ loggedIn: true, username: user.displayName, loginType: 'github' })
-            // ...
-            //console.log(fire)
-        }).catch(function (error) {
-            // Handle Errors here.
-            //var errorCode = error.code;
-            //var errorMessage = error.message;
-            console.log(error)
-            toast.error(error.message, {
-                position: "bottom-right",
-                autoClose: 5000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-            });
-            // The email of the user's account used.
-            //var email = error.email;
-            // The this.fire.auth.AuthCredential type that was used.
-            //var credential = error.credential;
-            // ...
-        });
+        this.fire.auth().signInWithPopup(this.provider)
+            .then(this.handleSuccess)
+            .catch(this.handleError);
     }
 
     googlesignin() {
-
-
-        //this.setState({ loggedIn: false })
         this.provider = new this.fire.auth.GoogleAuthProvider();
-        this.fire.auth().signInWithPopup(this.provider).then(function (result) {
-            // This gives you a Google Access Token. You can use it to access the Google API.
-            //var token = result.credential.accessToken;
-            // The signed-in user info.
-            var user = result.user;
-            this.setState({ loggedIn: true, username: user.displayName, loginType: 'google' })
-            // ...
-            //console.log(fire)
-        }).catch(function (error) {
-            // Handle Errors here.
-            //var errorCode = error.code;
-            //var errorMessage = error.message;
-            console.log(error)
-            // The email of the user's account used.
-            //var email = error.email;
-            // The this.fire.auth.AuthCredential type that was used.
-            //var credential = error.credential;
-            // ...
-        });
+        this.fire.auth().signInWithPopup(this.provider)
+            .then(this.handleSuccess)
+            .catch(this.handleError);
 
     }
     signout() {
-
         //reset login message
         this.fire.auth().signOut().then(function () {
             this.setState({ loggedIn: false })
-        }).catch(function (error) {
-            // An error happened.
-        });
-
+        })
+            .catch(this.handleError);
     }
 
     componentDidMount() {
-        //console.log(this.context)
+
         //this.fire replaces firebase 
         this.fire = this.context
         //this.provider = new this.fire.auth.GoogleAuthProvider();
@@ -186,6 +166,7 @@ export class Login extends React.Component {
         var myObject = {
             value: 0.1,
         }
+        //move wave animation
         anime.timeline({
             update: function () {
                 window.paperstuff.speed = myObject.value
@@ -310,7 +291,7 @@ export class Login extends React.Component {
                     </Formik>
                     <div className='alternate-login'>
                         <div className='alternate-login-label'>
-                            <span className='dutch-white'>OR</span> SIGN IN WITH:
+                            <span className='dutch-white'>OR</span> SIGN UP WITH:
                     </div>
                         <img className='alternate-login-png' src={gpng}
                             alt='google login logo'
