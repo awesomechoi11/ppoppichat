@@ -12,11 +12,12 @@ import { Formik, Field, Form } from 'formik';
 
 import anonpng from './anon.png';
 import fbpng from './facebook.png';
+import gitpng from './github.png';
 import gpng from './google.png';
 
 import { motion, AnimatePresence } from "framer-motion";
-
-
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const loginButtonSvg = (
     <svg id='loginButtonSvg' width="120" height="120" viewBox="0 0 120 120" >
@@ -45,7 +46,7 @@ function EnterButton(props) {
                 {loginButtonSvg}
             </button>
         )
-    } else if (props.loginType === 'facebook') {
+    } else if (props.loginType === 'github') {
         return (
 
             null
@@ -76,7 +77,9 @@ export class Login extends React.Component {
         this.handleChange = this.handleChange.bind(this);
         this.googlesignin = this.googlesignin.bind(this)
         this.signout = this.signout.bind(this)
-
+        this.githubsignin = this.githubsignin.bind(this)
+        this.anonsignin = this.anonsignin.bind(this)
+        this.emailsignin = this.emailsignin.bind(this)
     }
 
     handleChange(event) {
@@ -89,11 +92,52 @@ export class Login extends React.Component {
 
     }
 
+    anonsignin() {
+
+    }
+
+    emailsignin() {
+
+    }
+
+    githubsignin() {
+        this.provider = new this.fire.auth.GithubAuthProvider();
+        //this.provider.addScope('email');
+        this.fire.auth().signInWithPopup(this.provider).then(function (result) {
+            // This gives you a Google Access Token. You can use it to access the Google API.
+            //var token = result.credential.accessToken;
+            // The signed-in user info.
+            var user = result.user;
+            this.setState({ loggedIn: true, username: user.displayName, loginType: 'github' })
+            // ...
+            //console.log(fire)
+        }).catch(function (error) {
+            // Handle Errors here.
+            //var errorCode = error.code;
+            //var errorMessage = error.message;
+            console.log(error)
+            toast.error(error.message, {
+                position: "bottom-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+            });
+            // The email of the user's account used.
+            //var email = error.email;
+            // The this.fire.auth.AuthCredential type that was used.
+            //var credential = error.credential;
+            // ...
+        });
+    }
 
     googlesignin() {
 
 
         //this.setState({ loggedIn: false })
+        this.provider = new this.fire.auth.GoogleAuthProvider();
         this.fire.auth().signInWithPopup(this.provider).then(function (result) {
             // This gives you a Google Access Token. You can use it to access the Google API.
             //var token = result.credential.accessToken;
@@ -130,10 +174,10 @@ export class Login extends React.Component {
         //console.log(this.context)
         //this.fire replaces firebase 
         this.fire = this.context
-        this.provider = new this.fire.auth.GoogleAuthProvider();
+        //this.provider = new this.fire.auth.GoogleAuthProvider();
         this.fire.auth().onAuthStateChanged(function (user) {
             if (user) {
-                //console.log(user)
+                console.log(user)
                 // User is signed in.   
                 this.setState({ loggedIn: true, username: user.displayName, loginType: 'google' })
             }
@@ -171,12 +215,13 @@ export class Login extends React.Component {
         return (
             <div
                 className="login app-page" >
+                <ToastContainer />
                 <div id='login-platform'>
                     <AnimatePresence>
                         {!this.state.loggedIn ? (
                             <div className='login-platform-left'>
                                 <motion.div
-                                    key={this.state.loggedIn ? 'loggedIn' : 'loggedOut'}
+                                    key={'loggedOut'}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
@@ -219,7 +264,9 @@ export class Login extends React.Component {
                                         <img className='alternate-login-png' src={gpng}
                                             onClick={this.googlesignin}
                                         />
-                                        <img className='alternate-login-png' src={fbpng} />
+                                        <img className='alternate-login-png' src={gitpng}
+                                            onClick={this.githubsignin}
+                                        />
                                         <img className='alternate-login-png' src={anonpng} />
                                     </div>
                                     <div>
@@ -231,7 +278,7 @@ export class Login extends React.Component {
                         ) : (
                                 <div className='login-platform-left'>
                                     <motion.div
-                                        key={this.state.loggedIn ? 'loggedIn' : 'loggedOut'}
+                                        key={'loggedIn'}
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}

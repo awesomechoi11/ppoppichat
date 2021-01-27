@@ -63,6 +63,7 @@ export function SmallModal(props) {
                                         }
                                     }).then(res => {
                                         console.log(res.data)
+                                        //close modal after sucessful request
                                         props.closeModal()
                                     }).catch(err => {
                                         console.log(err)
