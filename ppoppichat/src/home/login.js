@@ -34,7 +34,6 @@ function EnterButton(props) {
 
     if (props.loginType === 'email') {
         return (
-
             <button id='loginbutton' type="submit" form='login-form'>
                 {loginButtonSvg}
             </button>
@@ -73,7 +72,7 @@ export class Login extends React.Component {
     constructor(props) {
         super(props)
 
-        this.state = { loggedIn: false, loginType: 'email' }
+        this.state = { loggedIn: false, loginType: 'email', mode: 'signin' }
         this.handleChange = this.handleChange.bind(this);
         this.googlesignin = this.googlesignin.bind(this)
         this.signout = this.signout.bind(this)
@@ -107,6 +106,7 @@ export class Login extends React.Component {
             // This gives you a Google Access Token. You can use it to access the Google API.
             //var token = result.credential.accessToken;
             // The signed-in user info.
+            console.log(result)
             var user = result.user;
             this.setState({ loggedIn: true, username: user.displayName, loginType: 'github' })
             // ...
@@ -233,7 +233,6 @@ export class Login extends React.Component {
                                     <Formik
                                         initialValues={{
                                             email: '',
-                                            username: '',
                                             password: '',
                                         }}
                                         onSubmit={(values) => {
@@ -248,9 +247,6 @@ export class Login extends React.Component {
                                                 <Field id="email" name="email" type="email" className="login-form" />
                                             </div>
                                             <div className="login-form-wrapper">
-                                                <label className="login-form-label" htmlFor="username">USERNAME</label>
-                                                <Field id="username" name="username" className="login-form" />
-
                                                 <label className="login-form-label" htmlFor="password">PASSWORD</label>
                                                 <Field id="password" name="password" type="password" className="login-form" />
                                             </div>
