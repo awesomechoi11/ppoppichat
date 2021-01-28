@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom";
 import './login.scss';
 
 import { FirebaseContext } from '../firebasecontext'
+import { getUserfromUid } from '../ppoppi/firebaseFunctions'
 
 import anime from 'animejs/lib/anime.es.js';
 
@@ -32,37 +33,64 @@ function EnterButton(props) {
     //const isLoggedIn = props.isLoggedIn;
     let history = useHistory();
 
-    if (props.loginType === 'email') {
-        return (
-            <button id='loginbutton' type="submit" form='login-form'>
-                {loginButtonSvg}
-            </button>
-        )
-    } else if (props.loginType === 'google') {
-        return (
-
-            <button id='loginbutton' onClick={() => { history.push('/ppoppi') }}>
-                {loginButtonSvg}
-            </button>
-        )
-    } else if (props.loginType === 'github') {
-        return (
-
-            null
-        )
-    } else if (props.loginType === 'anon') {
-        return (
-
-            null
-        )
-    } else {
-        return (
-
-            <div>
-                uwu
-            </div>
-        )
+    var handleClick = (e) => {
+        console.log('hello, handleclick is not set for enter button!!!')
     }
+
+    if (props.mode === 'signin') {
+        handleClick = (e) => {
+            props.esignin()
+        }
+    } else if (props.mode === 'signup') {
+        handleClick = (e) => {
+            props.esignup()
+        }
+    } else if (props.mode === 'loggedin') {
+        handleClick = (e) => {
+
+        }
+    } else {
+        console.log('err how did u get here?? ', props)
+    }
+    return (
+        <button id='loginbutton'
+            onClick={handleClick}
+        >
+            {loginButtonSvg}
+        </button>
+    )
+
+    // if (props.loginType === 'email') {
+    //     return (
+    //         <button id='loginbutton' type="submit" form='login-form'>
+    //             {loginButtonSvg}
+    //         </button>
+    //     )
+    // } else if (props.loginType === 'google') {
+    //     return (
+
+    //         <button id='loginbutton' onClick={() => { history.push('/ppoppi') }}>
+    //             {loginButtonSvg}
+    //         </button>
+    //     )
+    // } else if (props.loginType === 'github') {
+    //     return (
+
+    //         null
+    //     )
+    // } else if (props.loginType === 'anon') {
+    //     return (
+
+    //         null
+    //     )
+    // } else {
+    //     return (
+
+    //         <div>
+    //             uwu
+    //         </div>
+    //     )
+    // }
 
 
 }
@@ -80,6 +108,14 @@ export class Login extends React.Component {
         this.anonsignin = this.anonsignin.bind(this)
         this.emailsignin = this.emailsignin.bind(this)
         this.emailsignup = this.emailsignup.bind(this)
+        this.handleSuccess = this.handleSuccess.bind(this)
+        this.handleError = this.handleError.bind(this);
+
+        this.values = {
+            email: '',
+            password: ''
+        }
+
     }
 
     toastErr(msg) {
@@ -94,21 +130,50 @@ export class Login extends React.Component {
         });
     }
 
-    handleChange(event) {
-        const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
-        this.setState({
-            [name]: value
-        });
-
+    handleChange(values) {
+        this.values = values;
     }
 
     handleSuccess(result) {
         console.log(result)
+        //get once user profile from uid
+        const uid = result.user.uid
+        var type;
+        if (result.credential) {
+            type = result.credential.signInMethod
+        } else {
+            //anon login
+            type = 'anon'
+        }
+        //change mode to logged in
+        this.setState({
+            type: type,
+            uid: uid,
+            mode: 'loggedin',
+            userInfoLoading: true
+        })
+
+        //fetch user info with uid from login
+        getUserfromUid(uid)
+            .then(data => {
+                console.log(data)
+                if (data.exists) {
+                    this.setState({
+                        userInfoLoading: false,
+                        newUser: false
+                    })
+                    console.log(data)
+                } else {
+                    this.setState({
+                        userInfoLoading: false,
+                        newUser: true
+                    })
+                }
+            })
+
     }
     handleError(err) {
-        this.toastErr(error.msg)
+        this.toastErr(err.msg)
     }
     anonsignin() {
         this.fire.auth().signInAnonymously()
@@ -117,13 +182,14 @@ export class Login extends React.Component {
     }
 
     emailsignin() {
-        this.fire.auth().signInWithEmailAndPassword(this.state.email, this.state.password)
+        this.fire.auth().signInWithEmailAndPassword(this.values.email, this.values.password)
             .then(this.handleSuccess)
             .catch(this.handleError);
     }
 
     emailsignup() {
-        this.fire.auth().createUserWithEmailAndPassword(this.state.email, this.state.password)
+        console.log('sign up time', this.values)
+        this.fire.auth().createUserWithEmailAndPassword(this.values.email, this.values.password)
             .then(this.handleSuccess)
             .catch(this.handleError);
     }
@@ -142,10 +208,14 @@ export class Login extends React.Component {
             .catch(this.handleError);
 
     }
+
     signout() {
         //reset login message
-        this.fire.auth().signOut().then(function () {
-            this.setState({ loggedIn: false })
+        this.fire.auth().signOut().then(() => {
+            this.setState({
+                mode: 'signin',
+                userInfoLoading: true
+            })
         })
             .catch(this.handleError);
     }
@@ -154,14 +224,6 @@ export class Login extends React.Component {
 
         //this.fire replaces firebase 
         this.fire = this.context
-        //this.provider = new this.fire.auth.GoogleAuthProvider();
-        this.fire.auth().onAuthStateChanged(function (user) {
-            if (user) {
-                console.log(user)
-                // User is signed in.   
-                this.setState({ loggedIn: true, username: user.displayName, loginType: 'google' })
-            }
-        }.bind(this));
 
         var myObject = {
             value: 0.1,
@@ -193,6 +255,26 @@ export class Login extends React.Component {
 
     render() {
 
+        const altsignin = (
+            <div className='alternate-login'>
+                <div className='alternate-login-label'>
+                    <span className='dutch-white'>OR</span> SIGN UP WITH:
+                        </div>
+                <img className='alternate-login-png' src={gpng}
+                    alt='google login logo'
+                    onClick={this.googlesignin}
+                />
+                <img className='alternate-login-png' src={gitpng}
+                    alt='github logo'
+                    onClick={this.githubsignin}
+                />
+                <img className='alternate-login-png' src={anonpng}
+                    onClick={this.anonsignin}
+                    alt='anon mask' />
+            </div>
+        )
+
+
         var loginPlatformLeft;
 
         if (this.state.mode === 'signin') {
@@ -211,39 +293,25 @@ export class Login extends React.Component {
                         initialValues={{
                             email: '',
                             password: '',
-                        }}
-                        onSubmit={(values) => {
-                            //need to implement email login
-                            console.log(values)
-
-                        }}
-                    >
-                        <Form id='login-form' >
-                            <div className="login-form-wrapper">
-                                <label className="login-form-label" htmlFor="email">EMAIL</label>
-                                <Field id="email" name="email" type="email" className="login-form" />
-                            </div>
-                            <div className="login-form-wrapper">
-                                <label className="login-form-label" htmlFor="password">PASSWORD</label>
-                                <Field id="password" name="password" type="password" className="login-form" />
-                            </div>
-                            {/* <button id='loginbutton' type="submit">Submit</button> */}
-                        </Form>
+                        }}>
+                        {props => (
+                            <>
+                                {this.handleChange(props.values)}
+                                <Form id='login-form' >
+                                    <div className="login-form-wrapper">
+                                        <label className="login-form-label" htmlFor="email">EMAIL</label>
+                                        <Field id="email" name="email" type="email" className="login-form" />
+                                    </div>
+                                    <div className="login-form-wrapper">
+                                        <label className="login-form-label" htmlFor="password">PASSWORD</label>
+                                        <Field id="password" name="password" type="password" className="login-form" />
+                                    </div>
+                                    {/* <button id='loginbutton' type="submit">Submit</button> */}
+                                </Form>
+                            </>
+                        )}
                     </Formik>
-                    <div className='alternate-login'>
-                        <div className='alternate-login-label'>
-                            <span className='dutch-white'>OR</span> SIGN IN WITH:
-                    </div>
-                        <img className='alternate-login-png' src={gpng}
-                            alt='google login logo'
-                            onClick={this.googlesignin}
-                        />
-                        <img className='alternate-login-png' src={gitpng}
-                            alt='github logo'
-                            onClick={this.githubsignin}
-                        />
-                        <img className='alternate-login-png' src={anonpng} alt='anon mask' />
-                    </div>
+                    {altsignin}
                     <div className='here-button'
                         onClick={e => {
                             this.setState({ mode: 'signup' })
@@ -271,38 +339,25 @@ export class Login extends React.Component {
                             email: '',
                             password: '',
                         }}
-                        onSubmit={(values) => {
-                            //need to implement email login
-                            console.log(values)
-
-                        }}
                     >
-                        <Form id='login-form' >
-                            <div className="login-form-wrapper">
-                                <label className="login-form-label" htmlFor="email">EMAIL</label>
-                                <Field id="email" name="email" type="email" className="login-form" />
-                            </div>
-                            <div className="login-form-wrapper">
-                                <label className="login-form-label" htmlFor="password">PASSWORD</label>
-                                <Field id="password" name="password" type="password" className="login-form" />
-                            </div>
-                            {/* <button id='loginbutton' type="submit">Submit</button> */}
-                        </Form>
+                        {props => (
+                            <>
+                                {this.handleChange(props.values)}
+                                <Form id='login-form' >
+                                    <div className="login-form-wrapper">
+                                        <label className="login-form-label" htmlFor="email">EMAIL</label>
+                                        <Field id="email" name="email" type="email" className="login-form" />
+                                    </div>
+                                    <div className="login-form-wrapper">
+                                        <label className="login-form-label" htmlFor="password">PASSWORD</label>
+                                        <Field id="password" name="password" type="password" className="login-form" />
+                                    </div>
+                                    {/* <button id='loginbutton' type="submit">Submit</button> */}
+                                </Form>
+                            </>
+                        )}
                     </Formik>
-                    <div className='alternate-login'>
-                        <div className='alternate-login-label'>
-                            <span className='dutch-white'>OR</span> SIGN UP WITH:
-                    </div>
-                        <img className='alternate-login-png' src={gpng}
-                            alt='google login logo'
-                            onClick={this.googlesignin}
-                        />
-                        <img className='alternate-login-png' src={gitpng}
-                            alt='github logo'
-                            onClick={this.githubsignin}
-                        />
-                        <img className='alternate-login-png' src={anonpng} alt='anon mask' />
-                    </div>
+                    {altsignin}
                     <div className='here-button'
                         onClick={e => {
                             this.setState({ mode: 'signin' })
@@ -314,28 +369,72 @@ export class Login extends React.Component {
                 </motion.div>
             )
         } else if (this.state.mode === 'loggedin') {
-            loginPlatformLeft = (
-                <motion.div
-                    key={'loggedIn'}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className='signed-out'
-                >
-                    <div className='login-form-title dutch-white'>
-                        welcome!
-                </div>
-                    <div className='login-username-title'>
-                        USERNAME
-                </div>
-                    <div className='login-username'>
-                        {this.state.username}
-                    </div>
-                    <div className="here-button login-signout" onClick={this.signout}>
-                        <span>NOT</span> YOUR ACCOUNT? SIGN <span className='dutch-white'>OUT</span>
-                    </div>
-                </motion.div>
-            )
+            if (!this.state.userInfoLoading) {
+                loginPlatformLeft = (
+                    <motion.div
+                        key={'loggedIn'}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className='signed-out'
+                    >
+                        {!this.state.newUser ? (
+                            <>
+                                <div className='login-form-title dutch-white'>
+                                    welcome!
+                                </div>
+                                <div className='login-username-title'>
+                                    USERNAME
+                                </div>
+                                <div className='login-username'>
+                                    {this.state.username}
+                                </div>
+                            </>
+                        ) : (//new user creation screen
+                                <>
+                                    <div className='login-form-title dutch-white'>
+                                        welcome!
+                                </div>
+                                    <Formik
+                                        initialValues={{
+                                            username: ''
+
+                                        }}>
+                                        {props => (
+                                            <>
+                                                {this.handleChange(props.values)}
+                                                <Form id='user-create' >
+                                                    <div className="login-form-wrapper">
+                                                        <label className="login-form-label" htmlFor="username">CHOOSE A USERNAME</label>
+                                                        <Field id="username" name="username" className="login-form" />
+                                                    </div>
+                                                </Form>
+                                            </>
+                                        )}
+                                    </Formik>
+                                </>
+                            )}
+
+                        <div className="here-button login-signout" onClick={this.signout}>
+                            <span>NOT</span> YOUR ACCOUNT? SIGN <span className='dutch-white'>OUT</span>
+                        </div>
+                    </motion.div>
+                )
+            } else {
+                loginPlatformLeft = (
+                    <motion.div
+                        key={'loggedIn'}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className='signed-out'
+                    >
+                        <div className='login-form-title dutch-white'>
+                            loading...
+                        </div>
+                    </motion.div>
+                )
+            }
         }
 
 
@@ -352,7 +451,12 @@ export class Login extends React.Component {
                     </AnimatePresence>
                     <div className='login-platform-right'>
                         <span >
-                            <EnterButton loginType={this.state.loginType} />
+                            <EnterButton
+                                loginType={this.state.loginType}
+                                mode={this.state.mode}
+                                esignin={this.emailsignin}
+                                esignup={this.emailsignup}
+                            />
                         </span>
                     </div>
 

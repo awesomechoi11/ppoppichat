@@ -11,7 +11,7 @@ import { Channels } from './sidebar/channels';
 
 import placeholderPicture from './poppi.png'
 import { handleSignIn, listenToUserInfo } from './firebaseFunctions'
-import { setUserOnline } from './presence';
+import { setUserOnline, initSocket } from './presence';
 import { StatusMessage } from './statusmessage';
 
 
@@ -46,6 +46,13 @@ export class Ppoppi extends React.Component {
 
     }
 
+    gotoLogin() {
+        //redirect to login page if not logged in
+        let loc = new URL(window.location);
+        loc = loc.origin
+        window.location = loc + '/login'
+    }
+
     componentDidMount() {
 
         //check if logged in,
@@ -70,15 +77,14 @@ export class Ppoppi extends React.Component {
                             nickname: data.nickname
                         })
                         this.unsubUserInfo = this.listenToUserInfo(user)
+                        initSocket()
                     }).then(() => {
                         setUserOnline(user.uid)
                     })
 
             } else {
                 //redirect to login page if not logged in
-                let loc = new URL(window.location);
-                loc = loc.origin
-                window.location = loc + '/login'
+                this.gotoLogin();
             }
         }.bind(this));
 

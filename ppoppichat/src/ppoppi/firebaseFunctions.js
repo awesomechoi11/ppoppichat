@@ -97,6 +97,10 @@ export async function getUserfromRef(userRef) {
     //fire.firestore().doc(userRef.path)
 }
 
+export function getUserfromUid(uid) {
+    return db.doc('users/' + uid).get()
+}
+
 export function handleSignIn(user) {
     let userdoc = this.db.collection("users").doc(user.uid)
     console.log('signing in')

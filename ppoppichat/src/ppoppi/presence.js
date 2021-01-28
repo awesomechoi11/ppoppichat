@@ -1,21 +1,38 @@
 import openSocket from 'socket.io-client';
 
-function initSocket() {
+export function initSocket() {
+    socket = openSocket(socketurl);
+
+
+    socket.on("connect", () => {
+        console.log(process.env.NODE_ENV, 'connected to socket server')
+    })
+
+    socket.on("uwu", () => {
+        console.log('user is on another tab')
+    })
+    socket.on('videoControl', (videoState) => {
+        if (window.plyr) {
+
+            setTimeout(() => { setVideoState(videoState) }, 100)
+        } else {
+            window.prevState = videoState;
+        }
+    })
+
+    socket.on("requestVideoState", () => {
+        console.log('requested videostate, emitting')
+        socket.emit('videoControl', window.videoState)
+    })
 }
-var socket
+var socket;
+var socketurl;
 if (process.env.NODE_ENV === 'development') {
-    socket = openSocket('http://localhost:8086');
+    socketurl = 'http://localhost:8086';
 } else {
-    socket = openSocket('https://presence.ppoppichat.xyz');
+    socketurl = 'https://presence.ppoppichat.xyz';
 }
 
-socket.on("connect", () => {
-    console.log(process.env.NODE_ENV, 'connected to socket server')
-})
-
-socket.on("uwu", () => {
-    console.log('user is on another tab')
-})
 
 
 function setVideoState(videoState) {
@@ -36,19 +53,7 @@ function setVideoState(videoState) {
     }
 }
 
-socket.on('videoControl', (videoState) => {
-    if (window.plyr) {
 
-        setTimeout(() => { setVideoState(videoState) }, 100)
-    } else {
-        window.prevState = videoState;
-    }
-})
-
-socket.on("requestVideoState", () => {
-    console.log('requested videostate, emitting')
-    socket.emit('videoControl', window.videoState)
-})
 
 
 export function setUserOnline(uid) {
