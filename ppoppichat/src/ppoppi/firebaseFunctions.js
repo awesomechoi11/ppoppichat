@@ -16,8 +16,8 @@ var db = fire.firestore();
 
 function newUserDefaults(user) {
     return {
-        name: user.displayName,
-        nickname: user.displayName,
+        email: user.email,
+        username: user.displayName,
         photoURL: user.photoURL,
         statusColor: "#32EA44",
         statusMessage: '',
@@ -134,7 +134,9 @@ export function handleSignIn(user) {
     })
 }
 
-
+export function createNewUser(data) {
+    console.log(data)
+}
 
 export function joinVideoroom(userRef, videoroomID) {
     //if user not already in room, join

@@ -5,7 +5,7 @@ import { useHistory } from "react-router-dom";
 import './login.scss';
 
 import { FirebaseContext } from '../firebasecontext'
-import { getUserfromUid } from '../ppoppi/firebaseFunctions'
+import { getUserfromUid, createNewUser } from '../ppoppi/firebaseFunctions'
 
 import anime from 'animejs/lib/anime.es.js';
 
@@ -20,6 +20,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import img1 from './starterimage/angry.png'
+import img2 from './starterimage/index.png'
+import img3 from './starterimage/pirate.jpg'
+import img4 from './starterimage/ppoppi.png'
+import img5 from './starterimage/ppoppihead.png'
+import img6 from './starterimage/ppoppinose.png'
+
+
+
 const loginButtonSvg = (
     <svg id='loginButtonSvg' width="120" height="120" viewBox="0 0 120 120" >
         <rect x="0.5" y="0.5" width="119" height="119" rx="29.5" stroke="black" />
@@ -27,6 +36,7 @@ const loginButtonSvg = (
     </svg>
 
 )
+
 
 
 function EnterButton(props) {
@@ -46,8 +56,15 @@ function EnterButton(props) {
             props.esignup()
         }
     } else if (props.mode === 'loggedin') {
-        handleClick = (e) => {
 
+        if (props.userCreation) {
+            handleClick = (e) => {
+                createNewUser(props.userData)
+            }
+        } else {
+            handleClick = (e) => {
+                history.push('/ppoppi')
+            }
         }
     } else {
         console.log('err how did u get here?? ', props)
@@ -59,39 +76,6 @@ function EnterButton(props) {
             {loginButtonSvg}
         </button>
     )
-
-    // if (props.loginType === 'email') {
-    //     return (
-    //         <button id='loginbutton' type="submit" form='login-form'>
-    //             {loginButtonSvg}
-    //         </button>
-    //     )
-    // } else if (props.loginType === 'google') {
-    //     return (
-
-    //         <button id='loginbutton' onClick={() => { history.push('/ppoppi') }}>
-    //             {loginButtonSvg}
-    //         </button>
-    //     )
-    // } else if (props.loginType === 'github') {
-    //     return (
-
-    //         null
-    //     )
-    // } else if (props.loginType === 'anon') {
-    //     return (
-
-    //         null
-    //     )
-    // } else {
-    //     return (
-
-    //         <div>
-    //             uwu
-    //         </div>
-    //     )
-    // }
-
 
 }
 
@@ -160,7 +144,7 @@ export class Login extends React.Component {
                 if (data.exists) {
                     this.setState({
                         userInfoLoading: false,
-                        newUser: false
+                        newUser: false,
                     })
                     console.log(data)
                 } else {
@@ -397,8 +381,8 @@ export class Login extends React.Component {
                                 </div>
                                     <Formik
                                         initialValues={{
-                                            username: ''
-
+                                            username: '',
+                                            profilePicture: img1
                                         }}>
                                         {props => (
                                             <>
@@ -408,6 +392,45 @@ export class Login extends React.Component {
                                                         <label className="login-form-label" htmlFor="username">CHOOSE A USERNAME</label>
                                                         <Field id="username" name="username" className="login-form" />
                                                     </div>
+                                                    <div className='profile-picture-label'>
+                                                        CHOOSE A PROFILE PICTURE
+                                                    </div>
+                                                    <div className='profile-picture-radio-wrapper'>
+                                                        <img
+                                                            className='profile-picture-selected'
+                                                            src={props.values.profilePicture}
+                                                            alt='selected profile'
+                                                        ></img>
+                                                        <div className='profile-picture-grid'>
+                                                            <div>
+                                                                <Field type="radio" id='choice1' className='profile-picture-choice' name="profilePicture" value={img1} />
+                                                                <label className="profile-picture-item" htmlFor="choice1" style={{ backgroundImage: `url(${img1})` }} ></label>
+                                                            </div>
+                                                            <div>
+
+                                                                <Field type="radio" id='choice2' className='profile-picture-choice' name="profilePicture" value={img2} />
+                                                                <label className="profile-picture-item" htmlFor="choice2" style={{ backgroundImage: `url(${img2})` }} ></label>
+                                                            </div>
+                                                            <div>
+
+                                                                <Field type="radio" id='choice3' className='profile-picture-choice' name="profilePicture" value={img3} />
+                                                                <label className="profile-picture-item" htmlFor="choice3" style={{ backgroundImage: `url(${img3})` }} ></label>
+                                                            </div>
+                                                            <div>
+                                                                <Field type="radio" id='choice4' className='profile-picture-choice' name="profilePicture" value={img4} />
+                                                                <label className="profile-picture-item" htmlFor="choice4" style={{ backgroundImage: `url(${img4})` }} ></label>
+                                                            </div>
+                                                            <div>
+                                                                <Field type="radio" id='choice5' className='profile-picture-choice' name="profilePicture" value={img5} />
+                                                                <label className="profile-picture-item" htmlFor="choice5" style={{ backgroundImage: `url(${img5})` }} ></label>
+                                                            </div>
+                                                            <div>
+                                                                <Field type="radio" id='choice6' className='profile-picture-choice' name="profilePicture" value={img6} />
+                                                                <label className="profile-picture-item" htmlFor="choice6" style={{ backgroundImage: `url(${img6})` }} ></label>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
                                                 </Form>
                                             </>
                                         )}
@@ -415,7 +438,7 @@ export class Login extends React.Component {
                                 </>
                             )}
 
-                        <div className="here-button login-signout" onClick={this.signout}>
+                        <div className="here-button login-signout-create" onClick={this.signout}>
                             <span>NOT</span> YOUR ACCOUNT? SIGN <span className='dutch-white'>OUT</span>
                         </div>
                     </motion.div>
@@ -452,8 +475,9 @@ export class Login extends React.Component {
                     <div className='login-platform-right'>
                         <span >
                             <EnterButton
-                                loginType={this.state.loginType}
+                                userCreation={this.state.newUser}
                                 mode={this.state.mode}
+                                userData={this.state.userData}
                                 esignin={this.emailsignin}
                                 esignup={this.emailsignup}
                             />
