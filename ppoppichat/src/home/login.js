@@ -11,14 +11,16 @@ import anime from 'animejs/lib/anime.es.js';
 
 import { Formik, Field, Form } from 'formik';
 
+import { motion, AnimatePresence } from "framer-motion";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import isEqual from 'lodash.isequal'
+
 import anonpng from './anon.png';
 import fbpng from './facebook.png';
 import gitpng from './github.png';
 import gpng from './google.png';
-
-import { motion, AnimatePresence } from "framer-motion";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 import img1 from './starterimage/angry.png'
 import img2 from './starterimage/index.png'
@@ -60,6 +62,9 @@ function EnterButton(props) {
         if (props.userCreation) {
             handleClick = (e) => {
                 createNewUser(props.userData)
+                    .then(() => {
+                        history.push('/ppoppi')
+                    })
             }
         } else {
             handleClick = (e) => {
@@ -99,6 +104,10 @@ export class Login extends React.Component {
             email: '',
             password: ''
         }
+        this.newAccountValues = {
+            username: '',
+
+        }
 
     }
 
@@ -114,8 +123,18 @@ export class Login extends React.Component {
         });
     }
 
-    handleChange(values) {
-        this.values = values;
+    handleChange(values, create = false) {
+        console.log(values, create)
+        if (create) {
+            this.newAccountValues = values
+            if (!isEqual(this.newAccountValues, this.state.newAccountValues))
+                this.setState({
+                    newAccountValues: values
+                })
+        } else {
+            this.values = values;
+        }
+
     }
 
     handleSuccess(result) {
@@ -386,7 +405,7 @@ export class Login extends React.Component {
                                         }}>
                                         {props => (
                                             <>
-                                                {this.handleChange(props.values)}
+                                                {this.handleChange(props.values, true)}
                                                 <Form id='user-create' >
                                                     <div className="login-form-wrapper">
                                                         <label className="login-form-label" htmlFor="username">CHOOSE A USERNAME</label>
@@ -477,7 +496,10 @@ export class Login extends React.Component {
                             <EnterButton
                                 userCreation={this.state.newUser}
                                 mode={this.state.mode}
-                                userData={this.state.userData}
+                                userData={{
+                                    values: this.state.newAccountValues,
+                                    uid: this.state.uid
+                                }}
                                 esignin={this.emailsignin}
                                 esignup={this.emailsignup}
                             />

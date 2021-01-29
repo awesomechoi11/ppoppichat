@@ -5,7 +5,7 @@ var db = fire.firestore();
 
 //list of fields that can be editted
 // const validUserFields = [
-//     'nickname',
+//     'username',
 //     'photoURL',
 //     'statusColor',
 //     'statusMessage',
@@ -16,8 +16,7 @@ var db = fire.firestore();
 
 function newUserDefaults(user) {
     return {
-        email: user.email,
-        username: user.displayName,
+        username: user.username,
         photoURL: user.photoURL,
         statusColor: "#32EA44",
         statusMessage: '',
@@ -101,34 +100,35 @@ export function getUserfromUid(uid) {
     return db.doc('users/' + uid).get()
 }
 
+function gotoLogin() {
+    //redirect to login page if not logged in
+    let loc = new URL(window.location);
+    loc = loc.origin
+    window.location = loc + '/login'
+}
+
 export function handleSignIn(user) {
     let userdoc = this.db.collection("users").doc(user.uid)
     console.log('signing in')
     //attempt to get doc with uid
     return userdoc.get().then((doc) => {
+        return new Promise((resolve, reject) => {
 
-        //if user does not exist then it is a new account
-        if (!doc.exists) {
+            //if user does not exist then it is a new account
+            if (!doc.exists) {
+                //all account creation is now handled at login
+                gotoLogin()
+                console.log('no account found with uid: ', user.uid)
+                reject('no acc')
 
-            //set defaults for firebase and state
-            console.log('creating new user: ', user.uid)
-            return userdoc.set(newUserDefaults(user))
-                .then(() => {
-                    console.log('user signed in')
-                    createVideoroom(userdoc)
-                    return newUserDefaults(user);
-                })
+            } else {
 
-
-        } else {
-
-            //not a new account
-            return new Promise((resolve, reject) => {
+                //not a new account
                 console.log('user signed in')
                 resolve(doc.data())
-            })
 
-        }
+            }
+        })
         //always retruns user data
 
     })
@@ -136,6 +136,17 @@ export function handleSignIn(user) {
 
 export function createNewUser(data) {
     console.log(data)
+
+    const userRef = db.doc('users/' + data.uid)
+    return userRef.set(newUserDefaults({
+        username: data.values.username,
+        photoURL: data.values.profilePicture,
+    })).catch(e => {
+        console.log('error creating new user')
+        console.log(e)
+    }).then(() => {
+        createVideoroom(userRef)
+    })
 }
 
 export function joinVideoroom(userRef, videoroomID) {

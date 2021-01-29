@@ -6,7 +6,7 @@ import './ppoppi.scss';
 
 import { Panel } from './sidebar/panel';
 import { Main } from './main/main';
-import { Channels } from './sidebar/channels';
+//import { Channels } from './sidebar/channels';
 
 
 import placeholderPicture from './poppi.png'
@@ -34,7 +34,7 @@ export class Ppoppi extends React.Component {
         console.log('ppoppi called')
         this.state = {
             loggedIn: false,
-            nickname: 'loading...',
+            username: 'loading...',
             userStatus: 'status-offline',
             userPicture: placeholderPicture,
             statusMessage: ''
@@ -74,7 +74,7 @@ export class Ppoppi extends React.Component {
                             online: data.online,
                             videoroomID: data.videoroomID,
                             statusMessage: data.statusMessage,
-                            nickname: data.nickname
+                            username: data.username
                         })
                         this.unsubUserInfo = this.listenToUserInfo(user)
                         initSocket()

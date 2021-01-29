@@ -61,7 +61,7 @@ function MemberItem(props) {
         <div className='member-item-wrapper'>
             <img className='member-item-picture' alt='user profile' src={userData.data().photoURL}></img>
             <div className='member-item-name'>
-                {userData.data().nickname}
+                {userData.data().username}
             </div>
         </div>
     )

@@ -88,13 +88,6 @@ function Watch(props) {
 
     console.log('watch room updated')
 
-    var memberScroll;
-    var queueScroll;
-    useEffect(() => {
-
-        // memberScroll = new PerfectScrollbar('#members-list');
-        //queueScroll = new PerfectScrollbar('#queue-list')
-    }, []);
 
     if (value) {
         if (value.exists) {

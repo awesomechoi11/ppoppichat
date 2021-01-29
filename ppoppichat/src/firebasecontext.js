@@ -22,7 +22,7 @@ export const fire = firebase;
 
 export const UserContext = React.createContext({
     loggedIn: false,
-    nickname: 'loading...',
+    username: 'loading...',
     userStatus: 'status-offline',
     userPicture: placeholderPicture,
     statusMessage: ''

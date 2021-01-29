@@ -118,6 +118,20 @@
     }
 }
 
+.pawpaws {
+    fill: #001b2e;
+}
+
+.empty-queue-placeholder {
+    font-family: $font-fredoka;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    height: 200px;
+}
+
 .ReactModal__Overlay {
     z-index: 3;
 }

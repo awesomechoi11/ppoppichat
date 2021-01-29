@@ -2,6 +2,16 @@ import { useDocument } from 'react-firebase-hooks/firestore';
 //import placeholderPicture from './unknown.png'
 import { fire } from '../../../firebasecontext'
 
+const pawpaws = (
+    <svg className='pawpaws' width="96" height="84" viewBox="0 0 96 84" fill="none" >
+        <ellipse cx="12.3236" cy="25.1614" rx="12.2059" ry="12.2581" />
+        <ellipse cx="47.2059" cy="12.2581" rx="12.2059" ry="12.2581" />
+        <ellipse cx="83.2059" cy="25.2581" rx="12.2059" ry="12.2581" />
+        <path d="M46.5 32.5161C7.7581 32.5161 -29.9711 84 46.5001 84C122.971 84 85.2418 32.5161 46.5 32.5161Z" />
+    </svg>
+
+)
+
 
 export function VideoQueue(props) {
     const [value] = useDocument(
@@ -17,9 +27,15 @@ export function VideoQueue(props) {
                             <QueueItem key={index} videoData={video} />
                         ))
                         :
-                        <div>
-                            show empty placeholder
-                            uh oh!!! u have no videos click here to add some
+                        <div className='empty-queue-placeholder'
+                            onClick={e => {
+
+                            }}
+                        >
+                            {pawpaws}
+                            <div>
+                                click to add a video!
+                            </div>
                         </div>
 
                     }
