@@ -38,7 +38,7 @@ export function SmallModal(props) {
     const handleInput = event => {
         setUrl(event.target.value);
     };
-    //console.log(props.modalKey)
+    //console.log(props)
     const modalObj = {
         'members': <div>hello</div>,
         'queue': (

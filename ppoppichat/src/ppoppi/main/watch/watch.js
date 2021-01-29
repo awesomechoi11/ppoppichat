@@ -56,8 +56,6 @@ function PlusSvg(props) {
         setIsOpen(false)
     }
 
-
-
     return (
         <div className='sidebar-add-button'
             onClick={handleClick}

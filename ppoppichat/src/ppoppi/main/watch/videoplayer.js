@@ -220,7 +220,7 @@ class PlyrWrapper extends React.Component {
         if (window.plyr) {
 
             if (window.plyr.source !== this.state.source) {
-                console.log('this')
+                //console.log('this')
                 window.plyr.source = this.state.source
             }
         }

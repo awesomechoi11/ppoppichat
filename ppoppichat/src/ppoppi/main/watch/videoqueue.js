@@ -1,6 +1,8 @@
 import { useDocument } from 'react-firebase-hooks/firestore';
 //import placeholderPicture from './unknown.png'
 import { fire } from '../../../firebasecontext'
+import React from 'react'
+import { SmallModal } from './customModal'
 
 const pawpaws = (
     <svg className='pawpaws' width="96" height="84" viewBox="0 0 96 84" fill="none" >
@@ -17,9 +19,19 @@ export function VideoQueue(props) {
     const [value] = useDocument(
         fire.firestore().doc('/videorooms/' + props.videoroomID + '/videoState/queue')
     );
+
+    const [modalIsOpen, setIsOpen] = React.useState(false);
+
+    function closeModal() {
+        setIsOpen(false)
+    }
+    function openModal() {
+        setIsOpen(true)
+    }
+
     if (value) {
         if (value.exists) {
-            console.log(value.data().queue.length)
+            //console.log(value.data().queue.length)
             return (
                 <div className='members-list-inner'>
                     {value.data().queue.length > 0 ?
@@ -28,14 +40,18 @@ export function VideoQueue(props) {
                         ))
                         :
                         <div className='empty-queue-placeholder'
-                            onClick={e => {
-
-                            }}
+                            onClick={openModal}
                         >
                             {pawpaws}
                             <div>
                                 click to add a video!
                             </div>
+                            <SmallModal
+                                modalIsOpen={modalIsOpen}
+                                modalKey={'queue'}
+                                closeModal={closeModal}
+                                videoroomID={props.videoroomID}
+                            />
                         </div>
 
                     }
