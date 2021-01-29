@@ -9,7 +9,7 @@ import './videoplayer.scss'
 
 import { joinVideoroomSocket, requestNextVideo } from '../../presence'
 
-import { videoControl } from '../../presence'
+import { videoControl, setVideoState as socketSet } from '../../presence'
 
 
 import isEqual from 'lodash.isequal'
@@ -188,10 +188,23 @@ class PlyrWrapper extends React.Component {
                 console.log('loaded132231123')
             })
             console.log(e)
+            this.playNextTime = false;
             this.player.on('statechange', e => {
                 console.log('youtube ', e)
+
                 if (e.detail.code === -1) {
 
+                } else if (e.detail.code === 3) {
+                    //buffering
+                    //socketSet(window.videoState)
+                    //this.playNextTime = true;
+                } else if (e.detail.code === 2) {
+                    //paused
+                    if (this.playNextTime) {
+                        this.player.play()
+                        this.playNextTime = false;
+                        //socketSet(window.videoState)
+                    }
                 }
             })
 

@@ -166,8 +166,6 @@ export function joinVideoroom(userRef, videoroomID) {
                     members: fire.firestore.FieldValue.arrayUnion(userRef)
                 }).then(() => {
 
-
-
                     console.log('user successfully joined room')
                 }).catch(err => {
                     console.log('err joining videoroom: ', err)

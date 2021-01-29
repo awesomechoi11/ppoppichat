@@ -35,7 +35,7 @@ if (process.env.NODE_ENV === 'development') {
 
 
 
-function setVideoState(videoState) {
+export function setVideoState(videoState) {
     if (!videoState) {
         return
     }
