@@ -164,6 +164,7 @@ export class Login extends React.Component {
                     this.setState({
                         userInfoLoading: false,
                         newUser: false,
+                        username: data.get('username')
                     })
                     console.log(data)
                 } else {

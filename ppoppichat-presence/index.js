@@ -9,10 +9,14 @@ admin.initializeApp({
 
 const db = admin.firestore()
 
-
+//console.log(process.env)
+var origin = 'https://ppoppichat.xyz'
+if (process.env.MODE === 'development') {
+  origin = "http://localhost:8085"
+}
 const io = require('socket.io')({
   cors: {
-    origin: "http://localhost:8085",
+    origin: origin,
     methods: ["GET", "POST"]
   }
 });
@@ -33,7 +37,7 @@ function setNextVideo(currentVideo, videoroomID) {
     if (value.exists) {
       //console.log(value.data().queue[0])
       //console.log(currentVideo)
-      if (value.data().queue.length > 1) {
+      if (value.data().queue.length > 0) {
 
         if (isEqual(value.data().queue[0], currentVideo)) {
           docRef.update({

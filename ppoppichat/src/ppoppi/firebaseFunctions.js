@@ -145,7 +145,7 @@ export function createNewUser(data) {
         console.log('error creating new user')
         console.log(e)
     }).then(() => {
-        createVideoroom(userRef)
+        return createVideoroom(userRef)
     })
 }
 
