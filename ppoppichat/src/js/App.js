@@ -3,6 +3,8 @@ import React from 'react';
 
 import { Login } from './login';
 import { Ppoppi } from './ppoppi/ppoppi';
+import { Home } from './home/home';
+
 
 import {
   BrowserRouter as Router,
@@ -40,7 +42,7 @@ const routes = [
       </div>
     ),
     path: '/',
-    main: <Placeholder id='home' />
+    main: <Home />
   },
   {
     id: "download",

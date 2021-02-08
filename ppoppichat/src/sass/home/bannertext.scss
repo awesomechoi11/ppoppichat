@@ -1,0 +1,29 @@
+@import "../variables.scss";
+
+.banner-wrapper {
+    position: absolute;
+    top: calcvw(200);
+    left: calcvw(375);
+}
+
+.banner {
+    display: flex;
+}
+
+.banner-text-left {
+    width: calcvw(500);
+    height: calcvw(200);
+    margin-right: 50px;
+    font-size: calcvw(144);
+    text-align: right;
+    -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: black;
+}
+
+.banner-text-right {
+    width: calcvw(200);
+    height: calcvw(200);
+    display: block;
+    font-size: calcvw(144);
+}
