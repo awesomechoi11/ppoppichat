@@ -1,6 +1,6 @@
 import { useDocument } from 'react-firebase-hooks/firestore';
 //import placeholderPicture from './unknown.png'
-import { fire } from '../../../firebasecontext'
+import { fire } from '../../../utils/firebasecontext'
 import React from 'react'
 import { SmallModal } from './customModal'
 

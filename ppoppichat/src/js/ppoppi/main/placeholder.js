@@ -1,5 +1,5 @@
-import { leaveVideoroom } from "../firebaseFunctions"
-import { UserContext } from '../../firebasecontext'
+import { leaveVideoroom } from "../../utils/firebaseFunctions"
+import { UserContext } from '../../utils/firebasecontext'
 
 
 export function Placeholder(props) {

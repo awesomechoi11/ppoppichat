@@ -1,10 +1,10 @@
-import './watch.scss'
+import '../../../../sass/watch.scss'
 import firebase from "firebase/app"
 //when connected to this url
 //fetch from firebase 
 //import placeholderPicture from './unknown.png'
 import { useDocument } from 'react-firebase-hooks/firestore';
-import { joinVideoroom } from '../../firebaseFunctions'
+import { joinVideoroom } from '../../../utils/firebaseFunctions'
 import {
     useParams
 } from "react-router-dom";
@@ -15,14 +15,14 @@ import { SmallModal } from './customModal'
 import { VideoPlayer } from './videoplayer';
 import { VideoMembers } from './videomembers';
 import { VideoQueue } from './videoqueue';
-import { UserContext } from '../../../firebasecontext';
+import { UserContext } from '../../../utils/firebasecontext';
+import { requestNextVideo } from '../../../utils/presence'
 
 
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import PerfectScrollbar from 'react-perfect-scrollbar'
 
 
-import { requestNextVideo } from '../../presence'
 
 const membersDivider = (
     <svg width="240" height="24" viewBox="0 0 240 24" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -1,21 +1,18 @@
-import React from 'react';
-
 import '../../sass/ppoppi.scss';
 
-//import firebase from '../home/fire'
+import React from 'react';
 
 import { Panel } from './sidebar/panel';
 import { Main } from './main/main';
-//import { Channels } from './sidebar/channels';
-
-
-import placeholderPicture from './poppi.png'
-import { handleSignIn, listenToUserInfo } from './firebaseFunctions'
-import { setUserOnline, initSocket } from './presence';
 import { StatusMessage } from './statusmessage';
 
+//utils
+import { handleSignIn, listenToUserInfo } from '../utils/firebaseFunctions'
+import { FirebaseContext, UserContext } from '../utils/firebasecontext'
+import { setUserOnline, initSocket } from '../utils/presence';
 
-import { FirebaseContext, UserContext } from '../firebasecontext'
+import placeholderPicture from '../../assets/ppoppi.png'
+
 
 
 const settingsvg = (

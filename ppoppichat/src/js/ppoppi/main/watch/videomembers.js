@@ -1,6 +1,6 @@
 import { useDocument } from 'react-firebase-hooks/firestore';
-import placeholderPicture from './unknown.png'
-import { fire } from '../../../firebasecontext'
+import placeholderPicture from '../../../../assets/ppoppi.png'
+import { fire } from '../../../utils/firebasecontext'
 
 
 export function VideoMembers(props) {

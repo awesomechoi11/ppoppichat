@@ -1,10 +1,10 @@
 import ReactModal from 'react-modal';
 //uses react modal but with custom settings
 import React, { useState } from "react";
-import './customModal.scss'
+import '../../../../sass/customModal.scss'
 import axios from 'axios';
 
-import { UserContext } from '../../../firebasecontext';
+import { UserContext } from '../../../utils/firebasecontext';
 
 //const localurl = 'http://localhost:5001/ppoppi/us-central1/addVideoToList?'
 const produrl = 'https://us-central1-ppoppi.cloudfunctions.net/addVideoToList?'

@@ -6,7 +6,7 @@ import {
 
 } from "react-router-dom";
 
-import './main.scss'
+import '../../../sass/main.scss'
 import { Placeholder } from "./placeholder";
 
 import './watch/watch'

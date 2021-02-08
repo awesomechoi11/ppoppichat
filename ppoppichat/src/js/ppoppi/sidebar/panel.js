@@ -2,7 +2,7 @@ import {
     useRouteMatch,
     Link
 } from "react-router-dom";
-import './panel.scss';
+import '../../../sass/panel.scss';
 
 
 

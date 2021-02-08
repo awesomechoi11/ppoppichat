@@ -2,10 +2,10 @@ import React from 'react';
 import { useHistory } from "react-router-dom";
 //import fire from './fire'
 
-import './login.scss';
+import '../sass/login.scss';
 
-import { FirebaseContext } from '../firebasecontext'
-import { getUserfromUid, createNewUser } from '../ppoppi/firebaseFunctions'
+import { FirebaseContext } from './utils/firebasecontext'
+import { getUserfromUid, createNewUser } from '../utils/firebaseFunctions'
 
 import anime from 'animejs/lib/anime.es.js';
 
@@ -17,17 +17,17 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import isEqual from 'lodash.isequal'
 
-import anonpng from './anon.png';
-import fbpng from './facebook.png';
-import gitpng from './github.png';
-import gpng from './google.png';
+import anonpng from '../assets/login/anon.png';
+import fbpng from '../assets/login/facebook.png';
+import gitpng from '../assets/login/github.png';
+import gpng from '../assets/login/google.png';
 
-import img1 from './starterimage/angry.png'
-import img2 from './starterimage/index.png'
-import img3 from './starterimage/pirate.jpg'
-import img4 from './starterimage/ppoppi.png'
-import img5 from './starterimage/ppoppihead.png'
-import img6 from './starterimage/ppoppinose.png'
+import img1 from '../assets/login/starterimage/angry.png'
+import img2 from '../assets/login/starterimage/index.png'
+import img3 from '../assets/login/starterimage/pirate.jpg'
+import img4 from '../assets/login/starterimage/ppoppi.png'
+import img5 from '../assets/login/starterimage/ppoppihead.png'
+import img6 from '../assets/login/starterimage/ppoppinose.png'
 
 
 

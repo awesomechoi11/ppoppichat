@@ -1,15 +1,10 @@
 import React from 'react';
-//import ReactPlayer from 'react-player/youtube'
-//import { useDocument } from 'react-firebase-hooks/firestore';
-import { fire } from '../../../firebasecontext'
-// Only loads the YouTube player
 import PlyrJs from 'plyr'
 import 'plyr-react/dist/sass/plyr.scss'
-import './videoplayer.scss'
+import '../../../../sass/videoplayer.scss'
 
-import { joinVideoroomSocket, requestNextVideo } from '../../presence'
-
-import { videoControl, setVideoState as socketSet } from '../../presence'
+import { fire } from '../../../utils/firebasecontext'
+import { joinVideoroomSocket, requestNextVideo, videoControl, setVideoState as socketSet } from '../../../utils/presence'
 
 
 import isEqual from 'lodash.isequal'
