@@ -1,6 +1,6 @@
 import React from 'react';
 
-import './ppoppi.scss';
+import '../../sass/ppoppi.scss';
 
 //import firebase from '../home/fire'
 

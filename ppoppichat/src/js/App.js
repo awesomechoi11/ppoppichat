@@ -1,7 +1,7 @@
-import './App.scss';
+import '../sass/App.scss';
 import React from 'react';
 
-import { Login } from './home/login';
+import { Login } from './login';
 import { Ppoppi } from './ppoppi/ppoppi';
 
 import {
