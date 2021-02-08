@@ -1,4 +1,4 @@
-import { fire } from '../firebasecontext'
+import { fire } from './firebasecontext'
 import { leaveVideoroomSocket } from './presence';
 var db = fire.firestore();
 

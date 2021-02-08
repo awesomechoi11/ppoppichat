@@ -5,7 +5,7 @@ import { useHistory } from "react-router-dom";
 import '../sass/login.scss';
 
 import { FirebaseContext } from './utils/firebasecontext'
-import { getUserfromUid, createNewUser } from '../utils/firebaseFunctions'
+import { getUserfromUid, createNewUser } from './utils/firebaseFunctions'
 
 import anime from 'animejs/lib/anime.es.js';
 

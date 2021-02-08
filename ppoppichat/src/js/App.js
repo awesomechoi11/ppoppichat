@@ -13,7 +13,7 @@ import {
   useLocation
 } from "react-router-dom";
 
-import { FirebaseContext, fire } from './firebasecontext'
+import { FirebaseContext, fire } from './utils/firebasecontext'
 
 import paper, { Point, Path } from 'paper/dist/paper-core';
 import anime from 'animejs/lib/anime.es.js';
