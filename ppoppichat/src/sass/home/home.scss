@@ -1,6 +1,13 @@
+@import "../variables.scss";
+
 .home {
     position: absolute;
     width: 100vw;
     height: 100vh;
     display: flex;
+}
+
+.home-ppoppi-logo {
+    width: calcvw(46);
+    margin-right: calcvw(15);
 }

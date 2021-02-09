@@ -31,7 +31,7 @@ const routes = [
     text: (
       <div>
 
-        <svg width="46" height="28" viewBox="0 0 46 28" style={{ marginRight: '15px' }} >
+        <svg className='home-ppoppi-logo' viewBox="0 0 46 28"  >
           <path d="M32.2641 17.8422C32.2641 12.6801 26.836 12.6801 22.685 12.6801C18.5341 12.6801 12.6802 12.6801 12.6802 17.8422C12.6802 23.0043 18.268 27.4213 22.685 27.4213C27.1021 27.4213 32.2641 23.0043 32.2641 17.8422Z" fill="black" stroke="black" />
           <ellipse cx="6.59895" cy="6.38608" rx="6.59895" ry="6.38608" fill="black" />
           <ellipse cx="38.7968" cy="6.38608" rx="6.59895" ry="6.38608" fill="black" />

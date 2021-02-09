@@ -3,7 +3,7 @@
 .banner-wrapper {
     position: absolute;
     top: calcvw(200);
-    left: calcvw(375);
+    left: calcvw(300);
 }
 
 .banner {
@@ -16,9 +16,15 @@
     margin-right: 50px;
     font-size: calcvw(144);
     text-align: right;
-    -webkit-text-fill-color: white; /* Will override color (regardless of order) */
+    -webkit-text-fill-color: rgba($color: #000000, $alpha: 0); /* Will override color (regardless of order) */
     -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: black;
+
+    &:hover {
+        -webkit-text-fill-color: rgba($color: #111111, $alpha: 0);
+    }
+
+    transition: -webkit-text-fill-color 1s;
 }
 
 .banner-text-right {
