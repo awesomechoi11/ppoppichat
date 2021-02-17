@@ -1,10 +1,10 @@
-import React from 'react';
+import React { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
 //import fire from './fire'
 
 import '../sass/login.scss';
 
-import { FirebaseContext } from './utils/firebasecontext'
+import { fireauth } from './utils/firebasecontext'
 import { getUserfromUid, createNewUser } from './utils/firebaseFunctions'
 
 import anime from 'animejs/lib/anime.es.js';
@@ -18,7 +18,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import isEqual from 'lodash.isequal'
 
 import anonpng from '../assets/login/anon.png';
-import fbpng from '../assets/login/facebook.png';
 import gitpng from '../assets/login/github.png';
 import gpng from '../assets/login/google.png';
 
@@ -28,6 +27,7 @@ import img3 from '../assets/login/starterimage/pirate.jpg'
 import img4 from '../assets/login/starterimage/ppoppi.png'
 import img5 from '../assets/login/starterimage/ppoppihead.png'
 import img6 from '../assets/login/starterimage/ppoppinose.png'
+import { useEffect } from "react";
 
 
 
@@ -84,12 +84,76 @@ function EnterButton(props) {
 
 }
 
+function NewLogin() {
+    const [loading, setLoading] = useState(true)
+    const [loggedIn, setLoggedIn] = useState(false)
+    //listen to auth change// check if user is logged in
+
+    let history = useHistory();
+
+    useEffect(() => {
+        fireauth.onAuthStateChanged(user => {
+            //wait for auth to check if user is logged in
+            setLoading(false)
+            if (user) {
+                setLoggedIn(true)
+            }
+        })
+    }, [])
+
+    var platform;
+    if (loading) {
+        //return loading screen
+        platform = (
+            <div>
+                loading
+            </div>
+        )
+    } else {
+
+        platform = (
+            <div id='login-platform'>
+                <AnimatePresence>
+                    <div className='login-platform-left'>
+                        {loginPlatformLeft}
+                    </div>
+                </AnimatePresence>
+                <div className='login-platform-right'>
+                    <span >
+                        <EnterButton
+                            userCreation={this.state.newUser}
+                            mode={this.state.mode}
+                            userData={{
+                                values: this.state.newAccountValues,
+                                uid: this.state.uid
+                            }}
+                            esignin={this.emailsignin}
+                        />
+                    </span>
+                </div>
+            </div>
+        )
+    }
+    return (
+        <div className="login app-page" >
+            <ToastContainer />
+            {platform}
+        </div>
+    )
+
+}
+
 export class Login extends React.Component {
 
     constructor(props) {
         super(props)
 
-        this.state = { loggedIn: false, loginType: 'email', mode: 'signin' }
+        this.state = {
+            loggedIn: false,
+            loginType: 'email',
+            mode: 'signin',
+            loading: true
+        }
         this.handleChange = this.handleChange.bind(this);
         this.googlesignin = this.googlesignin.bind(this)
         this.signout = this.signout.bind(this)
@@ -106,8 +170,10 @@ export class Login extends React.Component {
         }
         this.newAccountValues = {
             username: '',
-
         }
+
+        //check if user is already signed in
+
 
     }
 
@@ -502,7 +568,6 @@ export class Login extends React.Component {
                                     uid: this.state.uid
                                 }}
                                 esignin={this.emailsignin}
-                                esignup={this.emailsignup}
                             />
                         </span>
                     </div>
@@ -517,4 +582,3 @@ export class Login extends React.Component {
     }
 }
 
-Login.contextType = FirebaseContext;
