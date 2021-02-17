@@ -1,10 +1,10 @@
-import React { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
-//import fire from './fire'
+import { useForm } from "react-hook-form";
 
 import '../sass/login.scss';
 
-import { fireauth } from './utils/firebasecontext'
+import firebase, { fireauth } from './utils/firebasecontext'
 import { getUserfromUid, createNewUser } from './utils/firebaseFunctions'
 
 import anime from 'animejs/lib/anime.es.js';
@@ -27,8 +27,6 @@ import img3 from '../assets/login/starterimage/pirate.jpg'
 import img4 from '../assets/login/starterimage/ppoppi.png'
 import img5 from '../assets/login/starterimage/ppoppihead.png'
 import img6 from '../assets/login/starterimage/ppoppinose.png'
-import { useEffect } from "react";
-
 
 
 const loginButtonSvg = (
@@ -36,7 +34,6 @@ const loginButtonSvg = (
         <rect x="0.5" y="0.5" width="119" height="119" rx="29.5" stroke="black" />
         <path d="M93.7678 61.7678C94.7441 60.7915 94.7441 59.2085 93.7678 58.2322L77.8579 42.3223C76.8816 41.346 75.2986 41.346 74.3223 42.3223C73.346 43.2986 73.346 44.8816 74.3223 45.8579L88.4645 60L74.3223 74.1421C73.346 75.1184 73.346 76.7014 74.3223 77.6777C75.2986 78.654 76.8816 78.654 77.8579 77.6777L93.7678 61.7678ZM27 62.5H92V57.5H27V62.5Z" fill="black" />
     </svg>
-
 )
 
 
@@ -84,56 +81,279 @@ function EnterButton(props) {
 
 }
 
-function NewLogin() {
+
+/** login flow
+
+//check if user is logged in (auth change)
+
+//true (1): show user card page
+    //check if user has acc
+        //true: continue
+        //false: prompt create acc platform
+            //then goto ppoppi
+//then set enter btn as goto ppoppi
+
+//false: show regular login page
+    //check if signin
+        //true: prompt signin platform
+            //set btn as login
+        //false: prompt signup platform
+            //set btn as sign up
+//then wait for auth change
+
+
+ */
+console.log('debug only remove later:', firebase)
+
+
+export function Login() {
     const [loading, setLoading] = useState(true)
     const [loggedIn, setLoggedIn] = useState(false)
-    //listen to auth change// check if user is logged in
-
+    const [userData, setUserData] = useState(null)
     let history = useHistory();
 
+    //listen to auth change// check if user is logged in
     useEffect(() => {
+        console.log('listen to auth change')
         fireauth.onAuthStateChanged(user => {
             //wait for auth to check if user is logged in
-            setLoading(false)
+            if (loading) {
+                setLoading(false)
+            }
+
             if (user) {
-                setLoggedIn(true)
+                //user is logged in
+                if (!loggedIn) {
+                    setLoggedIn(true)
+                }
+
+                //check if acc exists
+                if (!loading) {
+                    setLoading(true)
+                }
+
+                getUserfromUid(user.uid)
+                    .then(data => {
+                        console.log(user.uid, data)
+                        setUserData(data)
+                        if (loading) {
+                            setLoading(false)
+                        }
+
+                    })
+            } else {
+                //user is not logged in
+                if (loggedIn) {
+                    setLoggedIn(false)
+                }
             }
         })
     }, [])
 
     var platform;
+    var loginPlatformLeft;
+    var loginPlatformRight;
+
+    function toastErr(msg) {
+        toast.error(msg, {
+            position: "bottom-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+        });
+    }
+
+    function handleSuccess(result) {
+        console.log('need to implement success!!')
+    }
+    function handleError(err) {
+        toastErr(err.msg)
+    }
+
+
+    function anonsignin() {
+        fireauth.signInAnonymously()
+            .then(handleSuccess)
+            .catch(handleError);
+    }
+
+    function emailsignin(values) {
+        fireauth.signInWithEmailAndPassword(values.email, values.password)
+            .then(handleSuccess)
+            .catch(handleError);
+    }
+
+    function emailsignup(values) {
+        console.log('sign up time', values)
+        fireauth.createUserWithEmailAndPassword(values.email, values.password)
+            .then(handleSuccess)
+            .catch(handleError);
+    }
+
+    function githubsignin() {
+        var provider = new firebase.auth.GithubAuthProvider();
+        fireauth.signInWithPopup(provider)
+            .then(handleSuccess)
+            .catch(handleError);
+    }
+    function googlesignin() {
+        var provider = new firebase.auth.GoogleAuthProvider();
+        fireauth.signInWithPopup(provider)
+            .then(handleSuccess)
+            .catch(handleError);
+
+    }
+
+    const altsignin = (
+        <div className='alternate-login'>
+            <div className='alternate-login-label'>
+                <span className='dutch-white'>OR</span> SIGN UP WITH:
+                        </div>
+            <img className='alternate-login-png' src={gpng}
+                alt='google login logo'
+                onClick={googlesignin}
+            />
+            <img className='alternate-login-png' src={gitpng}
+                alt='github logo'
+                onClick={githubsignin}
+            />
+            <img className='alternate-login-png' src={anonpng}
+                onClick={anonsignin}
+                alt='anon mask' />
+        </div>
+    )
+
+    //wait for auth before showing anything
     if (loading) {
-        //return loading screen
-        platform = (
-            <div>
-                loading
-            </div>
+        //show loading screen
+        console.log('loading')
+    } else {
+        if (loggedIn) {
+            //user is logged in
+            console.log('logged in')
+            //now waiting if user has acc (still loading)
+            if (userData) {
+                if (userData.exists) {
+                    //acc is valid
+                    //show user card page
+                    console.log('acc valid')
+                } else {
+                    //acc is not valid
+                    //show creation page
+                    console.log('acc not valid')
+                }
+            }
+        } else {
+            //user is not logged in
+            //show user login page
+            console.log('not logged in')
+
+        }
+    }
+
+
+
+
+    //wait for auth before showing anything
+    if (loading) {
+        //show loading screen
+        loginPlatformLeft = (
+            <>
+                <div className='login-form-title dutch-white'>
+                    loading...
+                </div>
+            </>
         )
     } else {
+        if (loggedIn) {
+            //user is logged in
+            //now waiting if user has acc (still loading)
+            if (userData) {
 
-        platform = (
-            <div id='login-platform'>
-                <AnimatePresence>
-                    <div className='login-platform-left'>
-                        {loginPlatformLeft}
+                if (userData.exists) {
+                    //acc is valid
+                    //show user card page
+                    loginPlatformLeft = (
+                        <>
+                            <div className='login-form-title dutch-white'>
+                                welcome!
+                            </div>
+                            <div className='login-username-title'>
+                                USERNAME
+                            </div>
+                            <div className='login-username'>
+                                {userData.get('username')}
+                            </div>
+
+                            <div className="here-button login-signout-create" onClick={this.signout}>
+                                <span>NOT</span> YOUR ACCOUNT? SIGN <span className='dutch-white'>OUT</span>
+                            </div>
+                        </>
+                    )
+                } else {
+                    //acc is not valid
+                    //show creation page
+                    loginPlatformLeft = <UserCreatePlatform userData={userData} />
+                }
+            }
+        } else {
+            //user is not logged in
+            //show user login page
+            loginPlatformLeft = (
+                <>
+                    <div className='login-form-title dutch-white'>
+                        sign in
                     </div>
-                </AnimatePresence>
-                <div className='login-platform-right'>
-                    <span >
-                        <EnterButton
-                            userCreation={this.state.newUser}
-                            mode={this.state.mode}
-                            userData={{
-                                values: this.state.newAccountValues,
-                                uid: this.state.uid
-                            }}
-                            esignin={this.emailsignin}
-                        />
-                    </span>
-                </div>
-            </div>
-        )
+                    {/* need to fix need to change to react hook form */}
+                    <form id='login-form' >
+                        <div className="login-form-wrapper">
+                            <label className="login-form-label" htmlFor="email">EMAIL</label>
+                            <input id="email" name="email" type="email" className="login-form" />
+                        </div>
+                        <div className="login-form-wrapper">
+                            <label className="login-form-label" htmlFor="password">PASSWORD</label>
+                            <input id="password" name="password" type="password" className="login-form" />
+                        </div>
+                        <button id='loginbutton' type="submit">Submit</button>
+                    </form>
+                    {altsignin}
+                    <div className='here-button'
+                        onClick={e => {
+                            //this.setState({ mode: 'signup' })
+                        }}
+                    >
+                        <span>DONT</span> HAVE AN ACCOUNT? SIGN UP <span className='dutch-white'>HERE</span>
+                    </div>
+
+                </>
+            )
+        }
     }
+    platform = (
+        <div id='login-platform'>
+            <AnimatePresence>
+                <div className='login-platform-left'>
+                    {loginPlatformLeft}
+                </div>
+            </AnimatePresence>
+            <div className='login-platform-right'>
+                <span >
+                    {/* <EnterButton
+                        userCreation={this.state.newUser}
+                        mode={this.state.mode}
+                        userData={{
+                            values: this.state.newAccountValues,
+                            uid: this.state.uid
+                        }}
+                        esignin={this.emailsignin}
+                    /> */}
+                </span>
+            </div>
+        </div>
+    )
     return (
         <div className="login app-page" >
             <ToastContainer />
@@ -143,7 +363,7 @@ function NewLogin() {
 
 }
 
-export class Login extends React.Component {
+export class OldLogin extends React.Component {
 
     constructor(props) {
         super(props)
@@ -460,69 +680,7 @@ export class Login extends React.Component {
                                     {this.state.username}
                                 </div>
                             </>
-                        ) : (//new user creation screen
-                                <>
-                                    <div className='login-form-title dutch-white'>
-                                        welcome!
-                                </div>
-                                    <Formik
-                                        initialValues={{
-                                            username: '',
-                                            profilePicture: img1
-                                        }}>
-                                        {props => (
-                                            <>
-                                                {this.handleChange(props.values, true)}
-                                                <Form id='user-create' >
-                                                    <div className="login-form-wrapper">
-                                                        <label className="login-form-label" htmlFor="username">CHOOSE A USERNAME</label>
-                                                        <Field id="username" name="username" className="login-form" />
-                                                    </div>
-                                                    <div className='profile-picture-label'>
-                                                        CHOOSE A PROFILE PICTURE
-                                                    </div>
-                                                    <div className='profile-picture-radio-wrapper'>
-                                                        <img
-                                                            className='profile-picture-selected'
-                                                            src={props.values.profilePicture}
-                                                            alt='selected profile'
-                                                        ></img>
-                                                        <div className='profile-picture-grid'>
-                                                            <div>
-                                                                <Field type="radio" id='choice1' className='profile-picture-choice' name="profilePicture" value={img1} />
-                                                                <label className="profile-picture-item" htmlFor="choice1" style={{ backgroundImage: `url(${img1})` }} ></label>
-                                                            </div>
-                                                            <div>
-
-                                                                <Field type="radio" id='choice2' className='profile-picture-choice' name="profilePicture" value={img2} />
-                                                                <label className="profile-picture-item" htmlFor="choice2" style={{ backgroundImage: `url(${img2})` }} ></label>
-                                                            </div>
-                                                            <div>
-
-                                                                <Field type="radio" id='choice3' className='profile-picture-choice' name="profilePicture" value={img3} />
-                                                                <label className="profile-picture-item" htmlFor="choice3" style={{ backgroundImage: `url(${img3})` }} ></label>
-                                                            </div>
-                                                            <div>
-                                                                <Field type="radio" id='choice4' className='profile-picture-choice' name="profilePicture" value={img4} />
-                                                                <label className="profile-picture-item" htmlFor="choice4" style={{ backgroundImage: `url(${img4})` }} ></label>
-                                                            </div>
-                                                            <div>
-                                                                <Field type="radio" id='choice5' className='profile-picture-choice' name="profilePicture" value={img5} />
-                                                                <label className="profile-picture-item" htmlFor="choice5" style={{ backgroundImage: `url(${img5})` }} ></label>
-                                                            </div>
-                                                            <div>
-                                                                <Field type="radio" id='choice6' className='profile-picture-choice' name="profilePicture" value={img6} />
-                                                                <label className="profile-picture-item" htmlFor="choice6" style={{ backgroundImage: `url(${img6})` }} ></label>
-                                                            </div>
-
-                                                        </div>
-                                                    </div>
-                                                </Form>
-                                            </>
-                                        )}
-                                    </Formik>
-                                </>
-                            )}
+                        ) : <UserCreatePlatform />}
 
                         <div className="here-button login-signout-create" onClick={this.signout}>
                             <span>NOT</span> YOUR ACCOUNT? SIGN <span className='dutch-white'>OUT</span>
@@ -582,3 +740,65 @@ export class Login extends React.Component {
     }
 }
 
+
+function UserCreatePlatform(props) {
+
+    const { register, watch, errors, handleSubmit } = useForm();
+    const watchPic = watch('profilePicture', img1);
+
+    return (//new user creation screen
+        <>
+            <div className='login-form-title dutch-white'>
+                welcome!
+            </div>
+
+            <form id='user-create' >
+                <div className="login-form-wrapper">
+                    <label className="login-form-label" htmlFor="username">CHOOSE A USERNAME</label>
+                    <input id="username" name="username" className="login-form" ref={register} />
+                </div>
+                <div className='profile-picture-label'>
+                    CHOOSE A PROFILE PICTURE
+                            </div>
+                <div className='profile-picture-radio-wrapper'>
+                    <img
+                        className='profile-picture-selected'
+                        src={watchPic}
+                        alt='selected profile'
+                    ></img>
+                    <div className='profile-picture-grid'>
+                        <div>
+                            <input ref={register} type="radio" id='choice1' className='profile-picture-choice' name="profilePicture" value={img1} />
+                            <label className="profile-picture-item" htmlFor="choice1" style={{ backgroundImage: `url(${img1})` }} ></label>
+                        </div>
+                        <div>
+
+                            <input ref={register} type="radio" id='choice2' className='profile-picture-choice' name="profilePicture" value={img2} />
+                            <label className="profile-picture-item" htmlFor="choice2" style={{ backgroundImage: `url(${img2})` }} ></label>
+                        </div>
+                        <div>
+
+                            <input ref={register} type="radio" id='choice3' className='profile-picture-choice' name="profilePicture" value={img3} />
+                            <label className="profile-picture-item" htmlFor="choice3" style={{ backgroundImage: `url(${img3})` }} ></label>
+                        </div>
+                        <div>
+                            <input ref={register} type="radio" id='choice4' className='profile-picture-choice' name="profilePicture" value={img4} />
+                            <label className="profile-picture-item" htmlFor="choice4" style={{ backgroundImage: `url(${img4})` }} ></label>
+                        </div>
+                        <div>
+                            <input ref={register} type="radio" id='choice5' className='profile-picture-choice' name="profilePicture" value={img5} />
+                            <label className="profile-picture-item" htmlFor="choice5" style={{ backgroundImage: `url(${img5})` }} ></label>
+                        </div>
+                        <div>
+                            <input ref={register} type="radio" id='choice6' className='profile-picture-choice' name="profilePicture" value={img6} />
+                            <label className="profile-picture-item" htmlFor="choice6" style={{ backgroundImage: `url(${img6})` }} ></label>
+                        </div>
+
+                    </div>
+                </div>
+            </form>
+
+
+        </>
+    )
+}
