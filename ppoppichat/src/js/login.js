@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from "react-router-dom";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
+import Joi from 'joi';
 
 import { AnimatePresence } from "framer-motion";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {
-
     useSetRecoilState,
     useRecoilValue,
     useRecoilState
@@ -18,8 +18,8 @@ import firebase, { fireauth } from './utils/firebasecontext'
 import { getUserfromUid, createNewUser } from './utils/firebaseFunctions'
 import {
     currentMode,
+    userCreateValues,
     userDataFromFirebase,
-    userRefFromFirebase,
     userUIDFromFirebase
 } from './utils/atoms'
 import '../sass/login.scss';
@@ -43,13 +43,22 @@ const loginButtonSvg = (
     </svg>
 )
 
+const schema = Joi.object({
+    username: Joi.string()
+        .alphanum()
+        .min(3)
+        .max(26)
+        .required(),
+    profilePicture: Joi.required()
 
+})
 
 function EnterButton(props) {
     //const isLoggedIn = props.isLoggedIn;
     let history = useHistory();
     const mode = useRecoilValue(currentMode)
-    const userData = useRecoilValue(userDataFromFirebase)
+    const userUID = useRecoilValue(userUIDFromFirebase)
+    const userValues = useRecoilValue(userCreateValues)
 
     var handleClick = (e) => {
         console.log('hello, handleclick is not set for enter button!!!')
@@ -66,14 +75,17 @@ function EnterButton(props) {
     } else if (mode === 'createuser') {
 
         handleClick = (e) => {
-            console.log('createuser')
-            console.log(userData)
-            return;
-            // createNewUser(userData)
-            //     .then(() => {
-            //         // history.push('/ppoppi')
-            //         console.log('new acc created')
-            //     })
+            const { error, value } = schema.validate(userValues)
+            if (error) {
+                console.log(error)
+                return
+            } else {
+                console.log('createuser')
+                console.log({ ...value, uid: userUID })
+                createNewUser({ ...value, uid: userUID })
+                //    .then(item => console.log('acc created'))
+            }
+
         }
 
     } else if (mode === 'continue') {
@@ -242,38 +254,42 @@ export function Login() {
         </div>
     )
 
-    //wait for auth before showing anything
-    if (loading) {
-        //show loading screen
-        console.log('loading')
-    } else {
-        if (loggedIn) {
-            //user is logged in
-            console.log('logged in')
-            //now waiting if user has acc (still loading)
-            if (userData) {
-                if (userData.exists) {
-                    //acc is valid
-                    //show user card page
-                    console.log('acc valid')
-                    //enter button is continue
-                    setMode('continue')
-                } else {
-                    //acc is not valid
-                    //show creation page
-                    console.log('acc not valid')
-                    //enter button is createuser
-                    setMode('createuser')
-                }
-            }
-        } else {
-            //user is not logged in
-            //show user login page
-            console.log('not logged in')
-            //enter button is either signin or signup
 
+    useEffect(() => {
+        //wait for auth before showing anything
+        if (loading) {
+            //show loading screen
+            console.log('loading')
+        } else {
+            if (loggedIn) {
+                //user is logged in
+                console.log('logged in')
+                //now waiting if user has acc (still loading)
+                if (userData) {
+                    if (userData.exists) {
+                        //acc is valid
+                        //show user card page
+                        console.log('acc valid')
+                        //enter button is continue
+                        setMode('continue')
+                    } else {
+                        //acc is not valid
+                        //show creation page
+                        console.log('acc not valid')
+                        //enter button is createuser
+                        setMode('createuser')
+                    }
+                }
+            } else {
+                //user is not logged in
+                //show user login page
+                console.log('not logged in')
+                //enter button is either signin or signup
+
+            }
         }
-    }
+    }, [loading, loggedIn, userData, setMode])
+
 
 
 
@@ -382,16 +398,19 @@ export function Login() {
 
 function UserCreatePlatform(props) {
 
-    const { register, watch, getValues, handleSubmit } = useForm();
-    const onSubmit = data => console.log(data);
-    const onError = (errors, e) => console.log(errors, e);
+    const setUserValues = useSetRecoilState(userCreateValues)
 
-    const setMode = useSetRecoilState(currentMode);
-    const userData = useRecoilValue(userDataFromFirebase);
-
+    const { register, watch, control } = useForm();
+    const watchAllFields = watch(undefined, {
+        username: "",
+        photoURL: img1,
+    });
     const watchPic = watch('profilePicture', img1);
 
 
+    useEffect(() => {
+        setUserValues(watchAllFields)
+    }, [setUserValues, watchAllFields])
 
     return (//new user creation screen
         <>
@@ -399,7 +418,9 @@ function UserCreatePlatform(props) {
                 welcome!
             </div>
 
-            <form id='user-create' onSubmit={handleSubmit(onSubmit, onError)}>
+            <form id='user-create' onSubmit={e => {
+                e.preventDefault()
+            }}>
                 <div className="login-form-wrapper">
                     <label className="login-form-label" htmlFor="username">CHOOSE A USERNAME</label>
                     <input id="username" name="username" className="login-form" ref={register} />
@@ -413,35 +434,42 @@ function UserCreatePlatform(props) {
                         src={watchPic}
                         alt='selected profile'
                     ></img>
-                    <div className='profile-picture-grid'>
-                        <div>
-                            <input ref={register} type="radio" id='choice1' className='profile-picture-choice' name="profilePicture" value={img1} />
-                            <label className="profile-picture-item" htmlFor="choice1" style={{ backgroundImage: `url(${img1})` }} ></label>
-                        </div>
-                        <div>
+                    <Controller
+                        as={
+                            <div className='profile-picture-grid'>
+                                <div>
+                                    <input type="radio" id='choice1' className='profile-picture-choice' name="profilePicture" value={img1} />
+                                    <label className="profile-picture-item" htmlFor="choice1" style={{ backgroundImage: `url(${img1})` }} ></label>
+                                </div>
+                                <div>
 
-                            <input ref={register} type="radio" id='choice2' className='profile-picture-choice' name="profilePicture" value={img2} />
-                            <label className="profile-picture-item" htmlFor="choice2" style={{ backgroundImage: `url(${img2})` }} ></label>
-                        </div>
-                        <div>
+                                    <input type="radio" id='choice2' className='profile-picture-choice' name="profilePicture" value={img2} />
+                                    <label className="profile-picture-item" htmlFor="choice2" style={{ backgroundImage: `url(${img2})` }} ></label>
+                                </div>
+                                <div>
 
-                            <input ref={register} type="radio" id='choice3' className='profile-picture-choice' name="profilePicture" value={img3} />
-                            <label className="profile-picture-item" htmlFor="choice3" style={{ backgroundImage: `url(${img3})` }} ></label>
-                        </div>
-                        <div>
-                            <input ref={register} type="radio" id='choice4' className='profile-picture-choice' name="profilePicture" value={img4} />
-                            <label className="profile-picture-item" htmlFor="choice4" style={{ backgroundImage: `url(${img4})` }} ></label>
-                        </div>
-                        <div>
-                            <input ref={register} type="radio" id='choice5' className='profile-picture-choice' name="profilePicture" value={img5} />
-                            <label className="profile-picture-item" htmlFor="choice5" style={{ backgroundImage: `url(${img5})` }} ></label>
-                        </div>
-                        <div>
-                            <input ref={register} type="radio" id='choice6' className='profile-picture-choice' name="profilePicture" value={img6} />
-                            <label className="profile-picture-item" htmlFor="choice6" style={{ backgroundImage: `url(${img6})` }} ></label>
-                        </div>
+                                    <input type="radio" id='choice3' className='profile-picture-choice' name="profilePicture" value={img3} />
+                                    <label className="profile-picture-item" htmlFor="choice3" style={{ backgroundImage: `url(${img3})` }} ></label>
+                                </div>
+                                <div>
+                                    <input type="radio" id='choice4' className='profile-picture-choice' name="profilePicture" value={img4} />
+                                    <label className="profile-picture-item" htmlFor="choice4" style={{ backgroundImage: `url(${img4})` }} ></label>
+                                </div>
+                                <div>
+                                    <input type="radio" id='choice5' className='profile-picture-choice' name="profilePicture" value={img5} />
+                                    <label className="profile-picture-item" htmlFor="choice5" style={{ backgroundImage: `url(${img5})` }} ></label>
+                                </div>
+                                <div>
+                                    <input type="radio" id='choice6' className='profile-picture-choice' name="profilePicture" value={img6} />
+                                    <label className="profile-picture-item" htmlFor="choice6" style={{ backgroundImage: `url(${img6})` }} ></label>
+                                </div>
 
-                    </div>
+                            </div>
+                        }
+                        name="profilePicture"
+                        control={control}
+                        defaultValue={img1}
+                    />
                 </div>
             </form>
 

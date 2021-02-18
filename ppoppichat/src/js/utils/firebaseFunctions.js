@@ -1,21 +1,10 @@
-import firebase from './firebasecontext'
+import firebase, { firestore } from './firebasecontext'
 import { leaveVideoroomSocket } from './presence';
 
 var fire = firebase
 
 var db = fire.firestore();
 
-
-//list of fields that can be editted
-// const validUserFields = [
-//     'username',
-//     'photoURL',
-//     'statusColor',
-//     'statusMessage',
-//     'userStatus',
-//     'last-login',
-//     'new'
-// ]
 
 function newUserDefaults(user) {
     return {
@@ -38,7 +27,7 @@ function createVideoroom(userRef) {
     return userRef.get().then(user => {
         videoroomRef.set({
             owner: userRef,
-            roomName: user.get('name') + "'s room",
+            roomName: user.get('username') + "'s room",
             new: true
         }).then(() => {
             //add new videoroom to user
@@ -52,13 +41,6 @@ function createVideoroom(userRef) {
         videoroomRef.collection('videoState').doc('members').set({ members: [] })
     })
 }
-// function setDoc(docRef, obj) {
-//     if (typeof obj !== 'object') {
-//         console.error('setDoc failed, not a object', obj)
-//         return
-//     }
-//     return docRef.set(obj)
-// }
 
 export function listenToUserInfo(user) {
     console.log('listening to userinfo updates')
@@ -66,19 +48,9 @@ export function listenToUserInfo(user) {
         .onSnapshot(function (doc) {
             if (doc) {
 
-                //var source = doc.metadata.hasPendingWrites ? "Local" : "Server";
 
-                //console.log(source, " data: ", doc.data());
                 console.log('user info updated setstate')
-                // var newstate = doc.data();
-                // // delete newstate['created']
-                // // delete newstate['last-login']
-                // // delete newstate['name']
-                // // // delete newstate['currentVideoroom']
-                // // // delete newstate['new']
-                // // // delete newstate['photoURL']
-                // // //delete newstate['statusMessage']
-                // // //console.log(newstate)
+
                 if (this.state.online !== doc.data().online)
                     this.setState({ online: doc.data().online })
 
@@ -137,13 +109,14 @@ export function handleSignIn(user) {
     })
 }
 
-export function createNewUser(data) {
-    console.log(data)
-
-    const userRef = db.doc('users/' + data.uid)
+export function createNewUser({ uid, profilePicture, username }) {
+    const userRef = firestore.doc('users/' + uid).get()
+    console.log(uid, profilePicture, username)
+    console.log(userRef)
+    return
     return userRef.set(newUserDefaults({
-        username: data.values.username,
-        photoURL: data.values.profilePicture,
+        username: username,
+        photoURL: profilePicture,
     })).catch(e => {
         console.log('error creating new user')
         console.log(e)
