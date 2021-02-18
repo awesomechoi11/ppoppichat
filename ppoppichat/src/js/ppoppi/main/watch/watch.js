@@ -15,7 +15,7 @@ import { SmallModal } from './customModal'
 import { VideoPlayer } from './videoplayer';
 import { VideoMembers } from './videomembers';
 import { VideoQueue } from './videoqueue';
-import { UserContext } from '../../../utils/firebasecontext';
+//import { UserContext } from '../../../utils/firebasecontext';
 import { requestNextVideo } from '../../../utils/presence'
 
 
@@ -93,9 +93,10 @@ function Watch(props) {
 
             return (
                 <div id='watch-inner'>
-                    <UserContext.Consumer>
+                    {/* need to fix */}
+                    {/* <UserContext.Consumer>
                         {value => joinVideoroom(value.userRef, videoRoom)}
-                    </UserContext.Consumer>
+                    </UserContext.Consumer> */}
                     <div className='video-room-sidebar'>
                         <div className='title-wrapper'> {value.data().roomName}</div>
                         <div className='members-wrapper'>

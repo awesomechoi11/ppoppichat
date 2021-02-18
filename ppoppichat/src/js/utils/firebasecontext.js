@@ -1,7 +1,6 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
-import placeholderPicture from '../../assets/ppoppi.png'
 import React from 'react';
 
 // Your web app's Firebase configuration
@@ -18,18 +17,8 @@ var firebaseConfig = {
 console.log('init firebase')
 firebase.initializeApp(firebaseConfig);
 export const FirebaseContext = React.createContext(firebase);
-export const fire = firebase;
-
-export const UserContext = React.createContext({
-    loggedIn: false,
-    username: 'loading...',
-    userStatus: 'status-offline',
-    userPicture: placeholderPicture,
-    statusMessage: ''
-});
-
-export const UserRefContext = React.createContext()
-
-
+export default firebase;
+export const firestore = firebase.firestore();
+export const fireauth = firebase.auth();
 
 

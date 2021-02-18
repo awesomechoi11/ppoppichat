@@ -8,7 +8,7 @@ import { StatusMessage } from './statusmessage';
 
 //utils
 import { handleSignIn, listenToUserInfo } from '../utils/firebaseFunctions'
-import { FirebaseContext, UserContext } from '../utils/firebasecontext'
+import { FirebaseContext } from '../utils/firebasecontext'
 import { setUserOnline, initSocket } from '../utils/presence';
 
 import placeholderPicture from '../../assets/ppoppi.png'
@@ -124,9 +124,10 @@ export class Ppoppi extends React.Component {
 
                 </div>
                 <div id='main-wrapper'>
-                    <UserContext.Provider value={this.state}>
+                    {/* need to fix */}
+                    {/* <UserContext.Provider value={this.state}>
                         {this.state.online && <Main />}
-                    </UserContext.Provider>
+                    </UserContext.Provider> */}
                 </div>
 
             </div>

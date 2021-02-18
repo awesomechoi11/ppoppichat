@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import '../../../../sass/customModal.scss'
 import axios from 'axios';
 
-import { UserContext } from '../../../utils/firebasecontext';
+//import { UserContext } from '../../../utils/firebasecontext';
 
 //const localurl = 'http://localhost:5001/ppoppi/us-central1/addVideoToList?'
 const produrl = 'https://us-central1-ppoppi.cloudfunctions.net/addVideoToList?'
@@ -45,7 +45,8 @@ export function SmallModal(props) {
             <div className='add-video-modal'>
                 <div className='add-video-modal-title'>add a video</div>
                 <input onChange={handleInput} placeholder='hello' className='add-video-modal-input' />
-                <UserContext.Consumer>
+                {/* need to fix */}
+                {/* <UserContext.Consumer>
                     {value => (
 
                         <div
@@ -72,7 +73,7 @@ export function SmallModal(props) {
                             }}
                             className='add-video-modal-button'>add</div>
                     )}
-                </UserContext.Consumer>
+                </UserContext.Consumer> */}
             </div>
         )
     }

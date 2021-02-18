@@ -2,9 +2,11 @@ import '../sass/App.scss';
 import React from 'react';
 
 import { Login } from './login';
-import { Ppoppi } from './ppoppi/ppoppi';
+//import { Ppoppi } from './ppoppi/ppoppi';
 import { Home } from './home/home';
-
+import {
+  RecoilRoot
+} from 'recoil';
 
 import {
   BrowserRouter as Router,
@@ -15,7 +17,7 @@ import {
   useLocation
 } from "react-router-dom";
 
-import { FirebaseContext, fire } from './utils/firebasecontext'
+//import { FirebaseContext, fire } from './utils/firebasecontext'
 
 import paper, { Point, Path } from 'paper/dist/paper-core';
 import anime from 'animejs/lib/anime.es.js';
@@ -62,10 +64,9 @@ const routes = [
   {
     id: "login",
     text: 'login/ sign up',
-    main:
-      <FirebaseContext.Provider value={fire}>
-        <Login />
-      </FirebaseContext.Provider>
+    main: <RecoilRoot>
+      <Login />
+    </RecoilRoot>
   },
 ];
 
@@ -163,9 +164,12 @@ function RouterWrapper() {
 
   return (
     <Switch >
-      <Route path='/ppoppi'>
+
+      {/* need to fix need to reroute */}
+      {/* <Route path='/ppoppi'>
         <Ppoppi />
-      </Route>
+      </Route> */}
+
       <Route path='/'>
         {homenavbar}
         <AnimatePresence

@@ -1,5 +1,5 @@
 import { leaveVideoroom } from "../../utils/firebaseFunctions"
-import { UserContext } from '../../utils/firebasecontext'
+//import { UserContext } from '../../utils/firebasecontext'
 
 
 export function Placeholder(props) {
@@ -8,9 +8,10 @@ export function Placeholder(props) {
 
     return (
         <div>
-            <UserContext.Consumer>
+            {/* need to fix */}
+            {/* <UserContext.Consumer>
                 {value => leaveVideoroom(value.userRef)}
-            </UserContext.Consumer>
+            </UserContext.Consumer> */}
             hello
         </div>
     )
