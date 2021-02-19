@@ -63,6 +63,8 @@ function gotoLogin() {
     window.location = loc + '/login'
 }
 
+
+
 export function handleSignIn(user) {
     let userdoc = this.db.collection("users").doc(user.uid)
     console.log('signing in')
