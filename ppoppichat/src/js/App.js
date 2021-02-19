@@ -97,7 +97,9 @@ class App extends React.Component {
 
   }
 
+  componentWillUnmount() {
 
+  }
 
 
   render() {
@@ -247,17 +249,24 @@ function Placeholder(props) {
 
 }
 
+/**
+ * 
+ * ANCHOR: PAPERSTUFF
+ */
+
 function paperstuff(canvasRef) {
   paper.setup(canvasRef)
   //var width, height, center;
   var points = 6;
-  var path = new paper.Path();
   var mousePos = paper.view.center / 2;
+
+  var path = new paper.Path();
   var pathHeight = mousePos.y;
   path.fillColor = '#DCE9FF';
 
-  window.paperstuff = {}
-  window.paperstuff.speed = 0.01;
+  window.paperstuff = {
+    speed: 0.01
+  }
 
 
 

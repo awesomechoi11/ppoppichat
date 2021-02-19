@@ -10,6 +10,10 @@ export const currentModeAtom = atom({
     key: 'currentMode',
     default: 'signin',
 });
+export const userLoggedInAtom = atom({
+    key: 'userLoggedIn',
+    default: false,
+});
 
 export const userUIDFromFirebaseAtom = atom({
     key: 'userUIDFromFirebase',
