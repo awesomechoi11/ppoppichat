@@ -26,7 +26,6 @@ export function StatusMessage() {
     };
     const onError = (errors, e) => console.log(errors, e);
 
-
     return (
         <form onSubmit={handleSubmit(onSubmit, onError)}>
             <input
