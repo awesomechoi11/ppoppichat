@@ -16,7 +16,7 @@ var firebaseConfig = {
 // Initialize Firebase
 console.log('init firebase')
 firebase.initializeApp(firebaseConfig);
-export const FirebaseContext = React.createContext(firebase);
+
 export default firebase;
 export const firestore = firebase.firestore();
 export const fireauth = firebase.auth();

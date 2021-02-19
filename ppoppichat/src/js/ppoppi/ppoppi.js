@@ -1,26 +1,36 @@
 import '../../sass/ppoppi.scss';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     useRecoilState,
     useRecoilValue,
+    useSetRecoilState,
 } from 'recoil';
 
 import {
-    userLoggedInAtom
+    userLoggedInAtom,
+    userData_longterm,
+    userData_status
+
 } from '../utils/atoms'
 
 //import { Panel } from './sidebar/panel';
 //import { Main } from './main/main';
-//import { StatusMessage } from './statusmessage';
+import { StatusMessage } from './statusmessage';
 
 //utils
-import { handleSignIn, listenToUserInfo } from '../utils/firebaseFunctions'
-import { FirebaseContext } from '../utils/firebasecontext'
+import {
+    getUserfromUid,
+    handleSignIn,
+    listenToUserInfo
+} from '../utils/firebaseFunctions'
+import { fireauth, firestore } from '../utils/firebasecontext'
 import { setUserOnline, initSocket } from '../utils/presence';
 
 import placeholderPicture from '../../assets/ppoppi.png'
-import { useState } from 'react/cjs/react.development';
+import { useHistory } from 'react-router-dom';
+import isEqual from 'lodash.isequal';
+import forEach from 'lodash.foreach';
 
 
 
@@ -34,8 +44,10 @@ const settingsvg = (
 /**
  * ANCHOR: PPOPPI
  * 
+ * state management for user data
+ * 
  * SHUDNT UPDATE UNLESS THESE UPDATE:
- * loggedIn, 
+ * loggedIn, loading
  * 
  */
 
@@ -44,6 +56,68 @@ export function Ppoppi() {
 
     const [loading, setLoading] = useState(true)
     const [loggedIn, setLoggedIn] = useRecoilState(userLoggedInAtom)
+    const setUserData_longterm = useSetRecoilState(userData_longterm)
+    const setUserData_status = useSetRecoilState(userData_status)
+
+    let history = useHistory();
+
+    var prevData = {};
+    const sections = {
+        longterm: ['username', 'videoroomID', 'photoURL', 'uid'],
+        status: ['statusMessage', 'statusColor']
+    }
+    const setFunctions = {
+        longterm: setUserData_longterm,
+        status: setUserData_status
+    }
+    function setUserDataRecoil(data) {
+        //only set recoil if data is different
+        //groups at a time ig
+
+        forEach(sections, (value, key) => {
+            var currData = {}
+            //populates currData obj with only the keys in a defined section
+            value.forEach(name => {
+                currData[name] = data[name]
+            })
+            if (!isEqual(
+                prevData[key],
+                currData
+            )) {
+                console.log('setting recoils: ', key)
+                prevData[key] = currData;
+                setFunctions[key](currData)
+            }
+        })
+
+    }
+
+
+    //check if valid user
+    useEffect(() => {
+        //listen to user auth changes
+        fireauth.onAuthStateChanged(user => {
+            if (user) {
+                firestore.doc('users/' + user.uid)
+                    .onSnapshot(doc => {
+                        //console.log(doc)
+                        if (doc.exists) {
+                            //initialize recoil states
+                            setUserDataRecoil({ ...doc.data(), uid: user.uid })
+                            setLoading(false)
+                        } else {
+                            //if acc is not created kick em out!
+                            history.push('/login')
+                        }
+                    })
+            } else {
+                //goto login screen if not logged in
+                history.push('/login')
+            }
+        })
+
+
+    }, [])
 
     if (loading) {
 
@@ -69,7 +143,7 @@ export function Ppoppi() {
                         PPoPPi
                     </div>
                 <div id='status-message'>
-                    {/* <StatusMessage userRef={this.state.userRef} statusMessage={this.state.statusMessage} /> */}
+                    <StatusMessage />
                 </div>
             </div>
 
@@ -209,4 +283,3 @@ export class OldPpoppi extends React.Component {
     }
 }
 
-Ppoppi.contextType = FirebaseContext

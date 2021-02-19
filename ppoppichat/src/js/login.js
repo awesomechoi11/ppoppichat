@@ -9,7 +9,6 @@ import {
     useSetRecoilState,
     useRecoilValue,
     useRecoilState,
-    useResetRecoilState
 } from 'recoil';
 
 import firebase, { fireauth } from './utils/firebasecontext'

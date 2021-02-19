@@ -13,6 +13,7 @@
     "formik": "^2.2.6",
     "framer-motion": "^3.1.1",
     "joi": "^17.4.0",
+    "lodash.foreach": "^4.5.0",
     "lodash.isequal": "^4.5.0",
     "node-sass": "^4.14.1",
     "paper": "^0.12.11",
