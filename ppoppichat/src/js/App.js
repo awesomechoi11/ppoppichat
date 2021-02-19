@@ -4,9 +4,7 @@ import React from 'react';
 import { Login } from './login';
 //import { Ppoppi } from './ppoppi/ppoppi';
 import { Home } from './home/home';
-import {
-  RecoilRoot
-} from 'recoil';
+
 
 import {
   BrowserRouter as Router,
@@ -17,7 +15,6 @@ import {
   useLocation
 } from "react-router-dom";
 
-//import { FirebaseContext, fire } from './utils/firebasecontext'
 
 import paper, { Point, Path } from 'paper/dist/paper-core';
 import anime from 'animejs/lib/anime.es.js';
@@ -64,9 +61,8 @@ const routes = [
   {
     id: "login",
     text: 'login/ sign up',
-    main: <RecoilRoot>
-      <Login />
-    </RecoilRoot>
+    main: <Login />
+
   },
 ];
 

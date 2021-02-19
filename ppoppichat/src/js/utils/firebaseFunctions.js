@@ -1,9 +1,9 @@
 import firebase, { firestore } from './firebasecontext'
 import { leaveVideoroomSocket } from './presence';
 
-var fire = firebase
+const fire = firebase
 
-var db = fire.firestore();
+const db = fire.firestore();
 
 
 function newUserDefaults(user) {
@@ -21,26 +21,7 @@ function newUserDefaults(user) {
 
 }
 
-function createVideoroom(userRef) {
-    //get user info then create video room with default settings
-    const videoroomRef = db.collection('videorooms').doc()
-    return userRef.get().then(user => {
-        videoroomRef.set({
-            owner: userRef,
-            roomName: user.get('username') + "'s room",
-            new: true
-        }).then(() => {
-            //add new videoroom to user
-            userRef.update({
-                videoroomRef: videoroomRef,
-                videoroomID: videoroomRef.id
-            })
-        })
-        videoroomRef.collection('videoState').doc('queue').set({ queue: [] })
-        videoroomRef.collection('videoState').doc('videoState').set({ videoState: [] })
-        videoroomRef.collection('videoState').doc('members').set({ members: [] })
-    })
-}
+
 
 export function listenToUserInfo(user) {
     console.log('listening to userinfo updates')
@@ -109,11 +90,33 @@ export function handleSignIn(user) {
     })
 }
 
+function createVideoroom(userRef, uid, username) {
+    //get user info then create video room with default settings
+    console.log('attempting to create Videoroom: ', uid)
+    const videoroomRef = db.collection('videorooms').doc()
+
+    videoroomRef.set({
+        owner: userRef,
+        roomName: username + "'s room",
+        new: true
+    }).then(() => {
+        //add new videoroom to user
+        console.log('room created!')
+        userRef.update({
+            videoroomRef: videoroomRef,
+            videoroomID: videoroomRef.id
+        })
+    })
+    videoroomRef.collection('videoState').doc('queue').set({ queue: [] })
+    videoroomRef.collection('videoState').doc('videoState').set({ videoState: [] })
+    videoroomRef.collection('videoState').doc('members').set({ members: [] })
+
+}
+
 export function createNewUser({ uid, profilePicture, username }) {
-    const userRef = firestore.doc('users/' + uid).get()
-    console.log(uid, profilePicture, username)
-    console.log(userRef)
-    return
+    const userRef = db.collection('users').doc(uid)
+    console.log('creating user with: ', uid, profilePicture, username)
+
     return userRef.set(newUserDefaults({
         username: username,
         photoURL: profilePicture,
@@ -121,7 +124,7 @@ export function createNewUser({ uid, profilePicture, username }) {
         console.log('error creating new user')
         console.log(e)
     }).then(() => {
-        return createVideoroom(userRef)
+        return createVideoroom(userRef, uid, username)
     })
 }
 
@@ -194,5 +197,10 @@ export function leaveVideoroom(userRef) {
 
 
 
+
+}
+
+
+export function subscribeToUserDataChange() {
 
 }

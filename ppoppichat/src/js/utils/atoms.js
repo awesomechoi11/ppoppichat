@@ -5,38 +5,43 @@ import {
 /* atoms */
 //basically global variables
 
-
-export const currentMode = atom({
+//login stuff
+export const currentModeAtom = atom({
     key: 'currentMode',
     default: 'signin',
 });
 
-export const userDataFromFirebase = atom({
-    key: 'userDataFromFirebase',
-    default: null
-})
-
-export const userRefFromFirebase = atom({
-    key: 'userRefFromFirebase',
-    default: null
-})
-
-export const userUIDFromFirebase = atom({
+export const userUIDFromFirebaseAtom = atom({
     key: 'userUIDFromFirebase',
     default: null
 })
 
-export const userLoginValues = atom({
+export const userLoginValuesAtom = atom({
     key: 'userLoginValues',
     default: {
-
+        email: '',
+        password: ''
     }
 })
 
-export const userCreateValues = atom({
+export const userCreateValuesAtom = atom({
     key: 'userCreateValues',
     default: {
         username: "",
         photoURL: "",
     }
+})
+
+//userinformation
+
+export const userData_status = atom({
+    key: 'userCreateValues',
+    default: {
+        message: "",
+        color: "#32EA44"
+    }
+})
+export const userData_username = atom({
+    key: 'userData_username',
+    default: "undefined"
 })

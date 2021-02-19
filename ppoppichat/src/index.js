@@ -3,11 +3,17 @@ import ReactDOM from 'react-dom';
 import App from './js/App';
 import reportWebVitals from './reportWebVitals';
 
-
+import {
+  RecoilRoot
+} from 'recoil';
+import { ToastContainer } from 'react-toastify';
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <RecoilRoot>
+      <App />
+      <ToastContainer />
+    </RecoilRoot>
   </React.StrictMode>,
   document.getElementById('root')
 );

@@ -1,26 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useLayoutEffect } from 'react';
 import { useHistory } from "react-router-dom";
 import { useForm, Controller } from "react-hook-form";
 import Joi from 'joi';
 
-import { AnimatePresence } from "framer-motion";
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { toastErr } from './utils/utils'
 import {
     useSetRecoilState,
     useRecoilValue,
     useRecoilState
 } from 'recoil';
-//import isEqual from 'lodash.isequal'
-
 
 import firebase, { fireauth } from './utils/firebasecontext'
 import { getUserfromUid, createNewUser } from './utils/firebaseFunctions'
 import {
-    currentMode,
-    userCreateValues,
-    userDataFromFirebase,
-    userUIDFromFirebase
+    currentModeAtom,
+    userCreateValuesAtom,
+    userLoginValuesAtom,
+    userUIDFromFirebaseAtom,
+    userData_username
 } from './utils/atoms'
 import '../sass/login.scss';
 
@@ -43,7 +41,7 @@ const loginButtonSvg = (
     </svg>
 )
 
-const schema = Joi.object({
+const createUserSchema = Joi.object({
     username: Joi.string()
         .alphanum()
         .min(3)
@@ -53,37 +51,74 @@ const schema = Joi.object({
 
 })
 
+const signSchema = Joi.object({
+    email: Joi.string()
+        .email({ tlds: { allow: ['com', 'net'] } })
+        .required(),
+    password: Joi.required()
+
+})
+
+/**
+ * ANCHOR ENTERBUTTON
+ * 
+ */
+
 function EnterButton(props) {
     //const isLoggedIn = props.isLoggedIn;
     let history = useHistory();
-    const mode = useRecoilValue(currentMode)
-    const userUID = useRecoilValue(userUIDFromFirebase)
-    const userValues = useRecoilValue(userCreateValues)
-
+    const mode = useRecoilValue(currentModeAtom)
+    const userUID = useRecoilValue(userUIDFromFirebaseAtom)
+    const userCreateValues = useRecoilValue(userCreateValuesAtom)
+    const userLoginValues = useRecoilValue(userLoginValuesAtom)
     var handleClick = (e) => {
         console.log('hello, handleclick is not set for enter button!!!')
     }
 
-    if (mode === 'signin') {
+    function emailsignin(values) {
+        fireauth.signInWithEmailAndPassword(values.email, values.password)
+            .then(handleSuccess)
+            .catch(handleError);
+    }
+
+    function emailsignup(values) {
+        console.log('sign up time', values)
+        fireauth.createUserWithEmailAndPassword(values.email, values.password)
+            .then(handleSuccess)
+            .catch(handleError);
+    }
+
+    if (mode === 'signin' || mode === 'signup') {
         handleClick = (e) => {
             console.log('sign in')
-        }
-    } else if (mode === 'signup') {
-        handleClick = (e) => {
-            console.log('signup')
+            const { error, value } = signSchema.validate(userLoginValues)
+            if (error) {
+                console.log(error)
+                toastErr(error.message)
+            } else {
+                if (mode === 'signin') {
+                    emailsignin(value)
+                } else {
+                    emailsignup(value)
+                }
+            }
         }
     } else if (mode === 'createuser') {
 
         handleClick = (e) => {
-            const { error, value } = schema.validate(userValues)
+            const { error, value } = createUserSchema.validate(userCreateValues)
             if (error) {
                 console.log(error)
+                toastErr(error.message)
                 return
             } else {
                 console.log('createuser')
                 console.log({ ...value, uid: userUID })
                 createNewUser({ ...value, uid: userUID })
-                //    .then(item => console.log('acc created'))
+                    .then(item => {
+                        console.log('acc created')
+                        history.push('/ppoppi')
+                    })
             }
 
         }
@@ -105,43 +140,55 @@ function EnterButton(props) {
 
 }
 
-
-/** login flow
-
-//check if user is logged in (auth change)
-
-//true (1): show user card page
-    //check if user has acc
-        //true: continue
-        //false: prompt create acc platform
-            //then goto ppoppi
-//then set enter btn as goto ppoppi
-
-//false: show regular login page
-    //check if signin
-        //true: prompt signin platform
-            //set btn as login
-        //false: prompt signup platform
-            //set btn as sign up
-//then wait for auth change
-
-
+/**
+ * 
+ *  ANCHOR: LOGIN FLOW LOGIC
+ * 
+ 
+ // check if user is logged in (auth change)
+ 
+ // true: show user card page
+ //     check if user has acc
+ //         true: continue
+ //         false: prompt create acc platform
+ //             then goto ppoppi
+ // then set enter btn as goto ppoppi
+ 
+ // false: show regular login page
+ //     check if signin
+ //         true: prompt signin platform
+ //             set btn as login
+ //         false: prompt signup platform
+ //             set btn as sign up
+ // then wait for auth change
  */
-console.log('debug only remove later:', firebase)
 
+
+/**
+ * ANCHOR: LOGIN FUNCTION
+ * 
+ * 
+ * 
+ * 
+ */
 
 export function Login() {
 
     const [loading, setLoading] = useState(true)
     const [loggedIn, setLoggedIn] = useState(false)
+    const [hasAccount, setHasAccount] = useState(123)
 
-    const [mode, setMode] = useRecoilState(currentMode)
-    const [userData, setUserData] = useRecoilState(userDataFromFirebase)
-    const [userUID, setUserUID] = useRecoilState(userUIDFromFirebase)
-    let history = useHistory();
+    const [mode, setMode] = useRecoilState(currentModeAtom)
+    const setUserUID = useSetRecoilState(userUIDFromFirebaseAtom)
+    const [username, setUserData_username] = useRecoilState(userData_username)
+    //let history = useHistory();
+
+    function setUserInformation({ username }) {
+        setUserData_username(username)
+    }
 
     //listen to auth change// check if user is logged in
-    useEffect(() => {
+    useLayoutEffect(() => {
         console.log('listen to auth change')
         fireauth.onAuthStateChanged(user => {
             //wait for auth to check if user is logged in
@@ -163,8 +210,14 @@ export function Login() {
                 getUserfromUid(user.uid)
                     .then(data => {
                         console.log(user.uid, data)
-                        setUserData(data)
-
+                        if (data.exists) {
+                            setHasAccount(true)
+                            setUserInformation({
+                                username: data.get('username'),
+                            })
+                        } else {
+                            setHasAccount(false)
+                        }
                         if (loading) {
                             setLoading(false)
                         }
@@ -179,81 +232,6 @@ export function Login() {
         })
     }, [])
 
-    var platform;
-    var loginPlatformLeft;
-
-    function toastErr(msg) {
-        toast.error(msg, {
-            position: "bottom-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-        });
-    }
-
-    function handleSuccess(result) {
-        console.log('need to implement success!!')
-    }
-    function handleError(err) {
-        toastErr(err.msg)
-    }
-
-
-    function anonsignin() {
-        fireauth.signInAnonymously()
-            .then(handleSuccess)
-            .catch(handleError);
-    }
-
-    function emailsignin(values) {
-        fireauth.signInWithEmailAndPassword(values.email, values.password)
-            .then(handleSuccess)
-            .catch(handleError);
-    }
-
-    function emailsignup(values) {
-        console.log('sign up time', values)
-        fireauth.createUserWithEmailAndPassword(values.email, values.password)
-            .then(handleSuccess)
-            .catch(handleError);
-    }
-
-    function githubsignin() {
-        var provider = new firebase.auth.GithubAuthProvider();
-        fireauth.signInWithPopup(provider)
-            .then(handleSuccess)
-            .catch(handleError);
-    }
-    function googlesignin() {
-        var provider = new firebase.auth.GoogleAuthProvider();
-        fireauth.signInWithPopup(provider)
-            .then(handleSuccess)
-            .catch(handleError);
-
-    }
-
-    const altsignin = (
-        <div className='alternate-login'>
-            <div className='alternate-login-label'>
-                <span className='dutch-white'>OR</span> SIGN UP WITH:
-                        </div>
-            <img className='alternate-login-png' src={gpng}
-                alt='google login logo'
-                onClick={googlesignin}
-            />
-            <img className='alternate-login-png' src={gitpng}
-                alt='github logo'
-                onClick={githubsignin}
-            />
-            <img className='alternate-login-png' src={anonpng}
-                onClick={anonsignin}
-                alt='anon mask' />
-        </div>
-    )
-
 
     useEffect(() => {
         //wait for auth before showing anything
@@ -265,8 +243,8 @@ export function Login() {
                 //user is logged in
                 console.log('logged in')
                 //now waiting if user has acc (still loading)
-                if (userData) {
-                    if (userData.exists) {
+                if (hasAccount !== 123) {
+                    if (hasAccount) {
                         //acc is valid
                         //show user card page
                         console.log('acc valid')
@@ -288,11 +266,21 @@ export function Login() {
 
             }
         }
-    }, [loading, loggedIn, userData, setMode])
+    }, [loading, loggedIn, hasAccount, setMode])
 
 
 
+    var platform;
+    var loginPlatformLeft;
 
+    function signout() {
+        //reset login message
+        fireauth.signOut().then(() => {
+            setMode('signin')
+            setLoggedIn(false)
+        })
+            .catch(handleError);
+    }
 
     //wait for auth before showing anything
     if (loading) {
@@ -308,9 +296,9 @@ export function Login() {
         if (loggedIn) {
             //user is logged in
             //now waiting if user has acc (still loading)
-            if (userData) {
+            if (hasAccount !== 123) {
 
-                if (userData.exists) {
+                if (hasAccount) {
                     //acc is valid
                     //show user card page
                     loginPlatformLeft = (
@@ -322,10 +310,10 @@ export function Login() {
                                 USERNAME
                             </div>
                             <div className='login-username'>
-                                {userData.get('username')}
+                                {username}
                             </div>
 
-                            <div className="here-button login-signout-create" onClick={this.signout}>
+                            <div className="here-button login-signout-create" onClick={signout}>
                                 <span>NOT</span> YOUR ACCOUNT? SIGN <span className='dutch-white'>OUT</span>
                             </div>
                         </>
@@ -339,44 +327,26 @@ export function Login() {
         } else {
             //user is not logged in
             //show user login page
-            loginPlatformLeft = (
-                <>
-                    <div className='login-form-title dutch-white'>
-                        sign in
-                    </div>
-                    {/* need to fix need to change to react hook form */}
-                    <form id='login-form' >
-                        <div className="login-form-wrapper">
-                            <label className="login-form-label" htmlFor="email">EMAIL</label>
-                            <input id="email" name="email" type="email" className="login-form" />
-                        </div>
-                        <div className="login-form-wrapper">
-                            <label className="login-form-label" htmlFor="password">PASSWORD</label>
-                            <input id="password" name="password" type="password" className="login-form" />
-                        </div>
-                        <button id='loginbutton' type="submit">Submit</button>
-                    </form>
-                    {altsignin}
-                    <div className='here-button'
-                        onClick={e => {
-                            //this.setState({ mode: 'signup' })
-                        }}
-                    >
-                        <span>DONT</span> HAVE AN ACCOUNT? SIGN UP <span className='dutch-white'>HERE</span>
-                    </div>
+            if (mode === 'signin' || mode === 'signup') {
 
-                </>
-            )
+                loginPlatformLeft = <LoginForm></LoginForm>
+            } else {
+                loginPlatformLeft = (
+                    <div className='login-form-title dutch-white'>
+                        uh oh! pls refresh
+                    </div>
+                )
+            }
         }
     }
 
     platform = (
         <div id='login-platform'>
-            <AnimatePresence>
-                <div className='login-platform-left'>
-                    {loginPlatformLeft}
-                </div>
-            </AnimatePresence>
+
+            <div className='login-platform-left'>
+                {loginPlatformLeft}
+            </div>
+
             <div className='login-platform-right'>
                 <span >
                     <EnterButton />
@@ -387,18 +357,115 @@ export function Login() {
 
     return (
         <div className="login app-page" >
-            <ToastContainer />
             {platform}
         </div>
     )
 
 }
 
+function handleSuccess(result) {
+    console.log('need to implement success!!')
+}
+function handleError(err) {
+    toastErr(err.msg)
+}
 
+/**
+ * 
+ * ANCHOR: LOGINFORM
+ * 
+ */
+
+function LoginForm() {
+
+    const [mode, setMode] = useRecoilState(currentModeAtom)
+    const setUserLoginValues = useSetRecoilState(userLoginValuesAtom)
+
+    const { register, watch } = useForm();
+    const watchAllFields = watch();
+
+    useEffect(() => {
+        setUserLoginValues(watchAllFields)
+    }, [watchAllFields])
+
+    function anonsignin() {
+        fireauth.signInAnonymously()
+            .then(handleSuccess)
+            .catch(handleError);
+    }
+    function githubsignin() {
+        var provider = new firebase.auth.GithubAuthProvider();
+        fireauth.signInWithPopup(provider)
+            .then(handleSuccess)
+            .catch(handleError);
+    }
+    function googlesignin() {
+        var provider = new firebase.auth.GoogleAuthProvider();
+        fireauth.signInWithPopup(provider)
+            .then(handleSuccess)
+            .catch(handleError);
+
+    }
+
+    const altsignin = (
+        <div className='alternate-login'>
+            <div className='alternate-login-label'>
+                <span className='dutch-white'>OR</span> SIGN IN WITH:
+            </div>
+            <img className='alternate-login-png' src={gpng}
+                alt='google login logo'
+                onClick={googlesignin}
+            />
+            <img className='alternate-login-png' src={gitpng}
+                alt='github logo'
+                onClick={githubsignin}
+            />
+            <img className='alternate-login-png' src={anonpng}
+                onClick={anonsignin}
+                alt='anon mask' />
+        </div>
+    )
+
+    return (
+        <>
+            <div className='login-form-title dutch-white'>
+                {mode === 'signin' ? 'sign in' : 'sign up'}
+            </div>
+            {/* need to fix need to change to react hook form */}
+            <form id='login-form' onSubmit={e => {
+                e.preventDefault()
+            }}>
+                <div className="login-form-wrapper">
+                    <label className="login-form-label" htmlFor="email">EMAIL</label>
+                    <input ref={register} id="email" name="email" type="email" className="login-form" />
+                </div>
+                <div className="login-form-wrapper">
+                    <label className="login-form-label" htmlFor="password">PASSWORD</label>
+                    <input ref={register} id="password" name="password" type="password" className="login-form" />
+                </div>
+            </form>
+            {altsignin}
+            <div className='here-button'
+                onClick={e => {
+                    if (mode === 'signin') {
+                        setMode('signup')
+                    } else if (mode === 'signup') {
+                        setMode('signin')
+                    }
+
+                }}
+            >
+
+                <span>DONT</span> HAVE AN ACCOUNT? {mode === 'signin' ? ' SIGN IN ' : ' SIGN UP '} <span className='dutch-white'>HERE</span>
+            </div>
+
+        </>
+    )
+}
 
 function UserCreatePlatform(props) {
 
-    const setUserValues = useSetRecoilState(userCreateValues)
+    const setUserValues = useSetRecoilState(userCreateValuesAtom)
 
     const { register, watch, control } = useForm();
     const watchAllFields = watch(undefined, {
