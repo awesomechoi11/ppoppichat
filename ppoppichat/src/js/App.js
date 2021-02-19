@@ -2,7 +2,7 @@ import '../sass/App.scss';
 import React from 'react';
 
 import { Login } from './login';
-//import { Ppoppi } from './ppoppi/ppoppi';
+import { Ppoppi } from './ppoppi/ppoppi';
 import { Home } from './home/home';
 
 
@@ -108,14 +108,20 @@ class App extends React.Component {
     return (
 
       <Router>
-        <div id='app'>
-          <RouterWrapper />
-        </div>
-        <div id='app-background'>
-          <canvas id="myCanvas"
-            style={{ transform: 'translateY(20vw) rotate(-28deg)' }}
-            ref={this.canvasRef} resize='true'></canvas>
-        </div>
+        <Switch>
+          <Route path='/ppoppi' component={Ppoppi} />
+          <Route path='/'>
+
+            <div id='app'>
+              <RouterWrapper />
+            </div>
+            <div id='app-background'>
+              <canvas id="myCanvas"
+                style={{ transform: 'translateY(20vw) rotate(-28deg)' }}
+                ref={this.canvasRef} resize='true'></canvas>
+            </div>
+          </Route>
+        </Switch>
       </Router>
 
     )

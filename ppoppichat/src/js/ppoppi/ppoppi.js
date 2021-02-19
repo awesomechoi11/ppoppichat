@@ -1,10 +1,18 @@
 import '../../sass/ppoppi.scss';
 
 import React from 'react';
+import {
+    useRecoilState,
+    useRecoilValue,
+} from 'recoil';
 
-import { Panel } from './sidebar/panel';
-import { Main } from './main/main';
-import { StatusMessage } from './statusmessage';
+import {
+    userLoggedInAtom
+} from '../utils/atoms'
+
+//import { Panel } from './sidebar/panel';
+//import { Main } from './main/main';
+//import { StatusMessage } from './statusmessage';
 
 //utils
 import { handleSignIn, listenToUserInfo } from '../utils/firebaseFunctions'
@@ -12,6 +20,7 @@ import { FirebaseContext } from '../utils/firebasecontext'
 import { setUserOnline, initSocket } from '../utils/presence';
 
 import placeholderPicture from '../../assets/ppoppi.png'
+import { useState } from 'react/cjs/react.development';
 
 
 
@@ -22,7 +31,72 @@ const settingsvg = (
     </svg>
 )
 
-export class Ppoppi extends React.Component {
+/**
+ * ANCHOR: PPOPPI
+ * 
+ * SHUDNT UPDATE UNLESS THESE UPDATE:
+ * loggedIn, 
+ * 
+ */
+
+export function Ppoppi() {
+    console.log('ppoppi called')
+
+    const [loading, setLoading] = useState(true)
+    const [loggedIn, setLoggedIn] = useRecoilState(userLoggedInAtom)
+
+    if (loading) {
+
+        return (
+            <div>
+                loading
+            </div>
+        )
+    }
+
+    return (
+
+        <div id='ppoppi-wrapper' className="" >
+
+            <div id='topbar'>
+                <div className='topbar-logo'>
+                    <svg width="46" height="28" viewBox="0 0 46 28" style={{ marginRight: '15px' }} >
+                        <path d="M32.2641 17.8422C32.2641 12.6801 26.836 12.6801 22.685 12.6801C18.5341 12.6801 12.6802 12.6801 12.6802 17.8422C12.6802 23.0043 18.268 27.4213 22.685 27.4213C27.1021 27.4213 32.2641 23.0043 32.2641 17.8422Z" fill="black" stroke="black" />
+                        <ellipse cx="6.59895" cy="6.38608" rx="6.59895" ry="6.38608" fill="black" />
+                        <ellipse cx="38.7968" cy="6.38608" rx="6.59895" ry="6.38608" fill="black" />
+                    </svg>
+
+                        PPoPPi
+                    </div>
+                <div id='status-message'>
+                    {/* <StatusMessage userRef={this.state.userRef} statusMessage={this.state.statusMessage} /> */}
+                </div>
+            </div>
+
+            <div id='sidebar'>
+
+                <div id='channels-panel-wrapper'>
+                    {/* <Panel videoroomID={this.state.videoroomID} /> */}
+                </div>
+                <div id='channels-wrapper'>
+                    {/* <Channels channels={this.state.channels} /> */}
+                </div>
+                {settingsvg}
+
+            </div>
+            <div id='main-wrapper'>
+                {/* need to fix */}
+                {/* <UserContext.Provider value={this.state}>
+                    {this.state.online && <Main />}
+                </UserContext.Provider> */}
+            </div>
+
+        </div>
+    )
+
+}
+
+export class OldPpoppi extends React.Component {
 
     //this.unsubUserInfo function to close subscription to user info updates
 
@@ -109,13 +183,13 @@ export class Ppoppi extends React.Component {
                             PPoPPi
                         </div>
                     <div id='status-message'>
-                        <StatusMessage userRef={this.state.userRef} statusMessage={this.state.statusMessage} />
+                        {/* <StatusMessage userRef={this.state.userRef} statusMessage={this.state.statusMessage} /> */}
                     </div>
                 </div>
                 <div id='sidebar'>
 
                     <div id='channels-panel-wrapper'>
-                        <Panel videoroomID={this.state.videoroomID} />
+                        {/* <Panel videoroomID={this.state.videoroomID} /> */}
                     </div>
                     <div id='channels-wrapper'>
                         {/* <Channels channels={this.state.channels} /> */}
